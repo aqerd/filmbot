@@ -5,8 +5,10 @@ Project made for Object-Oriented Programming course at Ural Federal University b
 Project made with: 
 - Java
 - Maven
-- Telegrambots API
+- Telegram API
+- Telegrambots Library
 - Dotenv API
 - The Movie Database API
+- TMDb Java Wrapper
 
 You can use bot [here](https://t.me/findfilmsbyfiltersbot)
