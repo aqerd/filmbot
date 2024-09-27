@@ -3,4 +3,4 @@
 Project made for Object-Oriented Programming course at Ural Federal University by **Ruslan Suleymanov** and **Anna Khairullina**
 You can use bot [here](https://t.me/findfilmsbyfiltersbot)
 
-Project made with Java, Maven, Telegrambots API and The Movie Database API
+Project made with Java, Maven, Telegrambots API, Dotenv API and The Movie Database API
