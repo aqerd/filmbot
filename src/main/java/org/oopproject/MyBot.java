@@ -26,7 +26,7 @@ public class MyBot implements LongPollingSingleThreadUpdateConsumer {
             SendMessage message = SendMessage
                 .builder()
                 .chatId(chat_id)
-                .text("Hello World " + update) // Здесь мы выводим дефолтный текст
+                .text("Hello World \n\n" + update) // Здесь мы выводим дефолтный текст
                 .build();
 
             System.out.println(message_text + " " + chat_id + " " + update); // Вывод в терминал
