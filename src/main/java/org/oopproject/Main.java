@@ -21,6 +21,7 @@ public class Main {
             // Ошибка
             err.printStackTrace();
             System.out.println("ERROR: Bot is NOT running");
+
         }
     }
 }
