@@ -40,5 +40,3 @@ build/
 ### Environmental Value ###
 *.env
 assets/token.env
-
-# gitignore test
