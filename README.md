@@ -11,13 +11,10 @@ git clone git@github.com:aqerd/filmbot.git
 ```
 
 ## 🔨 Tools
-- Java
-- Maven
+- Java with Maven
 - Telegram API
 - Telegrambots Library
-- Dotenv API
 - The Movie Database API
-- TMDb Java Wrapper
 
 ## 🧑‍💻 Credits
 Project made by **Ruslan Suleymanov** and **Anna Khairullina** for Object-Oriented Programming course at Ural Federal University 
