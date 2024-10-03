@@ -7,7 +7,7 @@ You can use bot [here](https://t.me/findfilmsbyfiltersbot) in Telegram
 ## 🔗 Git
 To start using this you can clone our repository:
 ```bash
-git@github.com:aqerd/filmbot.git
+git clone git@github.com:aqerd/filmbot.git
 ```
 
 ## 🔨 Tools
