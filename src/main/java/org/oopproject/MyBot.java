@@ -17,16 +17,16 @@ public class MyBot implements LongPollingSingleThreadUpdateConsumer {
     @Override
     public void consume(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
-            // message_text - сообщение которое мы получаем от пользователя
-            // chat_id - айди чата
-            // update - все данные сообщения
+             /* message_text - сообщение которое мы получаем от пользователя
+                chat_id - айди чата
+                update - все данные сообщения */
 
             String message_text = update.getMessage().getText();
             long chat_id = update.getMessage().getChatId();
             SendMessage message = SendMessage
                 .builder()
                 .chatId(chat_id)
-                .text("Hello World \n\n" + update) // Здесь мы выводим дефолтный текст
+                .text("Hello World \n\n") // Здесь мы выводим дефолтный текст
                 .build();
 
             System.out.println(message_text + " " + chat_id + " " + update); // Вывод в терминал
