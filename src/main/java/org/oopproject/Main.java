@@ -17,7 +17,6 @@ public class Main {
             bot.registerBot(tgBotToken, new MyBot(tgBotToken));
 
             System.out.println("SUCCESS: Bot is running");
-
         } catch (TelegramApiException err) {
             // Ошибка
             err.printStackTrace();
