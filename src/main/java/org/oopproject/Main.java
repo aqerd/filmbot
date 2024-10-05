@@ -11,13 +11,11 @@ public class Main {
             String tgBotToken = dotenv.get("TELEGRAM_BOT_TOKEN");
             String tmdbToken = dotenv.get("TMDB_ACCESS_TOKEN");
 
-            // Создаем наш объект TG bot
             TelegramBotsLongPollingApplication bot = new TelegramBotsLongPollingApplication();
             bot.registerBot(tgBotToken, new MyBot(tgBotToken));
 
             System.out.println("SUCCESS: Bot is running");
         } catch (TelegramApiException err) {
-            // Ошибка
             err.printStackTrace();
             System.out.println("ERROR: Bot is NOT running");
         }

@@ -25,11 +25,12 @@ public class MyBot implements LongPollingSingleThreadUpdateConsumer {
             // Обработка команд
             switch (message_text) {
                 case "/start":
-                    responseMessage = "Привет! Я бот по поиску фильмов.\n" +
-                            "У меня есть следующие команды:\n" +
-                            "/genre - Поиск по жанру\n" +
-                            "/year - Поиск по году\n" +
-                            "Попробуй ввести команду!";
+                    responseMessage = """
+                        Привет! Я бот по поиску фильмов.
+                        У меня есть следующие команды:
+                        /genre - Поиск по жанру
+                        /year - Поиск по году
+                        Попробуй ввести команду!""";
                     break;
                 case "/genre":
                     responseMessage = "Введите жанр, и я найду фильмы по нему.";
@@ -42,10 +43,11 @@ public class MyBot implements LongPollingSingleThreadUpdateConsumer {
                     break;
             }
 
+            // Создание сообщения
             SendMessage message = SendMessage.builder()
-                    .chatId(chat_id)
-                    .text(responseMessage)
-                    .build();
+                .chatId(chat_id)
+                .text(responseMessage)
+                .build();
 
             try {
                 telegramClient.execute(message);
