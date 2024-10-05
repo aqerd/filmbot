@@ -33,13 +33,13 @@ public class MyBot implements LongPollingSingleThreadUpdateConsumer {
                         Попробуй ввести команду!""";
                     break;
                 case "/genre":
-                    responseMessage = "Введите жанр, и я найду фильмы по нему.";
+                    responseMessage = "Введите жанр, и я найду фильмы по нему";
                     break;
                 case "/year":
-                    responseMessage = "Введите год, и я найду фильмы, выпущенные в этом году.";
+                    responseMessage = "Введите год, и я найду фильмы, выпущенные в этом году";
                     break;
                 default:
-                    responseMessage = "Извините, я не понимаю эту команду. Попробуйте /start для получения списка команд.";
+                    responseMessage = "Извините, я не понимаю эту команду. Попробуйте /start для получения списка команд";
                     break;
             }
 
