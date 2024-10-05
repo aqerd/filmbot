@@ -7,7 +7,6 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 public class Main {
     public static void main(String[] args) {
         try {
-            // Здесь берём токены
             Dotenv dotenv = Dotenv.configure().directory("assets").filename("token.env").load();
             String tgBotToken = dotenv.get("TELEGRAM_BOT_TOKEN");
             String tmdbToken = dotenv.get("TMDB_ACCESS_TOKEN");
