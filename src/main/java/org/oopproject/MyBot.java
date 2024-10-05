@@ -17,19 +17,35 @@ public class MyBot implements LongPollingSingleThreadUpdateConsumer {
     @Override
     public void consume(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
-             /* message_text - сообщение которое мы получаем от пользователя
-                chat_id - айди чата
-                update - все данные сообщения */
-
+            // Получаем текст сообщения и ID чата
             String message_text = update.getMessage().getText();
             long chat_id = update.getMessage().getChatId();
-            SendMessage message = SendMessage
-                .builder()
-                .chatId(chat_id)
-                .text("Hello World \n\n") // Здесь мы выводим дефолтный текст
-                .build();
+            String responseMessage;
 
-            System.out.println(message_text + " " + chat_id + " " + update); // Вывод в терминал
+            // Обработка команд
+            switch (message_text) {
+                case "/start":
+                    responseMessage = "Привет! Я бот по поиску фильмов.\n" +
+                            "У меня есть следующие команды:\n" +
+                            "/genre - Поиск по жанру\n" +
+                            "/year - Поиск по году\n" +
+                            "Попробуй ввести команду!";
+                    break;
+                case "/genre":
+                    responseMessage = "Введите жанр, и я найду фильмы по нему.";
+                    break;
+                case "/year":
+                    responseMessage = "Введите год, и я найду фильмы, выпущенные в этом году.";
+                    break;
+                default:
+                    responseMessage = "Извините, я не понимаю эту команду. Попробуйте /start для получения списка команд.";
+                    break;
+            }
+
+            SendMessage message = SendMessage.builder()
+                    .chatId(chat_id)
+                    .text(responseMessage)
+                    .build();
 
             try {
                 telegramClient.execute(message);
