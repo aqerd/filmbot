@@ -1,13 +1,33 @@
 target/
+target/classes/
+target/generated-sources/
+target/maven-archiver
+target/maven-status
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+target/TelegramBot-1.0-SNAPSHOT.jar
+target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst
+target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/createdFiles.lst
+target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst
+target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst
+target/maven-archiver/pom.properties
+target/generated-sources/annotations
+target/classes/org/oopproject/MyBot.class
+target/classes/org/oopproject/Main.class
 
 ### IntelliJ IDEA ###
+.idea/
+.idea/inspectionProfiles/Project_Default.xml
 .idea/modules.xml
 .idea/jarRepositories.xml
 .idea/compiler.xml
 .idea/libraries/
+.idea/.gitignore
+.idea/encodings.xml
+.idea/misc.xml
+.idea/vcs.xml
+.idea/icon.svg
 *.iws
 *.iml
 *.ipr
