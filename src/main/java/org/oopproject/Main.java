@@ -28,7 +28,6 @@ public class Main {
 
             ListOfResults popularMoviesResults = tmdbService.getPopularMovies(tmdbToken);
 
-//            System.out.println(popularMoviesResults);
 //            Gson gson = new GsonBuilder().setPrettyPrinting().create();
 //            String formattedJson = gson.toJson(popularMoviesResults);
 //            System.out.println(formattedJson);
