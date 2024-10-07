@@ -7,6 +7,7 @@ public class Values {
     public String overview;
     public int id;
     public String original_language;
+    public double popularity;
 
     @SerializedName("vote_average")
     public double rating;
