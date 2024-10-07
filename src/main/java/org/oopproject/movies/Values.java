@@ -5,7 +5,8 @@ import com.google.gson.annotations.SerializedName;
 public class Values {
     public String title;
     public String overview;
-    public String id;
+    public int id;
+    public String original_language;
 
     @SerializedName("vote_average")
     public double rating;
