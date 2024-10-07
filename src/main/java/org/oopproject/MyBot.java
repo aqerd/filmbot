@@ -30,10 +30,18 @@ public class MyBot implements LongPollingSingleThreadUpdateConsumer {
                         У меня есть следующие команды:
                         /genre - Поиск по жанру
                         /year - Поиск по году
+                        /help - Справка
                         Попробуй ввести команду!""";
                     break;
                 case "/genre":
                     responseMessage = "Введите жанр, и я найду фильмы по нему";
+                    break;
+                case "/help":
+                    responseMessage = """
+                            Доступны следующие команды:
+                            
+                            /genre - Поиск по жанру
+                            /year - Поиск по году""";
                     break;
                 case "/year":
                     responseMessage = "Введите год, и я найду фильмы, выпущенные в этом году";
@@ -51,8 +59,8 @@ public class MyBot implements LongPollingSingleThreadUpdateConsumer {
 
             try {
                 telegramClient.execute(message);
-            } catch (TelegramApiException e) {
-                e.printStackTrace();
+            } catch (TelegramApiException err) {
+                err.printStackTrace();
             }
         }
     }
