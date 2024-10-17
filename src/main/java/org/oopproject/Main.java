@@ -41,32 +41,6 @@ public class Main {
                     .toJson(findMovie);
             System.out.println(gsonFindMovie);
 
-//            String gsonPopular = new GsonBuilder()
-//                    .setPrettyPrinting()
-//                    .create()
-//                    .toJson(popularMoviesResults.results);
-//            System.out.println(gsonPopular);
-//            System.out.println("-------------------------");
-//            String gsonId = new GsonBuilder()
-//                    .setPrettyPrinting()
-//                    .create()
-//                    .toJson(movieById);
-//            System.out.println(gsonId);
-//            System.out.println("-------------------------");
-//            String gsonAuth = new GsonBuilder()
-//                    .setPrettyPrinting()
-//                    .create()
-//                    .toJson(auth);
-//            System.out.println(gsonAuth);
-//
-//            popularMoviesResults.results.forEach(movie -> {
-//                System.out.println("Object: " + movie);
-//                System.out.println("Title: " + movie.title);
-//                System.out.println("Overview: " + movie.overview);
-//                System.out.println("Id: " + movie.id);
-//                System.out.println("Rating: " + movie.vote_average);
-//                System.out.println();
-//            });
 
         } catch (TelegramApiException e) {
             e.printStackTrace();

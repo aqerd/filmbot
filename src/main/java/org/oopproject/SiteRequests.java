@@ -6,34 +6,6 @@ import org.oopproject.responses.AuthResponse;
 import org.oopproject.responses.FilmResponse;
 import org.oopproject.responses.ListResponse;
 
-/******************************************************* СПРАВКА *******************************************************
-* Тесты:
-* - Для String никаких доп тестов не нужно;
-* - boolean должны быть true или false;
-* - int должны быть формата int32 (short int?), минимум -2147483648 и максимум 2147483647;
-* - float должны быть минимум -3.402823669209385e+38 и максимум 3.402823669209385e+38;
-* - Для некоторых параметров (release_date_lte, release_date_gte, primary_release_date_lte и primary_release_date_gte)
-* вместо типа String стоит тип date. Это значит что эти строки должны выглядить так: "YYYY-MM-DD", где
-* 1000 <= YYYY <= 9999, 01 <= MM <= 12, 01 <= DD <= (31, 30, 29 или 28), учитывая сколько дней было в выбранном месяце;
-
-* Параметры:
-* - К параметрам with_cast, with_companies, with_crew, with_genres, with_keywords, with_people, with_release_type,
-* with_watch_monetization_types, with_watch_providers можно применить AND и OR. Для AND нужно перечислить данные
-* запятой, а для OR нужно поставить |.
-* - sort_by можно применить только следующие данные: original_title.asc, original_title.desc, popularity.asc,
-* popularity.desc, revenue.asc, revenue.desc, primary_release_date.asc, title.asc, title.desc,
-* primary_release_date.desc, vote_average.asc, vote_average.desc, vote_count.asc, vote_count.desc
-* - Если заменить language на "ru" или "ru-RU" то данные фильма будут выводиться на русском. Для американского
-* английского код "en" или "en-US"
-* - page обязательный параметр. Наименьшее значение: 1
-
-* Термины:
-* - desc - сортировка по убыванию
-* - asc - сортировка по возрастанию
-* - gte - greater than or equal to, больше или равно
-* - lte - less than or equal to, меньше или равно
-***********************************************************************************************************************/
-
 public interface SiteRequests {
     @RequestLine("GET /authentication?api_key={api_key}")
     AuthResponse checkAuthStatus(@Param("api_key") String token);
