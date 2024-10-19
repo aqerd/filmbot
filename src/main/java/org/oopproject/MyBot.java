@@ -1,5 +1,6 @@
 package org.oopproject;
 
+import org.oopproject.helpers.GenreHelper;
 import org.oopproject.responses.FilmResponse;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
@@ -20,10 +21,14 @@ public class MyBot implements LongPollingSingleThreadUpdateConsumer {
     private final TelegramClient telegramClient;
     // Хранение текущего индекса для каждого года
     private final HashMap<Integer, Integer> yearMovieIndexMap = new HashMap<>();
+    private final HashMap<Integer, Integer> genreMovieIndexMap = new HashMap<>();
+
 
     private final SiteRequests tmdbService;
     private final String TMDB_TOKEN;
     private boolean waitingForYear = false;  // Флаг ожидания ввода года
+    private boolean waitingForGenre = false;  // Флаг ожидания ввода года
+
 
     public MyBot(String botToken) {
         telegramClient = new OkHttpTelegramClient(botToken);
@@ -82,7 +87,50 @@ public class MyBot implements LongPollingSingleThreadUpdateConsumer {
                     responseMessage = "Пожалуйста, введите корректный год!";
                 }
                 waitingForYear = false; // Сбрасываем флаг ожидания года
-            } else {
+            }
+                else if (waitingForGenre) {
+                    // Пользователь ввел название жанра
+                    String genreName = message_text.toLowerCase();
+                    String genreId = GenreHelper.getGenreId(genreName); // Получаем ID жанра
+
+                    if (genreId != null) {
+                        // Выполняем запрос к TMDB с указанным жанром
+                        ListResponse moviesByGenre = tmdbService.findMovie(
+                                TMDB_TOKEN, false, "ru", 1,
+                                "1900-01-01", "2100-01-01", "popularity.desc", 0, 10,
+                                genreId, 0, 0
+                        );
+
+                        if (moviesByGenre != null && moviesByGenre.results != null && !moviesByGenre.results.isEmpty()) {
+                            // Получаем фильмы по жанру
+                            List<FilmResponse> movies = moviesByGenre.results;
+
+                            // Получаем текущий индекс для данного жанра
+                            int currentIndex = genreMovieIndexMap.getOrDefault(genreId, 0);
+
+                            // Получаем фильм по текущему индексу
+                            FilmResponse currentMovie = movies.get(currentIndex);
+
+                            // Формируем сообщение с названием фильма
+                            responseMessage = "Фильм жанра " + genreName + ": " + currentMovie.title;
+
+                            // Увеличиваем индекс для следующего фильма
+                            currentIndex = (currentIndex + 1) % movies.size(); // Цикличный просмотр фильмов
+
+                            // Обновляем индекс для жанра в HashMap
+                            genreMovieIndexMap.put(Integer.valueOf(genreId), currentIndex);
+                        } else {
+                            responseMessage = "Извините, я не нашел фильмов для жанра " + genreName + ".";
+                        }
+                    } else {
+                        // Если жанр не найден
+                        responseMessage = "Извините, я не знаю такого жанра. Попробуйте другой.";
+                    }
+
+                    // Сбрасываем флаг ожидания жанра
+                    waitingForGenre = false;
+                }
+                else {
                 // Обрабатываем команды
                 switch (message_text) {
                     case "/start":
@@ -96,6 +144,7 @@ public class MyBot implements LongPollingSingleThreadUpdateConsumer {
                         break;
                     case "/genre":
                         responseMessage = "Введите жанр, и я найду фильмы по нему";
+                        waitingForGenre=true;
                         break;
                     case "/help":
                         responseMessage = """
