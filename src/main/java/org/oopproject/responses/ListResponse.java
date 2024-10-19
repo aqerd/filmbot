@@ -11,6 +11,7 @@ public class ListResponse {
     public int total_results;
     public String title; // Поле для хранения названия фильма
     public String overview; // Краткое описание
+
     // Геттер для получения списка фильмов
     public List<FilmResponse> getResults() {
         return results;

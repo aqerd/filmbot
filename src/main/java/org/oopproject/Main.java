@@ -41,7 +41,6 @@ public class Main {
                     .toJson(findMovie);
             System.out.println(gsonFindMovie);
 
-
         } catch (TelegramApiException e) {
             e.printStackTrace();
             System.out.println("ERROR: Bot is NOT running. Something wrong went with Telegram API");
