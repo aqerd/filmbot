@@ -8,12 +8,10 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
-
 import feign.Feign;
 import feign.gson.GsonDecoder;
 import org.oopproject.responses.ListResponse;
 import io.github.cdimascio.dotenv.Dotenv;
-
 import java.util.HashMap;
 import java.util.List;
 
@@ -26,7 +24,7 @@ public class MyBot implements LongPollingSingleThreadUpdateConsumer {
     private final SiteRequests tmdbService;
     private final String TMDB_TOKEN;
     private boolean waitingForYear = false;  // Флаг ожидания ввода года
-    private boolean waitingForGenre = false;  // Флаг ожидания ввода года
+    private boolean waitingForGenre = false;  // Флаг ожидания ввода жанра
 
     public MyBot(String botToken) {
         telegramClient = new OkHttpTelegramClient(botToken);
@@ -36,8 +34,7 @@ public class MyBot implements LongPollingSingleThreadUpdateConsumer {
         TMDB_TOKEN = dotenv.get("TMDB_ACCESS_TOKEN");
         final String API_URL = "https://api.themoviedb.org/3";
 
-        tmdbService = Feign
-                .builder()
+        tmdbService = Feign.builder()
                 .decoder(new GsonDecoder())
                 .target(SiteRequests.class, API_URL);
     }
@@ -90,7 +87,7 @@ public class MyBot implements LongPollingSingleThreadUpdateConsumer {
             case "/help":
                 responseMessage = """
                         Доступны следующие команды:
-                                                        
+                        
                         /genre - Поиск по жанру
                         /year - Поиск по году""";
                 break;
@@ -117,7 +114,7 @@ public class MyBot implements LongPollingSingleThreadUpdateConsumer {
             ListResponse moviesByGenre = tmdbService.findMovie(
                     TMDB_TOKEN, false, "ru", 1,
                     "1900-01-01", "2100-01-01", "popularity.desc", 0, 10,
-                    genreId, 0, 0
+                    genreId, "US", 0, 0
             );
 
             if (moviesByGenre != null && moviesByGenre.results != null && !moviesByGenre.results.isEmpty()) {
@@ -157,7 +154,8 @@ public class MyBot implements LongPollingSingleThreadUpdateConsumer {
             int year = Integer.parseInt(messageText); // Преобразуем ввод в год
             ListResponse moviesByYear = tmdbService.findMovie(
                     TMDB_TOKEN, false, "ru", 1,
-                    "1900-01-01", "2100-01-01", "popularity.desc", 0, 10, "", 0, year
+                    "1900-01-01", "2100-01-01", "popularity.desc", 0,
+                    10, "", "US",0, year
             );
 
             if (moviesByYear != null && moviesByYear.results != null && !moviesByYear.results.isEmpty()) {

@@ -35,7 +35,7 @@ public interface SiteRequests {
 //            "&with_companies={with_companies}" +
 //            "&with_crew={with_crew}" +
             "&with_genres={with_genres}" +
-//            "&with_origin_country={with_origin_country}" +
+            "&with_origin_country={with_origin_country}" +
 //            "&with_original_language={with_original_language}" +
             "&with_runtime.gte={with_runtime_gte}" +
 //            "&with_runtime.lte={with_runtime_lte}" +
@@ -59,7 +59,7 @@ public interface SiteRequests {
 //                           @Param("with_companies") String with_companies,
 //                           @Param("with_crew") String with_crew,
                            @Param("with_genres") String with_genres,
-//                           @Param("with_origin_country") String with_origin_country,
+                           @Param("with_origin_country") String with_origin_country,
 //                           @Param("with_original_language") String with_original_language,
                            @Param("with_runtime_gte") float with_runtime_gte,
 //                           @Param("with_runtime_lte") float with_runtime_lte,
