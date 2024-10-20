@@ -2,9 +2,9 @@ package org.oopproject.enums;
 
 public enum Genres {
     ACTION(28),
-    DRAMA(28),
-    COMEDY(28),
-    THRILLER(28);
+    DRAMA(18),
+    COMEDY(35),
+    THRILLER(53);
 
     public final String genreId;
 
