@@ -8,12 +8,14 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
-import feign.Feign;
-import feign.gson.GsonDecoder;
+//import feign.Feign;
+//import feign.gson.GsonDecoder;
 import org.oopproject.responses.ListResponse;
-import io.github.cdimascio.dotenv.Dotenv;
+//import io.github.cdimascio.dotenv.Dotenv;
 import java.util.HashMap;
 import java.util.List;
+import static org.oopproject.Config.TMDB_TOKEN;
+import static org.oopproject.Config.tmdbService;
 
 public class MyBot implements LongPollingSingleThreadUpdateConsumer {
     private final TelegramClient telegramClient;
@@ -21,8 +23,8 @@ public class MyBot implements LongPollingSingleThreadUpdateConsumer {
     private final HashMap<Integer, Integer> yearMovieIndexMap = new HashMap<>();
     private final HashMap<String, Integer> genreMovieIndexMap = new HashMap<>();
 
-    private final SiteRequests tmdbService;
-    private final String TMDB_TOKEN;
+//    private final SiteRequests tmdbService;
+//    private final String TMDB_TOKEN;
     private boolean waitingForYear = false;  // Флаг ожидания ввода года
     private boolean waitingForGenre = false;  // Флаг ожидания ввода жанра
 
@@ -30,13 +32,13 @@ public class MyBot implements LongPollingSingleThreadUpdateConsumer {
         telegramClient = new OkHttpTelegramClient(botToken);
 
         // Подключаем TMDB сервис через Feign
-        Dotenv dotenv = Dotenv.configure().directory("assets").filename("token.env").load();
-        TMDB_TOKEN = dotenv.get("TMDB_ACCESS_TOKEN");
-        final String API_URL = "https://api.themoviedb.org/3";
+//        Dotenv dotenv = Dotenv.configure().directory("assets").filename("token.env").load();
+//        TMDB_TOKEN = dotenv.get("TMDB_ACCESS_TOKEN");
+//        final String API_URL = "https://api.themoviedb.org/3";
 
-        tmdbService = Feign.builder()
-                .decoder(new GsonDecoder())
-                .target(SiteRequests.class, API_URL);
+//        tmdbService = Feign.builder()
+//                .decoder(new GsonDecoder())
+//                .target(SiteRequests.class, API_URL);
     }
 
     @Override
