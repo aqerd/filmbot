@@ -11,17 +11,15 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.oopproject.responses.ListResponse;
 import java.util.HashMap;
 import java.util.List;
-import static org.oopproject.Config.TMDB_TOKEN;
 import static org.oopproject.Config.tmdbService;
 
 public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     private final TelegramClient telegramClient;
-    // Хранение текущего индекса для каждого года
     private final HashMap<Integer, Integer> yearMovieIndexMap = new HashMap<>();
     private final HashMap<String, Integer> genreMovieIndexMap = new HashMap<>();
 
-    private boolean waitingForYear = false;  // Флаг ожидания ввода года
-    private boolean waitingForGenre = false;  // Флаг ожидания ввода жанра
+    private boolean waitingForYear = false;
+    private boolean waitingForGenre = false;
 
     public TelegramBot(String botToken) {
         telegramClient = new OkHttpTelegramClient(botToken);
@@ -84,7 +82,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 waitingForYear = true; // Устанавливаем флаг ожидания ввода года
                 break;
             default:
-                responseMessage = "Извините, я не понимаю эту команду. Попробуйте /start для получения списка команд";
+                responseMessage = "Извините, я не понимаю эту команду. Попробуйте /help для получения списка команд";
                 break;
         }
         return responseMessage;
@@ -99,11 +97,17 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             String genreId = Genres.valueOf(genreName.toUpperCase()).genreId; // Получаем ID жанра
 
             // Выполняем запрос к TMDB с указанным жанром
-            ListResponse moviesByGenre = tmdbService.findMovie(
-                    TMDB_TOKEN, false, "ru", 1,
-                    "1900-01-01", "2100-01-01", "popularity.desc", 0,
-                    10, genreId, "US", 0, 0
-            );
+//            ListResponse moviesByGenre = tmdbService.findMovie(
+//                    TMDB_TOKEN, false, "ru", 1, "1900-01-01",
+//                    "2100-01-01", "popularity.desc", 0,
+//                    10, genreId, "US", 0, 0
+//            );
+
+            // Новый вызов запроса
+            MovieSearchParameters params = new MovieSearchParameters()
+                    .withLanguage("ru")
+                    .withGenres(genreId);
+            ListResponse moviesByGenre = tmdbService.findMovie(params);
 
             if (moviesByGenre != null && moviesByGenre.results != null && !moviesByGenre.results.isEmpty()) {
                 // Получаем фильмы по жанру
@@ -146,6 +150,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 //                    10, "", "US", 0, userYear
 //            );
 
+            // Новый вызов запроса
             MovieSearchParameters params = new MovieSearchParameters()
                     .withLanguage("ru")
                     .withYear(userYear);
