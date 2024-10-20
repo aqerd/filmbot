@@ -42,42 +42,63 @@ public interface SiteRequests {
 //            "&without_genres={without_genres}" +
             "&year={year}")
     ListResponse findMovie(@Param("api_key") String token,
-//                           @Param("certification_country") String certification_country,
-                           @Param("include_adult") boolean include_adult,
-//                           @Param("include_video") boolean include_video,
+//                           @Param("certification_country") String certificationCountry,
+                           @Param("include_adult") boolean includeAdult,
+//                           @Param("include_video") boolean includeVideo,
                            @Param("language") String language,
                            @Param("page") int page,
-//                           @Param("primary_release_year") int primary_release_year,
+//                           @Param("primary_release_year") int primaryReleaseYear,
 //                           @Param("region") String region,
-                           @Param("release_date_gte") String release_date_gte,
-                           @Param("release_date_lte") String release_date_lte,
-                           @Param("sort_by") String sort_by,
-                           @Param("vote_average_gte") float vote_average_gte,
-                           @Param("vote_average_lte") float vote_average_lte,
-//                           @Param("watch_region") String watch_region,
-//                           @Param("with_cast") String with_cast,
-//                           @Param("with_companies") String with_companies,
-//                           @Param("with_crew") String with_crew,
-                           @Param("with_genres") String with_genres,
-                           @Param("with_origin_country") String with_origin_country,
-//                           @Param("with_original_language") String with_original_language,
-                           @Param("with_runtime_gte") float with_runtime_gte,
-//                           @Param("with_runtime_lte") float with_runtime_lte,
-//                           @Param("without_genres") String without_genres,
+                           @Param("release_date_gte") String releaseDateGte,
+                           @Param("release_date_lte") String releaseDateLte,
+                           @Param("sort_by") String sortBy,
+                           @Param("vote_average_gte") float voteAverageGte,
+                           @Param("vote_average_lte") float voteAverageLte,
+//                           @Param("watch_region") String watchRegion,
+//                           @Param("with_cast") String withCast,
+//                           @Param("with_companies") String withCompanies,
+//                           @Param("with_crew") String withCrew,
+                           @Param("with_genres") String withGenres,
+                           @Param("with_origin_country") String withOriginCountry,
+//                           @Param("with_original_language") String withOriginalLanguage,
+                           @Param("with_runtime_gte") float withRuntimeGte,
+//                           @Param("with_runtime_lte") float withRuntimeLte,
+//                           @Param("without_genres") String withoutGenres,
                            @Param("year") int year
     );
 
-//    @RequestLine("GET /movie/{id}/similar?api_key={api_key}")
-//    ListResponse getSimilarMovies(@Param("api_key") String token, @Param("id") String id);
-//
-//    @RequestLine("GET /movie/{id}/recommendations?api_key={api_key}")
-//    ListResponse getRecommendationsForMovie(@Param("api_key") String token, @Param("id") String id);
-//
-//    @RequestLine("GET /search/movie?query={query}&include_adult={adult}&language={language}&page={page}&year={year}")
-//    ListResponse searchMovie(@Param("api_key") String token,
-//                             @Param("query") String query,
-//                             @Param("adult") boolean adult,
-//                             @Param("language") String language,
-//                             @Param("page") int page,
-//                             @Param("year") String year);
+    default ListResponse findMovie(MovieParameters params) {
+        return findMovie(
+                params.token(),
+                params.includeAdult(),
+                params.language(),
+                params.page(),
+                params.releaseDateGte(),
+                params.releaseDateLte(),
+                params.sortBy(),
+                params.voteAverageGte(),
+                params.voteAverageLte(),
+                params.withGenres(),
+                params.withOriginCountry(),
+                params.withRuntimeGte(),
+                params.year()
+        );
+    }
+
+    /*
+    @RequestLine("GET /movie/{id}/similar?api_key={api_key}")
+    ListResponse getSimilarMovies(@Param("api_key") String token, @Param("id") String id);
+
+    @RequestLine("GET /movie/{id}/recommendations?api_key={api_key}")
+    ListResponse getRecommendationsForMovie(@Param("api_key") String token, @Param("id") String id);
+
+    @RequestLine("GET /search/movie?query={query}&include_adult={adult}&language={language}&page={page}&year={year}")
+    ListResponse searchMovie(@Param("api_key") String token,
+                             @Param("query") String query,
+                             @Param("adult") boolean adult,
+                             @Param("language") String language,
+                             @Param("page") int page,
+                             @Param("year") String year);
+
+     */
 }
