@@ -140,11 +140,16 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         // Пользователь ввел год
         try {
             int year = Integer.parseInt(messageText); // Преобразуем ввод в год
-            ListResponse moviesByYear = tmdbService.findMovie(
-                    TMDB_TOKEN, false, "ru", 1,
-                    "1900-01-01", "2100-01-01", "popularity.desc", 0,
-                    10, "", "US",0, year
-            );
+//            ListResponse moviesByYear = tmdbService.findMovie(
+//                    TMDB_TOKEN, false, "ru", 1,
+//                    "1900-01-01", "2100-01-01", "popularity.desc", 0,
+//                    10, "", "US", 0, year
+//            );
+
+            MovieSearchParameters params = new MovieSearchParameters()
+                    .withLanguage("ru")
+                    .withYear(2024);
+            ListResponse moviesByYear = tmdbService.findMovie(params);
 
             if (moviesByYear != null && moviesByYear.results != null && !moviesByYear.results.isEmpty()) {
                 // Получаем название первого фильма в списке
