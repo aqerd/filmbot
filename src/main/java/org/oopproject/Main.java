@@ -8,11 +8,9 @@ import static org.oopproject.Config.*;
 public class Main {
     public static void main(String[] args) {
         try {
-
             TelegramBotsLongPollingApplication bot = new TelegramBotsLongPollingApplication();
             bot.registerBot(BOT_TOKEN, new MyBot(BOT_TOKEN));
             System.out.println("SUCCESS: Bot is running");
-
         } catch (TelegramApiException e) {
             e.printStackTrace();
             System.out.println("ERROR: Bot is NOT running. Something wrong went with Telegram API");
