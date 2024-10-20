@@ -31,15 +31,6 @@ public class Main {
             ListResponse popularMoviesResults = tmdbService.getPopularMovies(TMDB_TOKEN);
             FilmResponse movieById = tmdbService.getMovieById(TMDB_TOKEN, "725201");
             AuthResponse auth = tmdbService.checkAuthStatus(TMDB_TOKEN);
-            ListResponse findMovie = tmdbService.findMovie(TMDB_TOKEN, true, "ru", 1,
-                    "1900-01-01", "2100-01-01", "popularity.desc", 7,
-                    10, "28|18", 90, 2022);
-
-            String gsonFindMovie = new GsonBuilder()
-                    .setPrettyPrinting()
-                    .create()
-                    .toJson(findMovie);
-            System.out.println(gsonFindMovie);
 
         } catch (TelegramApiException e) {
             e.printStackTrace();
