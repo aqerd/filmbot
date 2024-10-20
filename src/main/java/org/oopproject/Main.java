@@ -9,7 +9,7 @@ public class Main {
     public static void main(String[] args) {
         try {
             TelegramBotsLongPollingApplication bot = new TelegramBotsLongPollingApplication();
-            bot.registerBot(BOT_TOKEN, new MyBot(BOT_TOKEN));
+            bot.registerBot(BOT_TOKEN, new TelegramBot(BOT_TOKEN));
             System.out.println("SUCCESS: Bot is running");
         } catch (TelegramApiException e) {
             e.printStackTrace();
