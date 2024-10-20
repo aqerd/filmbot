@@ -139,16 +139,16 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         String responseMessage;
         // Пользователь ввел год
         try {
-            int year = Integer.parseInt(messageText); // Преобразуем ввод в год
+            int userYear = Integer.parseInt(messageText); // Преобразуем ввод в год
 //            ListResponse moviesByYear = tmdbService.findMovie(
 //                    TMDB_TOKEN, false, "ru", 1,
 //                    "1900-01-01", "2100-01-01", "popularity.desc", 0,
-//                    10, "", "US", 0, year
+//                    10, "", "US", 0, userYear
 //            );
 
             MovieSearchParameters params = new MovieSearchParameters()
                     .withLanguage("ru")
-                    .withYear(2024);
+                    .withYear(userYear);
             ListResponse moviesByYear = tmdbService.findMovie(params);
 
             if (moviesByYear != null && moviesByYear.results != null && !moviesByYear.results.isEmpty()) {
@@ -156,23 +156,23 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 List<FilmResponse> movies = moviesByYear.results;
 
                 // Получение текущего индекса для этого года (по умолчанию 0)
-                int currentIndex = yearMovieIndexMap.getOrDefault(year, 0);
+                int currentIndex = yearMovieIndexMap.getOrDefault(userYear, 0);
 
                 // Получаем фильм по текущему индексу
                 FilmResponse currentMovie = movies.get(currentIndex);
 
                 // Формируем сообщение с названием фильма
-                responseMessage = "Фильм, выпущенный в " + year + " году: " + currentMovie.title;
+                responseMessage = "Фильм, выпущенный в " + userYear + " году: " + currentMovie.title;
 
                 // Увеличиваем индекс для следующего фильма, Если индекс превышает размер списка, сбрасываем на 0
                 currentIndex = (currentIndex + 1) % movies.size();
 
                 // Обновляем индекс для этого года в HashMap
-                yearMovieIndexMap.put(year, currentIndex);
+                yearMovieIndexMap.put(userYear, currentIndex);
 
 
             } else {
-                responseMessage = "Извините, я не нашел фильмов за " + year + " год.";
+                responseMessage = "Извините, я не нашел фильмов за " + userYear + " год.";
             }
             waitingForYear = false;
         } catch (NumberFormatException e) {
