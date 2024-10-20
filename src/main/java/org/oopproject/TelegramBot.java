@@ -79,7 +79,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 break;
             case "/year":
                 responseMessage = "Введите год, и я найду фильмы, выпущенные в этом году";
-                waitingForYear = true; // Устанавливаем флаг ожидания ввода года
+                waitingForYear = true;
                 break;
             default:
                 responseMessage = "Извините, я не понимаю эту команду. Попробуйте /help для получения списка команд";
