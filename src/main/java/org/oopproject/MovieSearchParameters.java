@@ -23,10 +23,76 @@ public record MovieSearchParameters(
                 "US", 0, 0);
     }
 
+    public MovieSearchParameters withToken(String token) {
+        return new MovieSearchParameters(token, this.includeAdult, this.language, this.page, this.releaseDateGte,
+                this.releaseDateLte, this.sortBy, this.voteAverageGte, this.voteAverageLte, this.withGenres,
+                this.withOriginCountry, this.withRuntimeGte, this.year);
+    }
+
+    public MovieSearchParameters withIncludeAdult(boolean includeAdult) {
+        return new MovieSearchParameters(this.token, includeAdult, this.language, this.page, this.releaseDateGte,
+                this.releaseDateLte, this.sortBy, this.voteAverageGte, this.voteAverageLte, this.withGenres,
+                this.withOriginCountry, this.withRuntimeGte, this.year);
+    }
+
     public MovieSearchParameters withLanguage(String language) {
         return new MovieSearchParameters(this.token, this.includeAdult, language, this.page, this.releaseDateGte,
                 this.releaseDateLte, this.sortBy, this.voteAverageGte, this.voteAverageLte, this.withGenres,
                 this.withOriginCountry, this.withRuntimeGte, this.year);
+    }
+
+    public MovieSearchParameters withPage(int page) {
+        return new MovieSearchParameters(this.token, this.includeAdult, this.language, page, this.releaseDateGte,
+                this.releaseDateLte, this.sortBy, this.voteAverageGte, this.voteAverageLte, this.withGenres,
+                this.withOriginCountry, this.withRuntimeGte, this.year);
+    }
+
+    public MovieSearchParameters withReleaseDateGte(String releaseDateGte) {
+        return new MovieSearchParameters(this.token, this.includeAdult, this.language, this.page, releaseDateGte,
+                this.releaseDateLte, this.sortBy, this.voteAverageGte, this.voteAverageLte, this.withGenres,
+                this.withOriginCountry, this.withRuntimeGte, this.year);
+    }
+
+    public MovieSearchParameters withReleaseDateLte(String releaseDateLte) {
+        return new MovieSearchParameters(this.token, this.includeAdult, this.language, this.page, this.releaseDateGte,
+                releaseDateLte, this.sortBy, this.voteAverageGte, this.voteAverageLte, this.withGenres,
+                this.withOriginCountry, this.withRuntimeGte, this.year);
+    }
+
+    public MovieSearchParameters withSortBy(String sortBy) {
+        return new MovieSearchParameters(this.token, this.includeAdult, this.language, this.page, this.releaseDateGte,
+                this.releaseDateLte, sortBy, this.voteAverageGte, this.voteAverageLte, this.withGenres,
+                this.withOriginCountry, this.withRuntimeGte, this.year);
+    }
+
+    public MovieSearchParameters withVoteAverageGte(int voteAverageGte) {
+        return new MovieSearchParameters(this.token, this.includeAdult, this.language, this.page, this.releaseDateGte,
+                this.releaseDateLte, this.sortBy, voteAverageGte, this.voteAverageLte, this.withGenres,
+                this.withOriginCountry, this.withRuntimeGte, this.year);
+    }
+
+    public MovieSearchParameters withVoteAverageLte(int voteAverageLte) {
+        return new MovieSearchParameters(this.token, this.includeAdult, this.language, this.page, this.releaseDateGte,
+                this.releaseDateLte, this.sortBy, this.voteAverageGte, voteAverageLte, this.withGenres,
+                this.withOriginCountry, this.withRuntimeGte, this.year);
+    }
+
+    public MovieSearchParameters withGenres(String withGenres) {
+        return new MovieSearchParameters(this.token, this.includeAdult, this.language, this.page, this.releaseDateGte,
+                this.releaseDateLte, this.sortBy, this.voteAverageGte, this.voteAverageLte, withGenres,
+                this.withOriginCountry, this.withRuntimeGte, this.year);
+    }
+
+    public MovieSearchParameters withOriginCountry(String withOriginCountry) {
+        return new MovieSearchParameters(this.token, this.includeAdult, this.language, this.page, this.releaseDateGte,
+                this.releaseDateLte, this.sortBy, this.voteAverageGte, this.voteAverageLte, this.withGenres,
+                withOriginCountry, this.withRuntimeGte, this.year);
+    }
+
+    public MovieSearchParameters withRuntimeGte(float withRuntimeGte) {
+        return new MovieSearchParameters(this.token, this.includeAdult, this.language, this.page, this.releaseDateGte,
+                this.releaseDateLte, this.sortBy, this.voteAverageGte, this.voteAverageLte, this.withGenres,
+                this.withOriginCountry, withRuntimeGte, this.year);
     }
 
     public MovieSearchParameters withYear(int year) {
