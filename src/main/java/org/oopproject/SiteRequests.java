@@ -67,7 +67,7 @@ public interface SiteRequests {
                            @Param("year") int year
     );
 
-    default ListResponse findMovie(MovieSearchParameters params) {
+    default ListResponse findMovie(MovieParameters params) {
         return findMovie(
                 params.token(),
                 params.includeAdult(),

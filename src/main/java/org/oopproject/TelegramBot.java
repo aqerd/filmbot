@@ -104,7 +104,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 //            );
 
             // Новый вызов запроса
-            MovieSearchParameters params = new MovieSearchParameters()
+            MovieParameters params = new MovieParameters()
                     .withLanguage("ru")
                     .withGenres(genreId);
             ListResponse moviesByGenre = tmdbService.findMovie(params);
@@ -151,7 +151,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 //            );
 
             // Новый вызов запроса
-            MovieSearchParameters params = new MovieSearchParameters()
+            MovieParameters params = new MovieParameters()
                     .withLanguage("ru")
                     .withYear(userYear);
             ListResponse moviesByYear = tmdbService.findMovie(params);
