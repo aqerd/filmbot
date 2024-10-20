@@ -7,8 +7,6 @@ public class ListResponse {
     public List<FilmResponse> results;
     public int total_pages;
     public int total_results;
-    public String title;
-    public String overview;
 
     public List<FilmResponse> getResults() {
         return results;
