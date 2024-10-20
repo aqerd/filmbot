@@ -113,8 +113,8 @@ public class MyBot implements LongPollingSingleThreadUpdateConsumer {
             // Выполняем запрос к TMDB с указанным жанром
             ListResponse moviesByGenre = tmdbService.findMovie(
                     TMDB_TOKEN, false, "ru", 1,
-                    "1900-01-01", "2100-01-01", "popularity.desc", 0, 10,
-                    genreId, "US", 0, 0
+                    "1900-01-01", "2100-01-01", "popularity.desc", 0,
+                    10, genreId, "US", 0, 0
             );
 
             if (moviesByGenre != null && moviesByGenre.results != null && !moviesByGenre.results.isEmpty()) {
@@ -171,8 +171,8 @@ public class MyBot implements LongPollingSingleThreadUpdateConsumer {
                 // Формируем сообщение с названием фильма
                 responseMessage = "Фильм, выпущенный в " + year + " году: " + currentMovie.title;
 
-                // Увеличиваем индекс для следующего фильма
-                currentIndex = (currentIndex + 1) % movies.size();  // Если индекс превышает размер списка, сбрасываем на 0
+                // Увеличиваем индекс для следующего фильма, Если индекс превышает размер списка, сбрасываем на 0
+                currentIndex = (currentIndex + 1) % movies.size();
 
                 // Обновляем индекс для этого года в HashMap
                 yearMovieIndexMap.put(year, currentIndex);
