@@ -149,6 +149,14 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         try {
             int userYear = Integer.parseInt(messageText);
 
+            int currentYear = java.time.Year.now().getValue();
+
+            if (userYear < 1900 || userYear > currentYear) {
+                responseMessage = "Пожалуйста, введите год в диапазоне от 1900 до " + currentYear + ".";
+                return responseMessage;
+            }
+
+
             MovieParameters params = new MovieParameters()
                     .withLanguage("ru")
                     .withYear(userYear);
