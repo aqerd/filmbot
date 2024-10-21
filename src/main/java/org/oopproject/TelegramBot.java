@@ -2,13 +2,10 @@ package org.oopproject;
 
 import java.util.HashMap;
 import java.util.List;
-
 import org.oopproject.enums.Genres;
 import org.oopproject.responses.FilmResponse;
 import org.oopproject.responses.ListResponse;
-
 import static org.oopproject.Config.tmdbService;
-
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -23,8 +20,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
     private boolean waitingForYear = false;
     private boolean waitingForGenre = false;
-    private boolean waitingForBirthday = false;
-
+    private boolean waitingForAdultConfirmation = false;
+    private boolean isAdult = false;
 
     public TelegramBot(String botToken) {
         telegramClient = new OkHttpTelegramClient(botToken);
@@ -41,8 +38,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 responseMessage = handleYear(messageText);
             } else if (waitingForGenre) {
                 responseMessage = handleGenre(messageText);
-            } else if (waitingForBirthday) {
-                responseMessage = handleBirthday(messageText);
+            } else if (waitingForAdultConfirmation) {
+                responseMessage=handleAdultConfirmation(messageText);
             } else {
                 responseMessage = handleCommand(messageText);
             }
@@ -67,13 +64,12 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             case "/start":
                 responseMessage = """
                         Привет! Я бот по поиску фильмов.
-                        У меня есть следующие возможности:
-                        Поиск по жанру
-                        Поиск по году
-                    
-                        Перед поиском, пожалуйста, ответьте на вопрос:
-                        Вам больше 18 лет?""";
-                waitingForBirthday = true;
+                        У меня есть следующие команды:
+                        /genre - Поиск по жанру
+                        /year - Поиск по году
+                        /help - Справка
+                        /setadult - Установить возрастное ограничение
+                        Попробуй ввести команду!""";
                 break;
             case "/genre":
                 responseMessage = "Введите жанр, и я найду фильмы по нему";
@@ -82,13 +78,18 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             case "/help":
                 responseMessage = """
                         Доступны следующие команды:
-                                                
+                        
                         /genre - Поиск по жанру
-                        /year - Поиск по году""";
+                        /year - Поиск по году
+                        /setadult - Установить возрастное ограничение""";
                 break;
             case "/year":
                 responseMessage = "Введите год, и я найду фильмы, выпущенные в этом году";
                 waitingForYear = true;
+                break;
+            case "/setadult":
+                responseMessage = "Вам больше 18 лет? (да/нет)";
+                waitingForAdultConfirmation = true;
                 break;
             default:
                 responseMessage = "Извините, я не понимаю эту команду. Попробуйте /help для получения списка команд";
@@ -105,14 +106,6 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         try {
             String genreId = Genres.valueOf(genreName.toUpperCase()).genreId; // Получаем ID жанра
 
-            // Выполняем запрос к TMDB с указанным жанром
-//            ListResponse moviesByGenre = tmdbService.findMovie(
-//                    TMDB_TOKEN, false, "ru", 1, "1900-01-01",
-//                    "2100-01-01", "popularity.desc", 0,
-//                    10, genreId, "US", 0, 0
-//            );
-
-            // Новый вызов запроса
             MovieParameters params = new MovieParameters()
                     .withLanguage("ru")
                     .withGenres(genreId);
@@ -125,17 +118,19 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 // Получаем текущий индекс для данного жанра
                 int currentIndex = genreMovieIndexMap.getOrDefault(genreId, 0);
 
-                // Получаем фильм по текущему индексу
-                FilmResponse currentMovie = movies.get(currentIndex);
+                StringBuilder movieListBuilder = new StringBuilder("Фильмы жанра " + genreName + ":\n");
 
-                // Формируем сообщение с названием фильма
-                responseMessage = "Фильм жанра " + genreName + ": " + currentMovie.title;
+                for (int i = 0; i < 3; i++) { // Выводим до 3 фильмов
+                    FilmResponse currentMovie = movies.get((currentIndex + i) % movies.size());
+                    movieListBuilder.append(i + 1).append(". ").append(currentMovie.title).append("\n");
+                }
 
-                // Увеличиваем индекс для следующего фильма
                 currentIndex = (currentIndex + 1) % movies.size(); // Цикличный просмотр фильмов
 
-                // Обновляем индекс для жанра в HashMap
                 genreMovieIndexMap.put(genreId, currentIndex);
+
+                responseMessage = movieListBuilder.toString();
+
             } else {
                 responseMessage = "Извините, я не нашел фильмов для жанра " + genreName + ".";
             }
@@ -150,16 +145,10 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
     private String handleYear(String messageText) {
         String responseMessage;
-        // Пользователь ввел год
-        try {
-            int userYear = Integer.parseInt(messageText); // Преобразуем ввод в год
-//            ListResponse moviesByYear = tmdbService.findMovie(
-//                    TMDB_TOKEN, false, "ru", 1,
-//                    "1900-01-01", "2100-01-01", "popularity.desc", 0,
-//                    10, "", "US", 0, userYear
-//            );
 
-            // Новый вызов запроса
+        try {
+            int userYear = Integer.parseInt(messageText);
+
             MovieParameters params = new MovieParameters()
                     .withLanguage("ru")
                     .withYear(userYear);
@@ -172,19 +161,20 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 // Получение текущего индекса для этого года (по умолчанию 0)
                 int currentIndex = yearMovieIndexMap.getOrDefault(userYear, 0);
 
-                // Получаем фильм по текущему индексу
-                FilmResponse currentMovie = movies.get(currentIndex);
+                StringBuilder movieListBuilder = new StringBuilder("Фильмы, выпущенные в " + userYear + " году:\n");
 
-                // Формируем сообщение с названием фильма
-                responseMessage = "Фильм, выпущенный в " + userYear + " году: " + currentMovie.title;
+                for (int i = 0; i < 3; i++) { // Выводим до 3 фильмов
+                    FilmResponse currentMovie = movies.get((currentIndex + i) % movies.size());
+                    movieListBuilder.append(i + 1).append(". ").append(currentMovie.title).append("\n");
+                }
 
                 // Увеличиваем индекс для следующего фильма, Если индекс превышает размер списка, сбрасываем на 0
-                currentIndex = (currentIndex + 1) % movies.size();
+                currentIndex = (currentIndex + 3) % movies.size();
 
                 // Обновляем индекс для этого года в HashMap
                 yearMovieIndexMap.put(userYear, currentIndex);
 
-
+                responseMessage = movieListBuilder.toString();
             } else {
                 responseMessage = "Извините, я не нашел фильмов за " + userYear + " год.";
             }
@@ -193,26 +183,27 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             responseMessage = "Пожалуйста, введите корректный год!";
         }
 
+//        waitingForYear = false; // Сбрасываем флаг ожидания года
+
         return responseMessage;
     }
 
-    private String handleBirthday(String messageText) {
+    private String handleAdultConfirmation(String messageText) {
         String responseMessage;
-        String birthdayAnswer = messageText.toLowerCase();
+        String answer = messageText.toLowerCase();
 
-
-        if (birthdayAnswer.equals("да") || birthdayAnswer.equals("нет")) {
-                responseMessage="Спасибо за ответ, учтем. Можете выбирать команду\n" +
-                        "/genre - Поиск по жанру\n" +
-                        "/year - Поиск по году\n"+
-                        "/help - Справка";
-
-                waitingForBirthday=false;
+        if (answer.equals("да")) {
+            isAdult = true;
+            responseMessage = "Спасибо! Учтем ваш ответ";
+            waitingForAdultConfirmation = false;
+        } else if (answer.equals("нет")) {
+            responseMessage = "Спасибо! Учтем ваш ответ";
+            waitingForAdultConfirmation = false;
         } else {
-            responseMessage="Пожалуйста, введите корректный ответ 'да' или 'нет'";
+            responseMessage = "Пожалуйста, введите корректный ответ: 'да' или 'нет'.";
+            return responseMessage;
         }
+
         return responseMessage;
-
     }
-
 }
