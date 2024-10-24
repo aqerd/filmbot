@@ -1,13 +1,17 @@
 package org.oopproject;
 
-import java.util.HashMap;
-import java.util.List;
 import org.oopproject.enums.Genres;
 import org.oopproject.responses.FilmResponse;
 import org.oopproject.responses.ListResponse;
 import static org.oopproject.Config.tmdbService;
-import org.telegram.telegrambots.meta.api.objects.Update;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
+import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -15,11 +19,12 @@ import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateC
 
 public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     private final TelegramClient telegramClient;
+    private final ExecutorService executorService = Executors.newFixedThreadPool(4);
+
     private final HashMap<Integer, Integer> yearMovieIndexMap = new HashMap<>();
     private final HashMap<String, Integer> genreMovieIndexMap = new HashMap<>();
-
-    private boolean waitingForYear = false;
-    private boolean waitingForGenre = false;
+    private final Map<Long, Boolean> waitingForYearMap = new ConcurrentHashMap<>();
+    private final Map<Long, Boolean> waitingForGenreMap = new ConcurrentHashMap<>();
 
     public TelegramBot(String botToken) {
         telegramClient = new OkHttpTelegramClient(botToken);
@@ -27,20 +32,28 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
     @Override
     public void consume(Update update) {
+        executorService.submit(() -> handleUpdate(update));
+    }
+
+    public void handleUpdate(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
             String messageText = update.getMessage().getText();
             long chatId = update.getMessage().getChatId();
             String responseMessage;
 
+            boolean waitingForYear = waitingForYearMap.getOrDefault(chatId, false);
+            boolean waitingForGenre = waitingForGenreMap.getOrDefault(chatId, false);
+
             if (waitingForYear) {
-                responseMessage = handleYear(messageText);
+                responseMessage = handleYear(messageText, chatId);
+                waitingForYearMap.put(chatId, false); // сбрасываем состояние
             } else if (waitingForGenre) {
-                responseMessage = handleGenre(messageText);
+                responseMessage = handleGenre(messageText, chatId);
+                waitingForGenreMap.put(chatId, false); // сбрасываем состояние
             } else {
-                responseMessage = handleCommand(messageText);
+                responseMessage = handleCommands(messageText, chatId);
             }
 
-            // Создаем сообщение
             SendMessage message = SendMessage.builder()
                     .chatId(chatId)
                     .text(responseMessage)
@@ -54,7 +67,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         }
     }
 
-    private String handleCommand(String messageText) {
+    private String handleCommands(String messageText, long chatId) {
         String responseMessage;
         switch (messageText) {
             case "/start":
@@ -68,18 +81,18 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 break;
             case "/genre":
                 responseMessage = "Введите жанр, и я найду фильмы по нему";
-                waitingForGenre = true;
+                waitingForGenreMap.put(chatId, true);
                 break;
             case "/help":
                 responseMessage = """
                         Доступны следующие команды:
-                        
+
                         /genre - Поиск по жанру
                         /year - Поиск по году""";
                 break;
             case "/year":
                 responseMessage = "Введите год, и я найду фильмы, выпущенные в этом году";
-                waitingForYear = true;
+                waitingForYearMap.put(chatId, true);
                 break;
             default:
                 responseMessage = "Извините, я не понимаю эту команду. Попробуйте /help для получения списка команд";
@@ -88,7 +101,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         return responseMessage;
     }
 
-    private String handleGenre(String messageText) {
+    private String handleGenre(String messageText, long chatId) {
         // Пользователь ввел название жанра
         String responseMessage;
 
@@ -130,7 +143,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             } else {
                 responseMessage = "Извините, я не нашел фильмов для жанра " + genreName + ".";
             }
-            waitingForGenre = false;
+            waitingForGenreMap.put(chatId, false);
         } catch (IllegalArgumentException e) {
             // Если жанр не найден
             responseMessage = "Извините, я не знаю такого жанра. Попробуйте другой.";
@@ -139,7 +152,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         return responseMessage;
     }
 
-    private String handleYear(String messageText) {
+    private String handleYear(String messageText, long chatId) {
         String responseMessage;
         // Пользователь ввел год
         try {
@@ -179,12 +192,12 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             } else {
                 responseMessage = "Извините, я не нашел фильмов за " + userYear + " год.";
             }
-            waitingForYear = false;
+            waitingForYearMap.put(chatId, false);
         } catch (NumberFormatException e) {
             responseMessage = "Пожалуйста, введите корректный год!";
         }
 
-//        waitingForYear = false; // Сбрасываем флаг ожидания года
+//        waitingForYear = false; // Сбрасываем флаг ожидания года (ЛЕГАСИ)
 
         return responseMessage;
     }
