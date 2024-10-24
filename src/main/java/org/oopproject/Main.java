@@ -1,7 +1,7 @@
 package org.oopproject;
 
-import feign.FeignException;
 import static org.oopproject.Config.*;
+import feign.FeignException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
 
