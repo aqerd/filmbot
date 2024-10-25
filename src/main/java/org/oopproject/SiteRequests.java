@@ -18,6 +18,7 @@ public interface SiteRequests {
 
     @RequestLine("GET /discover/movie" +
             "?api_key={api_key}" +
+            "?certification.lte={certification_lte}" +
 //            "&certification_country={certification_country}" +
             "&include_adult={include_adult}" +
 //            "&include_video={include_video}" +
@@ -42,6 +43,7 @@ public interface SiteRequests {
 //            "&without_genres={without_genres}" +
             "&year={year}")
     ListResponse findMovie(@Param("api_key") String token,
+                           @Param("certification_lte") String certificationLte,
 //                           @Param("certification_country") String certificationCountry,
                            @Param("include_adult") boolean includeAdult,
 //                           @Param("include_video") boolean includeVideo,
@@ -70,6 +72,7 @@ public interface SiteRequests {
     default ListResponse findMovie(MovieParameters params) {
         return findMovie(
                 params.token(),
+                params.certificationLte(),
                 params.includeAdult(),
                 params.language(),
                 params.page(),
