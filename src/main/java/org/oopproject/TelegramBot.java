@@ -121,16 +121,16 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     }
 
     private ReplyKeyboardMarkup createCommandKeyboard() {
-        ReplyKeyboardMarkup keyboardMarkup=new ReplyKeyboardMarkup();
-        List<KeyboardRow> keyboard=new ArrayList<>();
+        ReplyKeyboardMarkup keyboardMarkup = ReplyKeyboardMarkup.builder().build();
+        List<KeyboardRow> keyboard = new ArrayList<>();
 
-        KeyboardRow row1=new KeyboardRow();
-        row1.add("/genre");
-        row1.add("/year");
+        KeyboardRow row1 = new KeyboardRow();
+        row1.add("Genre");
+        row1.add("Year");
 
-        KeyboardRow row2=new KeyboardRow();
-        row2.add("/setadult");
-        row2.add("/help");
+        KeyboardRow row2 = new KeyboardRow();
+        row2.add("Set adult");
+        row2.add("Help");
 
         keyboard.add(row1);
         keyboard.add(row2);
@@ -239,7 +239,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         return responseMessage;
     }
 
-    private String handleAge(String messageText) {
+    private String handleAge(String messageText, long chatId) {
         String responseMessage;
 
         try {
