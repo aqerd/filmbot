@@ -24,12 +24,10 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     private final HashMap<Integer, Integer> yearMovieIndexMap = new HashMap<>();
     private final HashMap<String, Integer> genreMovieIndexMap = new HashMap<>();
 
-// RESOLVED CONFLICT
-    /* + */ private int userAge;
+//    private int userAge;
     private final Map<Long, Boolean> waitingForYearMap = new ConcurrentHashMap<>();
     private final Map<Long, Boolean> waitingForGenreMap = new ConcurrentHashMap<>();
-    /* + */ private final Map<Long, Boolean> waitingForAgeMap = new ConcurrentHashMap<>();
-// RESOLVED CONFLICT
+    private final Map<Long, Boolean> waitingForAgeMap = new ConcurrentHashMap<>();
 
     public TelegramBot(String botToken) {
         telegramClient = new OkHttpTelegramClient(botToken);
@@ -54,13 +52,11 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 responseMessage = handleYear(messageText, chatId);
                 waitingForYearMap.put(chatId, false);
             } else if (waitingForGenre) {
-// RESOLVED CONFLICT down
                 responseMessage = handleGenre(messageText, chatId);
                 waitingForGenreMap.put(chatId, false);
             } else if (waitingForAge) {
                 responseMessage = handleAge(messageText, chatId);
-                /* + */ waitingForAgeMap.put(chatId, false);
-// RESOLVED CONFLICT up
+                waitingForAgeMap.put(chatId, false);
             } else {
                 responseMessage = handleCommands(messageText, chatId);
             }
@@ -109,7 +105,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 break;
             case "/setadult":
                 responseMessage = "Введите, сколько вам полных лет";
-                /* + */ waitingForAgeMap.put(chatId, true);
+                waitingForAgeMap.put(chatId, true);
                 break;
             default:
                 responseMessage = "Извините, я не понимаю эту команду. Попробуйте /help для получения списка команд";
@@ -118,8 +114,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         return responseMessage;
     }
 
-
-    /* + */ private String handleGenre(String messageText, long chatId) {
+    private String handleGenre(String messageText, long chatId) {
         String responseMessage;
 
         String genreName = messageText.toLowerCase();
@@ -224,7 +219,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
             if (userAge >= 0 && userAge <= 100) {
                 responseMessage = "Спасибо! Учтем ваш ответ";
-                /* + */ waitingForAgeMap.put(chatId, false);
+                waitingForAgeMap.put(chatId, false);
             } else {
                 responseMessage = "Пожалуйста, введите корректное число (от 0 до 100)";
             }
