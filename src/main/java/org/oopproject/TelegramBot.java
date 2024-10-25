@@ -4,6 +4,7 @@ import org.oopproject.enums.Genres;
 import org.oopproject.responses.FilmResponse;
 import org.oopproject.responses.ListResponse;
 import static org.oopproject.Config.tmdbService;
+import static org.oopproject.BotUtils.isCommand;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +25,6 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     private final HashMap<Integer, Integer> yearMovieIndexMap = new HashMap<>();
     private final HashMap<String, Integer> genreMovieIndexMap = new HashMap<>();
 
-//    private int userAge;
     private final Map<Long, Boolean> waitingForYearMap = new ConcurrentHashMap<>();
     private final Map<Long, Boolean> waitingForGenreMap = new ConcurrentHashMap<>();
     private final Map<Long, Boolean> waitingForAgeMap = new ConcurrentHashMap<>();
@@ -115,6 +115,11 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     }
 
     private String handleGenre(String messageText, long chatId) {
+        if (isCommand(messageText)) {
+            waitingForGenreMap.put(chatId, false);
+            return handleCommands(messageText, chatId);
+        }
+
         String responseMessage;
 
         String genreName = messageText.toLowerCase();
@@ -160,6 +165,11 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     }
 
     private String handleYear(String messageText, long chatId) {
+        if (isCommand(messageText)) {
+            waitingForYearMap.put(chatId, false);
+            return handleCommands(messageText, chatId);
+        }
+
         String responseMessage;
 
         try {
@@ -212,6 +222,11 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     }
 
     private String handleAge(String messageText, long chatId) {
+        if (isCommand(messageText)) {
+            waitingForAgeMap.put(chatId, false);
+            return handleCommands(messageText, chatId);
+        }
+
         String responseMessage;
 
         try {
