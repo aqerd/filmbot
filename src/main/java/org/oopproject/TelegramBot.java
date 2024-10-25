@@ -25,7 +25,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     private final HashMap<String, Integer> genreMovieIndexMap = new HashMap<>();
 
 // RESOLVED CONFLICT
-    /* + */ private int age;
+    /* + */ private int userAge;
     private final Map<Long, Boolean> waitingForYearMap = new ConcurrentHashMap<>();
     private final Map<Long, Boolean> waitingForGenreMap = new ConcurrentHashMap<>();
     /* + */ private final Map<Long, Boolean> waitingForAgeMap = new ConcurrentHashMap<>();
@@ -220,9 +220,9 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         String responseMessage;
 
         try {
-            int age = Integer.parseInt(messageText);
+            int userAge = Integer.parseInt(messageText);
 
-            if (age >= 0 && age <= 100) {
+            if (userAge >= 0 && userAge <= 100) {
                 responseMessage = "Спасибо! Учтем ваш ответ";
                 /* + */ waitingForAgeMap.put(chatId, false);
             } else {
