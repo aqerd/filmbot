@@ -123,7 +123,9 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
             MovieParameters params = new MovieParameters()
                     .withLanguage("ru")
-                    .withGenres(genreId);
+                    .withGenres(genreId)
+                    .withCertificationLte("PG-13")
+                    .withCertificationCountry("US");
             ListResponse moviesByGenre = tmdbService.findMovie(params);
 
             if (moviesByGenre != null && moviesByGenre.results != null && !moviesByGenre.results.isEmpty()) {
@@ -170,11 +172,11 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 return responseMessage;
             }
 
-
             MovieParameters params = new MovieParameters()
-                    .withLanguage("ru")
+                    .withLanguage("en")
                     .withYear(userYear)
-                    .withIncludeAdult(true);
+                    .withCertificationLte("PG-13")
+                    .withCertificationCountry("US");
             ListResponse moviesByYear = tmdbService.findMovie(params);
 
             if (moviesByYear != null && moviesByYear.results != null && !moviesByYear.results.isEmpty()) {
@@ -187,10 +189,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 StringBuilder movieListBuilder = new StringBuilder("Фильмы, выпущенные в " + userYear + " году:\n");
 
                 for (int i = 0; i  < 3; i++) {
-
                     FilmResponse currentMovie = movies.get((currentIndex + i) % movies.size());
                     movieListBuilder.append(i + 1).append(". ").append(currentMovie.title).append("\n");
-
                 }
 
                 // Увеличиваем индекс для следующего фильма, Если индекс превышает размер списка, сбрасываем на 0
