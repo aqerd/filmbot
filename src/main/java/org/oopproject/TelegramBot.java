@@ -48,6 +48,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
             boolean waitingForYear = waitingForYearMap.getOrDefault(chatId, false);
             boolean waitingForGenre = waitingForGenreMap.getOrDefault(chatId, false);
+            boolean waitingForAge = waitingForAgeMap.getOrDefault(chatId, false);
 
             if (waitingForYear) {
                 responseMessage = handleYear(messageText, chatId);
@@ -56,8 +57,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 // RESOLVED CONFLICT down
                 responseMessage = handleGenre(messageText, chatId);
                 waitingForGenreMap.put(chatId, false);
-            /* + */ } else if (waitingForAge) {
-                /* + */ responseMessage = handleAge(messageText, chatId);
+            } else if (waitingForAge) {
+                responseMessage = handleAge(messageText, chatId);
                 /* + */ waitingForAgeMap.put(chatId, false);
 // RESOLVED CONFLICT up
             } else {
@@ -142,7 +143,6 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 for (int i = 0; i < 3; i++) {
                     FilmResponse currentMovie = movies.get((currentIndex + i) % movies.size());
                     movieListBuilder.append(i + 1).append(". ").append(currentMovie.title).append("\n");
-
                 }
 
                 currentIndex = (currentIndex + 3) % movies.size(); // Цикличный просмотр фильмов
@@ -178,7 +178,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
             MovieParameters params = new MovieParameters()
                     .withLanguage("ru")
-                    .withYear(userYear);
+                    .withYear(userYear)
+                    .withIncludeAdult(true);
             ListResponse moviesByYear = tmdbService.findMovie(params);
 
             if (moviesByYear != null && moviesByYear.results != null && !moviesByYear.results.isEmpty()) {
@@ -215,7 +216,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         return responseMessage;
     }
 
-    private String handleAge(String messageText) {
+    private String handleAge(String messageText, long chatId) {
         String responseMessage;
 
         try {
