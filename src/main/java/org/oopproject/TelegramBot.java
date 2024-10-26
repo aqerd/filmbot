@@ -5,18 +5,21 @@ import org.oopproject.responses.FilmResponse;
 import org.oopproject.responses.ListResponse;
 import static org.oopproject.Config.tmdbService;
 import static org.oopproject.BotUtils.isCommand;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
 public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     private final TelegramClient telegramClient;
@@ -25,6 +28,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     private final HashMap<Integer, Integer> yearMovieIndexMap = new HashMap<>();
     private final HashMap<String, Integer> genreMovieIndexMap = new HashMap<>();
 
+    private int age;
     private final Map<Long, Boolean> waitingForYearMap = new ConcurrentHashMap<>();
     private final Map<Long, Boolean> waitingForGenreMap = new ConcurrentHashMap<>();
     private final Map<Long, Boolean> waitingForAgeMap = new ConcurrentHashMap<>();
@@ -64,6 +68,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             SendMessage message = SendMessage.builder()
                     .chatId(chatId)
                     .text(responseMessage)
+                    .replyMarkup(createCommandKeyboard())
                     .build();
 
             try {
@@ -112,6 +117,28 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 break;
         }
         return responseMessage;
+    }
+
+    private ReplyKeyboardMarkup createCommandKeyboard() {
+        ReplyKeyboardMarkup keyboardMarkup = ReplyKeyboardMarkup.builder().build();
+        List<KeyboardRow> keyboard = new ArrayList<>();
+
+        KeyboardRow row1 = new KeyboardRow();
+        row1.add("Genre");
+        row1.add("Year");
+
+        KeyboardRow row2 = new KeyboardRow();
+        row2.add("Set adult");
+        row2.add("Help");
+
+        keyboard.add(row1);
+        keyboard.add(row2);
+
+        keyboardMarkup.setKeyboard(keyboard);
+        keyboardMarkup.setResizeKeyboard(true);
+        keyboardMarkup.setOneTimeKeyboard(true);
+
+        return keyboardMarkup;
     }
 
     private String handleGenre(String messageText, long chatId) {
