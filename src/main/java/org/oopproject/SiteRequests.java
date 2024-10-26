@@ -16,9 +16,11 @@ public interface SiteRequests {
     @RequestLine("GET /movie/{id}?api_key={api_key}")
     FilmResponse getMovieById(@Param("api_key") String token, @Param("id") String id);
 
+    // discover/movie?certification.lte=18%2B&certification_country=RU&include_adult=false&include_video=false&language=ru&page=1&sort_by=popularity.desc"
     @RequestLine("GET /discover/movie" +
             "?api_key={api_key}" +
-//            "&certification_country={certification_country}" +
+            "&certification.lte={certification_lte}" +
+            "&certification_country={certification_country}" +
             "&include_adult={include_adult}" +
 //            "&include_video={include_video}" +
             "&language={language}" +
@@ -42,7 +44,8 @@ public interface SiteRequests {
 //            "&without_genres={without_genres}" +
             "&year={year}")
     ListResponse findMovie(@Param("api_key") String token,
-//                           @Param("certification_country") String certificationCountry,
+                           @Param("certification_lte") String certificationLte,
+                           @Param("certification_country") String certificationCountry,
                            @Param("include_adult") boolean includeAdult,
 //                           @Param("include_video") boolean includeVideo,
                            @Param("language") String language,
@@ -68,8 +71,11 @@ public interface SiteRequests {
     );
 
     default ListResponse findMovie(MovieParameters params) {
+        System.out.println(params.certificationLte() + ", " + params.certificationCountry() + ", " + params.includeAdult() + ", " + params.language() + ", " + params.page() + ", " + params.releaseDateGte() + ", " + params.releaseDateLte() + ", " + params.sortBy() + ", " + params.voteAverageGte() + ", " + params.voteAverageLte() + ", " + params.withGenres() + ", " + params.withOriginCountry() + ", " + params.withRuntimeGte() + ", " + params.year());
         return findMovie(
                 params.token(),
+                params.certificationLte(),
+                params.certificationCountry(),
                 params.includeAdult(),
                 params.language(),
                 params.page(),
@@ -99,6 +105,5 @@ public interface SiteRequests {
                              @Param("language") String language,
                              @Param("page") int page,
                              @Param("year") String year);
-
      */
 }
