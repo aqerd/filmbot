@@ -21,7 +21,7 @@ public enum Genres {
 
     public final String genreId;
 
-    private Genres(int genreId) {
+    Genres(int genreId) {
         this.genreId = String.valueOf(genreId);
     }
 }
