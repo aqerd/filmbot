@@ -8,7 +8,7 @@ public class BotUtils {
             "/genre", "Genre",
             "/year", "Year",
             "/help", "Help",
-            "/setadult", "Set adult"
+            "/setage", "Set Age"
     );
 
     public static boolean isCommand(String text) {

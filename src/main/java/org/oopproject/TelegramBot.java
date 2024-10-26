@@ -89,7 +89,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                         /genre - Поиск по жанру
                         /year - Поиск по году
                         /help - Справка
-                        /setadult - Установить возрастное ограничение
+                        /setage - Установить возрастное ограничение
                         Попробуй ввести команду!""";
                 break;
             case "/genre": case "Genre":
@@ -102,13 +102,13 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
                         /genre - Поиск по жанру
                         /year - Поиск по году
-                        /setadult - Установить возрастное ограничение""";
+                        /setage - Установить возрастное ограничение""";
                 break;
             case "/year": case "Year":
                 responseMessage = "Введите год, и я найду фильмы, выпущенные в этом году";
                 waitingForYearMap.put(chatId, true);
                 break;
-            case "/setadult": case "Set Adult":
+            case "/setage": case "Set Age":
                 responseMessage = "Введите, сколько вам полных лет";
                 waitingForAgeMap.put(chatId, true);
                 break;
