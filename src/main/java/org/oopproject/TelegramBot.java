@@ -82,7 +82,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     private String handleCommands(String messageText, long chatId) {
         String responseMessage;
         switch (messageText) {
-            case "/start":
+            case "/start": case "Start":
                 responseMessage = """
                         Привет! Я бот по поиску фильмов.
                         У меня есть следующие команды:
@@ -92,11 +92,11 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                         /setadult - Установить возрастное ограничение
                         Попробуй ввести команду!""";
                 break;
-            case "/genre":
+            case "/genre": case "Genre":
                 responseMessage = "Введите жанр, и я найду фильмы по нему";
                 waitingForGenreMap.put(chatId, true);
                 break;
-            case "/help":
+            case "/help": case "Help":
                 responseMessage = """
                         Доступны следующие команды:
 
@@ -104,11 +104,11 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                         /year - Поиск по году
                         /setadult - Установить возрастное ограничение""";
                 break;
-            case "/year":
+            case "/year": case "Year":
                 responseMessage = "Введите год, и я найду фильмы, выпущенные в этом году";
                 waitingForYearMap.put(chatId, true);
                 break;
-            case "/setadult":
+            case "/setadult": case "Set Adult":
                 responseMessage = "Введите, сколько вам полных лет";
                 waitingForAgeMap.put(chatId, true);
                 break;
