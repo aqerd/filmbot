@@ -128,7 +128,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         row1.add("Year");
 
         KeyboardRow row2 = new KeyboardRow();
-        row2.add("Set adult");
+        row2.add("Set Age");
         row2.add("Help");
 
         keyboard.add(row1);
@@ -161,12 +161,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             ListResponse moviesByGenre = tmdbService.findMovie(params);
 
             if (moviesByGenre != null && moviesByGenre.results != null && !moviesByGenre.results.isEmpty()) {
-                // Получаем фильмы по жанру
                 List<FilmResponse> movies = moviesByGenre.results;
-
-                // Получаем текущий индекс для данного жанра
                 int currentIndex = genreMovieIndexMap.getOrDefault(genreId, 0);
-
                 StringBuilder movieListBuilder = new StringBuilder("Фильмы жанра " + genreName + ":\n");
 
                 for (int i = 0; i < 3; i++) {
@@ -175,9 +171,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 }
 
                 currentIndex = (currentIndex + 3) % movies.size(); // Цикличный просмотр фильмов
-
                 genreMovieIndexMap.put(genreId, currentIndex);
-
                 responseMessage = movieListBuilder.toString();
 
             } else {
@@ -201,7 +195,6 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
         try {
             int userYear = Integer.parseInt(messageText);
-
             int currentYear = java.time.Year.now().getValue();
 
             if (userYear < 1900 || userYear > currentYear) {
@@ -217,12 +210,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             ListResponse moviesByYear = tmdbService.findMovie(params);
 
             if (moviesByYear != null && moviesByYear.results != null && !moviesByYear.results.isEmpty()) {
-                // Получаем название первого фильма в списке
                 List<FilmResponse> movies = moviesByYear.results;
-
-                // Получение текущего индекса для этого года (по умолчанию 0)
                 int currentIndex = yearMovieIndexMap.getOrDefault(userYear, 0);
-
                 StringBuilder movieListBuilder = new StringBuilder("Фильмы, выпущенные в " + userYear + " году:\n");
 
                 for (int i = 0; i  < 3; i++) {
@@ -230,13 +219,10 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                     movieListBuilder.append(i + 1).append(". ").append(currentMovie.title).append("\n");
                 }
 
-                // Увеличиваем индекс для следующего фильма, Если индекс превышает размер списка, сбрасываем на 0
                 currentIndex = (currentIndex + 3) % movies.size();
-
-                // Обновляем индекс для этого года в HashMap
                 yearMovieIndexMap.put(userYear, currentIndex);
-
                 responseMessage = movieListBuilder.toString();
+
             } else {
                 responseMessage = "Извините, я не нашел фильмов за " + userYear + " год.";
             }
