@@ -95,7 +95,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                         Попробуй ввести команду!""";
                 break;
             case "/genre": case "Genre":
-                responseMessage = "Введите жанр, и я найду фильмы по нему";
+                responseMessage = "Введите жанр, и я найду фильмы по нему\n" +
+                "Вот список доступных жанров: ANIMATION, COMEDY, CRIME, DOCUMENTARY, DRAMA, FAMILY, FANTASY, HISTORY, HORROR, MUSIC, MYSTERY, ROMANCE, SCIENCE_FICTION, TV_MOVIE, THRILLER, WAR, WESTERN.";
                 waitingForGenreMap.put(chatId, true);
                 break;
             case "/help": case "Help":
