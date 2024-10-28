@@ -25,6 +25,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     private final TelegramClient telegramClient;
     private final ExecutorService executorService = Executors.newFixedThreadPool(4);
 
+    public int nOfFilms = 10;
+
     private final HashMap<Integer, Integer> yearMovieIndexMap = new HashMap<>();
     private final HashMap<String, Integer> genreMovieIndexMap = new HashMap<>();
 
@@ -149,7 +151,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
         String responseMessage;
 
-        String genreName = messageText.toLowerCase();
+        String genreName = messageText;
         try {
             String genreId = Genres.valueOf(genreName.toUpperCase()).genreId;
 
@@ -165,12 +167,12 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 int currentIndex = genreMovieIndexMap.getOrDefault(genreId, 0);
                 StringBuilder movieListBuilder = new StringBuilder("Фильмы жанра " + genreName + ":\n");
 
-                for (int i = 0; i < 3; i++) {
+                for (int i = 0; i < nOfFilms; i++) {
                     FilmResponse currentMovie = movies.get((currentIndex + i) % movies.size());
                     movieListBuilder.append(i + 1).append(". ").append(currentMovie.title).append("\n");
                 }
 
-                currentIndex = (currentIndex + 3) % movies.size(); // Цикличный просмотр фильмов
+                currentIndex = (currentIndex + nOfFilms) % movies.size(); // Цикличный просмотр фильмов
                 genreMovieIndexMap.put(genreId, currentIndex);
                 responseMessage = movieListBuilder.toString();
 
@@ -214,12 +216,12 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 int currentIndex = yearMovieIndexMap.getOrDefault(userYear, 0);
                 StringBuilder movieListBuilder = new StringBuilder("Фильмы, выпущенные в " + userYear + " году:\n");
 
-                for (int i = 0; i  < 3; i++) {
+                for (int i = 0; i  < nOfFilms; i++) {
                     FilmResponse currentMovie = movies.get((currentIndex + i) % movies.size());
                     movieListBuilder.append(i + 1).append(". ").append(currentMovie.title).append("\n");
                 }
 
-                currentIndex = (currentIndex + 3) % movies.size();
+                currentIndex = (currentIndex + nOfFilms) % movies.size();
                 yearMovieIndexMap.put(userYear, currentIndex);
                 responseMessage = movieListBuilder.toString();
 

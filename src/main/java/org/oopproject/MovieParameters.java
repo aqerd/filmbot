@@ -20,7 +20,7 @@ public record MovieParameters(
         int year
 ) {
     public MovieParameters() {
-        this(TMDB_TOKEN, "18+","RU",false, "en", 1, "1900-01-01",
+        this(TMDB_TOKEN, "G","US",false, "en", 1, "1900-01-01",
                 "2100-01-01", "popularity.desc", 0, 10, "",
                 "US", 0, 0);
     }

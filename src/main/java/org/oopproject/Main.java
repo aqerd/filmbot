@@ -1,6 +1,6 @@
 package org.oopproject;
 
-import static org.oopproject.Config.*;
+import static org.oopproject.Config.BOT_TOKEN;
 import feign.FeignException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
