@@ -2,7 +2,7 @@ package org.oopproject;
 
 import java.util.Set;
 
-public class BotUtils {
+public class Utils {
     private static final Set<String> COMMANDS = Set.of(
             "/start", "Start",
             "/genre", "Genre",
