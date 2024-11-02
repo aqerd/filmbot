@@ -90,14 +90,14 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                         /genre - Поиск по жанру
                         /year - Поиск по году
                         /help - Справка
-                        /setage - Установить возрастное ограничение
+                        /stage - Установить возрастное ограничение
                         Попробуй ввести команду!""";
                 break;
             case "/genre": case "Genre":
                 responseMessage = """
                         Введите жанр, и я найду фильмы по нему
-                        Вот список доступных жанров: 
-                        ANIMATION, COMEDY, CRIME, DOCUMENTARY, DRAMA, FAMILY, FANTASY, HISTORY, HORROR, MUSIC, MYSTERY, 
+                        Вот список доступных жанров:
+                        ANIMATION, COMEDY, CRIME, DOCUMENTARY, DRAMA, FAMILY, FANTASY, HISTORY, HORROR, MUSIC, MYSTERY,
                         ROMANCE, SCIENCE_FICTION, TV_MOVIE, THRILLER, WAR, WESTERN""";
                 waitingForGenreMap.put(chatId, true);
                 break;
