@@ -1,10 +1,12 @@
 package org.oopproject;
 
-import org.oopproject.enums.Genres;
+import org.oopproject.tools.Genres;
+import org.oopproject.parameters.MovieParameters;
+import org.oopproject.parameters.ParametersBuilder;
 import org.oopproject.responses.FilmResponse;
 import org.oopproject.responses.ListResponse;
-import static org.oopproject.Config.tmdbService;
-import static org.oopproject.BotUtils.isCommand;
+import static org.oopproject.tools.Config.tmdbService;
+import static org.oopproject.tools.Utils.isCommand;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -158,11 +160,12 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         try {
             String genreId = Genres.valueOf(genreName.toUpperCase()).genreId;
 
-            MovieParameters params = new MovieParameters()
+            MovieParameters params = new ParametersBuilder()
                     .withLanguage("ru")
                     .withGenres(genreId)
                     .withCertificationLte("PG-13")
-                    .withCertificationCountry("US");
+                    .withCertificationCountry("US")
+                    .build();
             ListResponse moviesByGenre = tmdbService.findMovie(params);
 
             if (moviesByGenre != null && moviesByGenre.results != null && !moviesByGenre.results.isEmpty()) {
@@ -207,11 +210,12 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 return responseMessage;
             }
 
-            MovieParameters params = new MovieParameters()
+            MovieParameters params = new ParametersBuilder()
                     .withLanguage("en")
                     .withYear(userYear)
                     .withCertificationLte("PG-13")
-                    .withCertificationCountry("US");
+                    .withCertificationCountry("US")
+                    .build();
             ListResponse moviesByYear = tmdbService.findMovie(params);
 
             if (moviesByYear != null && moviesByYear.results != null && !moviesByYear.results.isEmpty()) {
