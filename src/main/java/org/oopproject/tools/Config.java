@@ -1,8 +1,9 @@
-package org.oopproject;
+package org.oopproject.tools;
 
 import feign.Feign;
 import feign.gson.GsonDecoder;
 import io.github.cdimascio.dotenv.Dotenv;
+import org.oopproject.SiteRequests;
 
 public class Config {
     public static final String BOT_TOKEN;

@@ -1,4 +1,4 @@
-package org.oopproject.enums;
+package org.oopproject.tools;
 
 public enum Genres {
     ANIMATION(16),
