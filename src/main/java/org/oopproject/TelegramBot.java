@@ -97,8 +97,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 responseMessage = """
                         Введите жанр, и я найду фильмы по нему
                         Вот список доступных жанров:
-                        ANIMATION, COMEDY, CRIME, DOCUMENTARY, DRAMA, FAMILY, FANTASY, HISTORY, HORROR, MUSIC, MYSTERY,
-                        ROMANCE, SCIENCE_FICTION, TV_MOVIE, THRILLER, WAR, WESTERN""";
+                        ANIMATION, COMEDY, CRIME, DOCUMENTARY, DRAMA, FAMILY, FANTASY, HISTORY, HORROR, MUSIC,
+                        MYSTERY, ROMANCE, SCIENCE_FICTION, TV_MOVIE, THRILLER, WAR, WESTERN""";
                 waitingForGenreMap.put(chatId, true);
                 break;
             case "/help": case "Help":
