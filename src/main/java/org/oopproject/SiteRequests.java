@@ -2,6 +2,7 @@ package org.oopproject;
 
 import feign.Param;
 import feign.RequestLine;
+import org.oopproject.parameters.MovieParameters;
 import org.oopproject.responses.AuthResponse;
 import org.oopproject.responses.FilmResponse;
 import org.oopproject.responses.ListResponse;
