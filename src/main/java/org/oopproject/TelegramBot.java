@@ -1,12 +1,12 @@
 package org.oopproject;
 
-import org.oopproject.tools.Genres;
+import org.oopproject.utils.Genres;
 import org.oopproject.parameters.MovieParameters;
 import org.oopproject.parameters.ParametersBuilder;
 import org.oopproject.responses.FilmResponse;
 import org.oopproject.responses.ListResponse;
-import static org.oopproject.tools.Config.tmdbService;
-import static org.oopproject.tools.Validators.isCommand;
+import static org.oopproject.utils.Config.tmdbService;
+import static org.oopproject.utils.Validators.isCommand;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

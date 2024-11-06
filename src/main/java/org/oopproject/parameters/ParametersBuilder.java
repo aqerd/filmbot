@@ -1,6 +1,6 @@
 package org.oopproject.parameters;
 
-import static org.oopproject.tools.Config.TMDB_TOKEN;
+import static org.oopproject.utils.Config.TMDB_TOKEN;
 
 public class ParametersBuilder {
     private String token = TMDB_TOKEN;
