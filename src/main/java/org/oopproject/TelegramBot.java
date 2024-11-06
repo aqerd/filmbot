@@ -105,7 +105,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 responseMessage = getReply("help");
                 break;
             default:
-                responseMessage = getReply("not recognized");
+                responseMessage = getReply("unknown");
                 break;
         }
         return responseMessage;

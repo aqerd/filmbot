@@ -18,16 +18,15 @@ public class Replies {
         replies.put("genre", """
                         Введите жанр, и я найду фильмы по нему.
                         Вот список доступных жанров:
-                        ANIMATION, COMEDY, CRIME, DOCUMENTARY, DRAMA, FAMILY, FANTASY, HISTORY, HORROR, MUSIC, MYSTERY, ROMANCE, SCIENCE_FICTION, TV_MOVIE, THRILLER, WAR, WESTERN""");
+                        animation, comedy, crime, documentary, drama, family, fantasy, history, horror, music, mystery, romance, science_fiction, tv_movie, thriller, war, western""");
         replies.put("help", """
                         Доступны следующие команды:
-
                         /genre - Поиск по жанру
                         /year - Поиск по году
                         /setage - Установить возрастное ограничение""");
         replies.put("year", "Введите год, и я найду фильмы, выпущенные в этом году");
-        replies.put("set age", "Введите, сколько вам полных лет");
-        replies.put("not recognized", "Команда не распознана. Попробуйте /help для получения списка команд");
+        replies.put("set age", "Введите ваш полный возраст");
+        replies.put("unknown", "Команда не распознана. Попробуйте /help для получения списка команд");
     }
 
     public static String getReply(String command) {
