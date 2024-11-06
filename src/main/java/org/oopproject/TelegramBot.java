@@ -6,7 +6,7 @@ import org.oopproject.parameters.ParametersBuilder;
 import org.oopproject.responses.FilmResponse;
 import org.oopproject.responses.ListResponse;
 import static org.oopproject.tools.Config.tmdbService;
-import static org.oopproject.tools.Utils.isCommand;
+import static org.oopproject.tools.Validators.isCommand;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
