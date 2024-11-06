@@ -7,6 +7,7 @@ import org.oopproject.responses.FilmResponse;
 import org.oopproject.responses.ListResponse;
 import static org.oopproject.utils.Config.tmdbService;
 import static org.oopproject.utils.Validators.isCommand;
+import static org.oopproject.utils.Replies.getReply;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -86,41 +87,25 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         String responseMessage;
         switch (messageText) {
             case "/start": case "Start":
-                responseMessage = """
-                        Привет! Я бот по поиску фильмов.
-                        У меня есть следующие команды:
-                        /genre - Поиск по жанру
-                        /year - Поиск по году
-                        /help - Справка
-                        /stage - Установить возрастное ограничение
-                        Попробуй ввести команду!""";
+                responseMessage = getReply("start");
                 break;
             case "/genre": case "Genre":
-                responseMessage = """
-                        Введите жанр, и я найду фильмы по нему
-                        Вот список доступных жанров:
-                        ANIMATION, COMEDY, CRIME, DOCUMENTARY, DRAMA, FAMILY, FANTASY, HISTORY, HORROR, MUSIC,
-                        MYSTERY, ROMANCE, SCIENCE_FICTION, TV_MOVIE, THRILLER, WAR, WESTERN""";
+                responseMessage = getReply("genre");
                 waitingForGenreMap.put(chatId, true);
                 break;
-            case "/help": case "Help":
-                responseMessage = """
-                        Доступны следующие команды:
-
-                        /genre - Поиск по жанру
-                        /year - Поиск по году
-                        /setage - Установить возрастное ограничение""";
-                break;
             case "/year": case "Year":
-                responseMessage = "Введите год, и я найду фильмы, выпущенные в этом году";
+                responseMessage = getReply("year");
                 waitingForYearMap.put(chatId, true);
                 break;
             case "/setage": case "Set Age":
-                responseMessage = "Введите, сколько вам полных лет";
+                responseMessage = getReply("set age");
                 waitingForAgeMap.put(chatId, true);
                 break;
+            case "/help": case "Help":
+                responseMessage = getReply("help");
+                break;
             default:
-                responseMessage = "Извините, я не понимаю эту команду. Попробуйте /help для получения списка команд";
+                responseMessage = getReply("not recognized");
                 break;
         }
         return responseMessage;
