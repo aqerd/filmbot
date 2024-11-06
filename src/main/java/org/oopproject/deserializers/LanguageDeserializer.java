@@ -1,6 +1,6 @@
-package org.oopproject.responses;
+package org.oopproject.deserializers;
 
-public class LanguageResponse {
+public class LanguageDeserializer {
     public String english_name;
     public String iso_639_1;
     public String name;

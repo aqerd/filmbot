@@ -1,6 +1,6 @@
-package org.oopproject.responses;
+package org.oopproject.deserializers;
 
-public class AuthResponse {
+public class AuthDeserializer {
     public int status_code;
     public String status_message;
     public String success;

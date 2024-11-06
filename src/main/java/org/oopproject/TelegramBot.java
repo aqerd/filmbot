@@ -1,10 +1,11 @@
 package org.oopproject;
 
+import org.oopproject.deserializers.ListDeserializer;
 import org.oopproject.utils.Genres;
 import org.oopproject.parameters.MovieParameters;
 import org.oopproject.parameters.ParametersBuilder;
-import org.oopproject.responses.FilmResponse;
-import org.oopproject.responses.ListResponse;
+import org.oopproject.deserializers.FilmDeserializer;
+
 import static org.oopproject.utils.Config.tmdbService;
 import static org.oopproject.utils.Validators.isCommand;
 import static org.oopproject.utils.Replies.getReply;
@@ -151,15 +152,15 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                     .withCertificationLte("PG-13")
                     .withCertificationCountry("US")
                     .build();
-            ListResponse moviesByGenre = tmdbService.findMovie(params);
+            ListDeserializer moviesByGenre = tmdbService.findMovie(params);
 
             if (moviesByGenre != null && moviesByGenre.results != null && !moviesByGenre.results.isEmpty()) {
-                List<FilmResponse> movies = moviesByGenre.results;
+                List<FilmDeserializer> movies = moviesByGenre.results;
                 int currentIndex = genreMovieIndexMap.getOrDefault(genreId, 0);
                 StringBuilder movieListBuilder = new StringBuilder("Фильмы жанра " + genreName + ":\n");
 
                 for (int i = 0; i < nOfFilms; i++) {
-                    FilmResponse currentMovie = movies.get((currentIndex + i) % movies.size());
+                    FilmDeserializer currentMovie = movies.get((currentIndex + i) % movies.size());
                     movieListBuilder.append(i + 1).append(". ").append(currentMovie.title).append("\n");
                 }
 
@@ -201,15 +202,15 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                     .withCertificationLte("PG-13")
                     .withCertificationCountry("US")
                     .build();
-            ListResponse moviesByYear = tmdbService.findMovie(params);
+            ListDeserializer moviesByYear = tmdbService.findMovie(params);
 
             if (moviesByYear != null && moviesByYear.results != null && !moviesByYear.results.isEmpty()) {
-                List<FilmResponse> movies = moviesByYear.results;
+                List<FilmDeserializer> movies = moviesByYear.results;
                 int currentIndex = yearMovieIndexMap.getOrDefault(userYear, 0);
                 StringBuilder movieListBuilder = new StringBuilder("Фильмы, выпущенные в " + userYear + " году:\n");
 
                 for (int i = 0; i  < nOfFilms; i++) {
-                    FilmResponse currentMovie = movies.get((currentIndex + i) % movies.size());
+                    FilmDeserializer currentMovie = movies.get((currentIndex + i) % movies.size());
                     movieListBuilder.append(i + 1).append(". ").append(currentMovie.title).append("\n");
                 }
 
