@@ -1,12 +1,12 @@
-package org.oopproject.responses;
+package org.oopproject.deserializers;
 
 import java.util.List;
 
-public class FilmResponse {
+public class FilmDeserializer {
     public boolean adult;
     public String backdrop_path;
     public int budget;
-    public List<GenreResponse> genres;
+    public List<GenreDeserializer> genres;
     public int[] genre_ids;
     public String homepage;
     public String id;
@@ -20,7 +20,7 @@ public class FilmResponse {
     public String release_date;
     public String revenue;
     public String runtime;
-    public List<LanguageResponse> spoken_languages;
+    public List<LanguageDeserializer> spoken_languages;
     public String status;
     public String tagline;
     public String title;
@@ -28,6 +28,6 @@ public class FilmResponse {
     public double vote_average;
     public double vote_count;
 //    public boolean belongs_to_collection;
-//    public List<FilmResponse> production_companies;
-//    public List<FilmResponse> production_countries;
+//    public List<FilmDeserializer> production_companies;
+//    public List<FilmDeserializer> production_countries;
 }

@@ -1,8 +1,8 @@
-package org.oopproject.tools;
+package org.oopproject.utils;
 
 import java.util.Set;
 
-public class Utils {
+public class Validators {
     private static final Set<String> COMMANDS = Set.of(
             "/start", "Start",
             "/genre", "Genre",

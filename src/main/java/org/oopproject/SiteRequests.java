@@ -2,20 +2,20 @@ package org.oopproject;
 
 import feign.Param;
 import feign.RequestLine;
+import org.oopproject.deserializers.FilmDeserializer;
 import org.oopproject.parameters.MovieParameters;
-import org.oopproject.responses.AuthResponse;
-import org.oopproject.responses.FilmResponse;
-import org.oopproject.responses.ListResponse;
+import org.oopproject.deserializers.AuthDeserializer;
+import org.oopproject.deserializers.ListDeserializer;
 
 public interface SiteRequests {
     @RequestLine("GET /authentication?api_key={api_key}")
-    AuthResponse checkAuthStatus(@Param("api_key") String token);
+    AuthDeserializer checkAuthStatus(@Param("api_key") String token);
 
     @RequestLine("GET /movie/popular?api_key={api_key}")
-    ListResponse getPopularMovies(@Param("api_key") String token);
+    ListDeserializer getPopularMovies(@Param("api_key") String token);
 
     @RequestLine("GET /movie/{id}?api_key={api_key}")
-    FilmResponse getMovieById(@Param("api_key") String token, @Param("id") String id);
+    FilmDeserializer getMovieById(@Param("api_key") String token, @Param("id") String id);
 
     // discover/movie?certification.lte=18%2B&certification_country=RU&include_adult=false&include_video=false&language=ru&page=1&sort_by=popularity.desc"
     @RequestLine("GET /discover/movie" +
@@ -44,35 +44,35 @@ public interface SiteRequests {
 //            "&with_runtime.lte={with_runtime_lte}" +
 //            "&without_genres={without_genres}" +
             "&year={year}")
-    ListResponse findMovie(@Param("api_key") String token,
-                           @Param("certification_lte") String certificationLte,
-                           @Param("certification_country") String certificationCountry,
-                           @Param("include_adult") boolean includeAdult,
+    ListDeserializer findMovie(@Param("api_key") String token,
+                               @Param("certification_lte") String certificationLte,
+                               @Param("certification_country") String certificationCountry,
+                               @Param("include_adult") boolean includeAdult,
 //                           @Param("include_video") boolean includeVideo,
-                           @Param("language") String language,
-                           @Param("page") int page,
+                               @Param("language") String language,
+                               @Param("page") int page,
 //                           @Param("primary_release_year") int primaryReleaseYear,
 //                           @Param("region") String region,
-                           @Param("release_date_gte") String releaseDateGte,
-                           @Param("release_date_lte") String releaseDateLte,
-                           @Param("sort_by") String sortBy,
-                           @Param("vote_average_gte") float voteAverageGte,
-                           @Param("vote_average_lte") float voteAverageLte,
+                               @Param("release_date_gte") String releaseDateGte,
+                               @Param("release_date_lte") String releaseDateLte,
+                               @Param("sort_by") String sortBy,
+                               @Param("vote_average_gte") float voteAverageGte,
+                               @Param("vote_average_lte") float voteAverageLte,
 //                           @Param("watch_region") String watchRegion,
 //                           @Param("with_cast") String withCast,
 //                           @Param("with_companies") String withCompanies,
 //                           @Param("with_crew") String withCrew,
-                           @Param("with_genres") String withGenres,
-                           @Param("with_origin_country") String withOriginCountry,
+                               @Param("with_genres") String withGenres,
+                               @Param("with_origin_country") String withOriginCountry,
 //                           @Param("with_original_language") String withOriginalLanguage,
-                           @Param("with_runtime_gte") float withRuntimeGte,
+                               @Param("with_runtime_gte") float withRuntimeGte,
 //                           @Param("with_runtime_lte") float withRuntimeLte,
 //                           @Param("without_genres") String withoutGenres,
-                           @Param("year") int year
+                               @Param("year") int year
     );
 
-    default ListResponse findMovie(MovieParameters params) {
-        System.out.println(params.certificationLte() + ", " + params.certificationCountry() + ", " + params.includeAdult() + ", " + params.language() + ", " + params.page() + ", " + params.releaseDateGte() + ", " + params.releaseDateLte() + ", " + params.sortBy() + ", " + params.voteAverageGte() + ", " + params.voteAverageLte() + ", " + params.withGenres() + ", " + params.withOriginCountry() + ", " + params.withRuntimeGte() + ", " + params.year());
+    default ListDeserializer findMovie(MovieParameters params) {
+        System.out.println("LOG: " + params.certificationLte() + ", " + params.certificationCountry() + ", " + params.includeAdult() + ", " + params.language() + ", " + params.page() + ", " + params.releaseDateGte() + ", " + params.releaseDateLte() + ", " + params.sortBy() + ", " + params.voteAverageGte() + ", " + params.voteAverageLte() + ", " + params.withGenres() + ", " + params.withOriginCountry() + ", " + params.withRuntimeGte() + ", " + params.year());
         return findMovie(
                 params.token(),
                 params.certificationLte(),
@@ -94,13 +94,13 @@ public interface SiteRequests {
 
     /*
     @RequestLine("GET /movie/{id}/similar?api_key={api_key}")
-    ListResponse getSimilarMovies(@Param("api_key") String token, @Param("id") String id);
+    ListDeserializer getSimilarMovies(@Param("api_key") String token, @Param("id") String id);
 
     @RequestLine("GET /movie/{id}/recommendations?api_key={api_key}")
-    ListResponse getRecommendationsForMovie(@Param("api_key") String token, @Param("id") String id);
+    ListDeserializer getRecommendationsForMovie(@Param("api_key") String token, @Param("id") String id);
 
     @RequestLine("GET /search/movie?query={query}&include_adult={adult}&language={language}&page={page}&year={year}")
-    ListResponse searchMovie(@Param("api_key") String token,
+    ListDeserializer searchMovie(@Param("api_key") String token,
                              @Param("query") String query,
                              @Param("adult") boolean adult,
                              @Param("language") String language,
