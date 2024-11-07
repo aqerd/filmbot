@@ -1,4 +1,4 @@
-# Find films by filter bot
+# Filmbot
 #### This bot helps you find films you want to watch based on some filters like genre, year, actors, etc
 
 ## 🚀 Usage
