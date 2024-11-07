@@ -1,5 +1,5 @@
 # Filmbot
-#### This bot helps you find films you want to watch based on some filters like genre, year, actors, etc
+#### This bot helps you find films you want to watch based on some filters like genre, year and etc
 
 ## 🚀 Usage
 You can use bot [here](https://t.me/findfilmsbyfiltersbot) in Telegram
