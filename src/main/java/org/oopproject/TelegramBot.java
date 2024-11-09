@@ -84,7 +84,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         }
     }
 
-    private String handleCommands(String messageText, long chatId) {
+    protected String handleCommands(String messageText, long chatId) {
         String responseMessage;
         switch (messageText) {
             case "/start": case "Start":
@@ -134,7 +134,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         return keyboardMarkup;
     }
 
-    private String handleGenre(String messageText, long chatId) {
+    protected String handleGenre(String messageText, long chatId) {
         if (isCommand(messageText)) {
             waitingForGenreMap.put(chatId, false);
             return handleCommands(messageText, chatId);
@@ -169,17 +169,17 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 responseMessage = movieListBuilder.toString();
 
             } else {
-                responseMessage = "Извините, я не нашел фильмов для жанра " + genreName + ".";
+                responseMessage = "Извините, я не нашел фильмов для жанра " + genreName;
             }
             waitingForGenreMap.put(chatId, false);
         } catch (IllegalArgumentException e) {
-            responseMessage = "Извините, я не знаю такого жанра. Попробуйте другой.";
+            responseMessage = "Извините, я не знаю такого жанра. Попробуйте другой";
         }
 
         return responseMessage;
     }
 
-    private String handleYear(String messageText, long chatId) {
+    protected String handleYear(String messageText, long chatId) {
         if (isCommand(messageText)) {
             waitingForYearMap.put(chatId, false);
             return handleCommands(messageText, chatId);
@@ -192,7 +192,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             int currentYear = java.time.Year.now().getValue();
 
             if (userYear < 1900 || userYear > currentYear) {
-                responseMessage = "Пожалуйста, введите год в диапазоне от 1900 до " + currentYear + ".";
+                responseMessage = "Пожалуйста, введите год в диапазоне от 1900 до " + currentYear;
                 return responseMessage;
             }
 
@@ -219,7 +219,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 responseMessage = movieListBuilder.toString();
 
             } else {
-                responseMessage = "Извините, я не нашел фильмов за " + userYear + " год.";
+                responseMessage = "Извините, я не нашел фильмов за " + userYear + " год";
             }
             waitingForYearMap.put(chatId, false);
         } catch (NumberFormatException e) {
@@ -229,7 +229,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         return responseMessage;
     }
 
-    private String handleAge(String messageText, long chatId) {
+    protected String handleAge(String messageText, long chatId) {
         if (isCommand(messageText)) {
             waitingForAgeMap.put(chatId, false);
             return handleCommands(messageText, chatId);
