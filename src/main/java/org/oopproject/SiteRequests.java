@@ -17,7 +17,6 @@ public interface SiteRequests {
     @RequestLine("GET /movie/{id}?api_key={api_key}")
     FilmDeserializer getMovieById(@Param("api_key") String token, @Param("id") String id);
 
-    // discover/movie?certification.lte=18%2B&certification_country=RU&include_adult=false&include_video=false&language=ru&page=1&sort_by=popularity.desc"
     @RequestLine("GET /discover/movie" +
             "?api_key={api_key}" +
             "&certification.lte={certification_lte}" +
@@ -72,7 +71,6 @@ public interface SiteRequests {
     );
 
     default ListDeserializer findMovie(MovieParameters params) {
-        System.out.println("LOG: " + params.certificationLte() + ", " + params.certificationCountry() + ", " + params.includeAdult() + ", " + params.language() + ", " + params.page() + ", " + params.releaseDateGte() + ", " + params.releaseDateLte() + ", " + params.sortBy() + ", " + params.voteAverageGte() + ", " + params.voteAverageLte() + ", " + params.withGenres() + ", " + params.withOriginCountry() + ", " + params.withRuntimeGte() + ", " + params.year());
         return findMovie(
                 params.token(),
                 params.certificationLte(),
