@@ -2,13 +2,11 @@ package org.oopproject;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
 
 import static org.mockito.Mockito.*;
 
 class MainTest {
-
     private TelegramBotsLongPollingApplication botApp;
     private TelegramBot bot;
 
