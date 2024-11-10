@@ -9,6 +9,8 @@ import org.oopproject.deserializers.FilmDeserializer;
 import static org.oopproject.utils.Config.tmdbService;
 import static org.oopproject.utils.Validators.isCommand;
 import static org.oopproject.utils.Replies.getReply;
+
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +30,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     private final TelegramClient telegramClient;
     private final ExecutorService executorService = Executors.newFixedThreadPool(4);
+    private final Database database=new Database();
 
     public int nOfFilms = 10;
 
@@ -38,7 +41,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     private final Map<Long, Boolean> waitingForGenreMap = new ConcurrentHashMap<>();
     private final Map<Long, Boolean> waitingForAgeMap = new ConcurrentHashMap<>();
 
-    public TelegramBot(String botToken) {
+    public TelegramBot(String botToken) throws SQLException {
         telegramClient = new OkHttpTelegramClient(botToken);
     }
 
@@ -49,8 +52,10 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
     public void handleUpdate(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
-            String messageText = update.getMessage().getText();
             long chatId = update.getMessage().getChatId();
+            database.insertChatId(chatId);
+
+            String messageText = update.getMessage().getText();
             String responseMessage;
 
             boolean waitingForYear = waitingForYearMap.getOrDefault(chatId, false);
