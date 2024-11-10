@@ -1,19 +1,25 @@
 package org.oopproject;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.*;
+import java.util.Properties;
 
 public class Database {
     private Connection connection;
 
     public Database() {
-        String username = "root";
-        String password = "Root2004";
-        String connectionUrl = "jdbc:mysql://localhost:3306/botusers";
-        try {
+        Properties properties = new Properties();
+        try (FileInputStream input = new FileInputStream("assets/config.properties")){
+            properties.load(input);
+            String username = properties.getProperty("db.username");
+            String password = properties.getProperty("db.password");
+            String connectionUrl = properties.getProperty("db.url");
+
             connection = DriverManager.getConnection(connectionUrl, username, password);
             System.out.println("Connected to database");
-
-        } catch (SQLException e) {
+        } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
     }
