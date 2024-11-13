@@ -34,11 +34,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
     private final HashMap<Integer, Integer> yearMovieIndexMap = new HashMap<>();
     private final HashMap<String, Integer> genreMovieIndexMap = new HashMap<>();
-
-//    /* - */ private final Map<Long, Boolean> waitingForYearMap = new ConcurrentHashMap<>();
-//    /* - */ private final Map<Long, Boolean> waitingForGenreMap = new ConcurrentHashMap<>();
-//    /* - */ private final Map<Long, Boolean> waitingForAgeMap = new ConcurrentHashMap<>();
-    /* + */ private final Map<Long, CommandWaiter> commandWaiter = new ConcurrentHashMap<>();
+    private final Map<Long, CommandWaiter> commandWaiter = new ConcurrentHashMap<>();
 
     public TelegramBot(String botToken) {
         telegramClient = new OkHttpTelegramClient(botToken);
@@ -54,31 +50,9 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             String messageText = update.getMessage().getText();
             long chatId = update.getMessage().getChatId();
             String responseMessage;
-
-//            /* - */ boolean waitingForYear = waitingForYearMap.getOrDefault(chatId, false);
-//            /* - */ boolean waitingForGenre = waitingForGenreMap.getOrDefault(chatId, false);
-//            /* - */ boolean waitingForAge = waitingForAgeMap.getOrDefault(chatId, false);
-            /* + */ CommandWaiter waiter = commandWaiter.getOrDefault(chatId, NONE);
-
-            /* - */
-//            if (waitingForYear) {
-//                responseMessage = handleYear(messageText, chatId);
-//                /* - */ waitingForYearMap.put(chatId, false);
-//                /* + */ commandWaiter.put(chatId, NONE);
-//            } else if (waitingForGenre) {
-//                responseMessage = handleGenre(messageText, chatId);
-//                /* - */ waitingForGenreMap.put(chatId, false);
-//                /* + */ commandWaiter.put(chatId, NONE);
-//            } else if (waitingForAge) {
-//                responseMessage = handleAge(messageText, chatId);
-//                /* - */ waitingForAgeMap.put(chatId, false);
-//                /* + */ commandWaiter.put(chatId, NONE);
-//            } else {
-//                responseMessage = handleCommands(messageText, chatId);
-//            }
+            CommandWaiter waiter = commandWaiter.getOrDefault(chatId, NONE);
 
             switch (waiter) {
-//                case NONE:
                 case YEAR:
                     responseMessage = handleYear(messageText, chatId);
                     commandWaiter.put(chatId, NONE);
@@ -118,18 +92,15 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 break;
             case "/genre": case "Genre":
                 responseMessage = getReply("genre");
-//                /* - */ waitingForGenreMap.put(chatId, true);
-                /* + */ commandWaiter.put(chatId, GENRE);
+                commandWaiter.put(chatId, GENRE);
                 break;
             case "/year": case "Year":
                 responseMessage = getReply("year");
-//                /* - */ waitingForYearMap.put(chatId, true);
-                /* + */ commandWaiter.put(chatId, YEAR);
+                commandWaiter.put(chatId, YEAR);
                 break;
             case "/setage": case "Set Age":
                 responseMessage = getReply("set age");
-//                /* - */ waitingForAgeMap.put(chatId, true);
-                /* + */ commandWaiter.put(chatId, SETAGE);
+                commandWaiter.put(chatId, SETAGE);
                 break;
             case "/help": case "Help":
                 responseMessage = getReply("help");
@@ -165,8 +136,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
     protected String handleGenre(String messageText, long chatId) {
         if (isCommand(messageText)) {
-//            /* - */ waitingForGenreMap.put(chatId, false);
-            /* + */ commandWaiter.put(chatId, NONE);
+            commandWaiter.put(chatId, NONE);
             return handleCommands(messageText, chatId);
         }
 
@@ -200,8 +170,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             } else {
                 responseMessage = "Извините, я не нашел фильмов для жанра " + genreName;
             }
-//            /* - */ waitingForGenreMap.put(chatId, false);
-            /* + */ commandWaiter.put(chatId, NONE);
+            commandWaiter.put(chatId, NONE);
         } catch (IllegalArgumentException e) {
             responseMessage = "Извините, я не знаю такого жанра. Попробуйте другой";
         }
@@ -211,8 +180,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
     protected String handleYear(String messageText, long chatId) {
         if (isCommand(messageText)) {
-//            /* - */ waitingForYearMap.put(chatId, false);
-            /* + */ commandWaiter.put(chatId, NONE);
+            commandWaiter.put(chatId, NONE);
             return handleCommands(messageText, chatId);
         }
 
@@ -252,8 +220,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             } else {
                 responseMessage = "Извините, я не нашел фильмов за " + userYear + " год";
             }
-//            /* - */ waitingForYearMap.put(chatId, false);
-            /* + */ commandWaiter.put(chatId, NONE);
+            commandWaiter.put(chatId, NONE);
         } catch (NumberFormatException e) {
             responseMessage = "Пожалуйста, введите корректный год!";
         }
@@ -263,8 +230,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
     protected String handleAge(String messageText, long chatId) {
         if (isCommand(messageText)) {
-//            /* - */ waitingForAgeMap.put(chatId, false);
-            /* + */ commandWaiter.put(chatId, NONE);
+            commandWaiter.put(chatId, NONE);
             return handleCommands(messageText, chatId);
         }
 
@@ -275,8 +241,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
             if (userAge >= 0 && userAge <= 100) {
                 responseMessage = "Спасибо! Учтем ваш ответ";
-//                /* - */ waitingForAgeMap.put(chatId, false);
-                /* + */ commandWaiter.put(chatId, NONE);
+                commandWaiter.put(chatId, NONE);
             } else {
                 responseMessage = "Пожалуйста, введите корректное число (от 0 до 100)";
             }
