@@ -156,7 +156,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             if (moviesByGenre != null && moviesByGenre.results != null && !moviesByGenre.results.isEmpty()) {
                 List<FilmDeserializer> movies = moviesByGenre.results;
                 int currentIndex = genreMovieIndexMap.getOrDefault(genreId, 0);
-                StringBuilder movieListBuilder = new StringBuilder("Фильмы жанра " + messageText + ":\n");
+                StringBuilder movieListBuilder = new StringBuilder("Фильмы жанра " + messageText + ":" + "\n");
 
                 for (int i = 0; i < nOfFilms; i++) {
                     FilmDeserializer currentMovie = movies.get((currentIndex + i) % movies.size());
@@ -196,7 +196,6 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             }
 
             MovieParameters params = new ParametersBuilder()
-                    .withLanguage("en")
                     .withYear(userYear)
                     .withCertificationLte("PG-13")
                     .withCertificationCountry("US")
@@ -206,7 +205,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             if (moviesByYear != null && moviesByYear.results != null && !moviesByYear.results.isEmpty()) {
                 List<FilmDeserializer> movies = moviesByYear.results;
                 int currentIndex = yearMovieIndexMap.getOrDefault(userYear, 0);
-                StringBuilder movieListBuilder = new StringBuilder("Фильмы, выпущенные в " + userYear + " году:\n");
+                StringBuilder movieListBuilder = new StringBuilder("Фильмы, выпущенные в " + userYear + " году:" + "\n");
 
                 for (int i = 0; i  < nOfFilms; i++) {
                     FilmDeserializer currentMovie = movies.get((currentIndex + i) % movies.size());
