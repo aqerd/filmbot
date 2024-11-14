@@ -33,7 +33,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     private final TelegramClient telegramClient;
     private final ExecutorService executorService = Executors.newFixedThreadPool(4);
-    private final Database database=new Database();
+    private final Database database = new Database();
     private final Gson gson = new Gson();
 
     public int nOfFilms = 10;
