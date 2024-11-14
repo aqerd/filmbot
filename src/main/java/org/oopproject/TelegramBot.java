@@ -12,7 +12,6 @@ import static org.oopproject.utils.CommandWaiter.*;
 import static org.oopproject.utils.Config.tmdbService;
 import static org.oopproject.utils.Validators.isCommand;
 import static org.oopproject.utils.Replies.getReply;
-
 import java.lang.reflect.Type;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -61,28 +60,28 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
             String messageText = update.getMessage().getText();
             String responseMessage;
-            CommandWaiter waiter = commandWaiter.getOrDefault(userID, NONE);
+            CommandWaiter waiter = commandWaiter.getOrDefault(chatId, NONE);
 
             switch (waiter) {
                 case YEAR:
-                    responseMessage = handleYear(messageText, userID);
-                    commandWaiter.put(userID, NONE);
+                    responseMessage = handleYear(messageText, chatId);
+                    commandWaiter.put(chatId, NONE);
                     break;
                 case GENRE:
-                    responseMessage = handleGenre(messageText, userID);
-                    commandWaiter.put(userID, NONE);
+                    responseMessage = handleGenre(messageText, chatId);
+                    commandWaiter.put(chatId, NONE);
                     break;
                 case SETAGE:
-                    responseMessage = handleAge(messageText, userID);
-                    commandWaiter.put(userID, NONE);
+                    responseMessage = handleAge(messageText, chatId);
+                    commandWaiter.put(chatId, NONE);
                     break;
                 default:
-                    responseMessage = handleCommands(messageText, userID);
+                    responseMessage = handleCommands(messageText, chatId);
                     break;
             }
 
             SendMessage message = SendMessage.builder()
-                    .chatId(userID)
+                    .chatId(chatId)
                     .text(responseMessage)
                     .replyMarkup(createCommandKeyboard())
                     .build();
@@ -112,7 +111,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
 
 
-    protected String handleCommands(String messageText, long userID) {
+    protected String handleCommands(String messageText, long chatId) {
         String responseMessage;
 
         switch (messageText) {
@@ -121,15 +120,15 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 break;
             case "/genre": case "Genre":
                 responseMessage = getReply("genre");
-                commandWaiter.put(userID, GENRE);
+                commandWaiter.put(chatId, GENRE);
                 break;
             case "/year": case "Year":
                 responseMessage = getReply("year");
-                commandWaiter.put(userID, YEAR);
+                commandWaiter.put(chatId, YEAR);
                 break;
             case "/setage": case "Set Age":
                 responseMessage = getReply("set age");
-                commandWaiter.put(userID, SETAGE);
+                commandWaiter.put(chatId, SETAGE);
                 break;
             case "/help": case "Help":
                 responseMessage = getReply("help");
@@ -170,8 +169,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
     protected String handleGenre(String messageText, long chatId) {
         if (isCommand(messageText)) {
-            commandWaiter.put(userID, NONE);
-            return handleCommands(messageText, userID);
+            commandWaiter.put(chatId, NONE);
+            return handleCommands(messageText, chatId);
         }
 
         String responseMessage;
@@ -207,7 +206,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             } else {
                 responseMessage = "Извините, я не нашел фильмов для жанра " + messageText;
             }
-            commandWaiter.put(userID, NONE);
+            commandWaiter.put(chatId, NONE);
         } catch (IllegalArgumentException e) {
             responseMessage = "Извините, я не знаю такого жанра. Попробуйте другой";
         }
@@ -223,8 +222,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     protected String handleYear(String messageText, long chatId) {
 
         if (isCommand(messageText)) {
-            commandWaiter.put(userID, NONE);
-            return handleCommands(messageText, userID);
+            commandWaiter.put(chatId, NONE);
+            return handleCommands(messageText, chatId);
         }
 
         String responseMessage;
@@ -265,7 +264,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             } else {
                 responseMessage = "Извините, я не нашел фильмов за " + userYear + " год";
             }
-            commandWaiter.put(userID, NONE);
+            commandWaiter.put(chatId, NONE);
         } catch (NumberFormatException e) {
             responseMessage = "Пожалуйста, введите корректный год!";
         }
@@ -273,10 +272,10 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         return responseMessage;
     }
 
-    protected String handleAge(String messageText, long userID) {
+    protected String handleAge(String messageText, long chatId) {
         if (isCommand(messageText)) {
-            commandWaiter.put(userID, NONE);
-            return handleCommands(messageText, userID);
+            commandWaiter.put(chatId, NONE);
+            return handleCommands(messageText, chatId);
         }
 
         String responseMessage;
@@ -286,7 +285,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
             if (userAge >= 0 && userAge <= 100) {
                 responseMessage = "Спасибо! Учтем ваш ответ";
-                commandWaiter.put(userID, NONE);
+                commandWaiter.put(chatId, NONE);
             } else {
                 responseMessage = "Пожалуйста, введите корректное число (от 0 до 100)";
             }
