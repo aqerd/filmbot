@@ -2,26 +2,30 @@ package org.oopproject;
 
 import static org.oopproject.utils.Config.BOT_TOKEN;
 import feign.FeignException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
 
 public class Main {
+    private static final Logger logger = LoggerFactory.getLogger(Main.class);
+
     public static void main(String[] args) {
         try {
             TelegramBotsLongPollingApplication bot = new TelegramBotsLongPollingApplication();
             bot.registerBot(BOT_TOKEN, new TelegramBot(BOT_TOKEN));
-            System.out.println("SUCCESS: Bot is running");
+            logger.info("Bot is running");
         } catch (TelegramApiException e) {
             e.printStackTrace();
-            System.out.println("ERROR: Bot is NOT running. Something wrong went with Telegram API");
+            logger.error("Bot is NOT running. Something wrong went with Telegram API");
         } catch (FeignException e) {
             if (e.status() == 401) {
-                System.out.println("ERROR: Invalid TMDB TOKEN");
+                logger.error("Invalid TMDB TOKEN");
             } else {
-                System.out.println("ERROR: Something wrong went with Feign: " + e.getMessage());
+                logger.error("Something wrong went with Feign: {}", e.getMessage());
             }
         } catch (Exception e) {
-            System.out.println("ERROR: Unexpected error" + e.getMessage());
+            logger.error("Unexpected error {}", e.getMessage());
         }
     }
 }

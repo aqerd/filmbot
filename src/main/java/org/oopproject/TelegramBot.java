@@ -3,11 +3,12 @@ package org.oopproject;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.oopproject.deserializers.ListDeserializer;
+import org.oopproject.utils.CommandWaiter;
 import org.oopproject.utils.Genres;
 import org.oopproject.parameters.MovieParameters;
 import org.oopproject.parameters.ParametersBuilder;
 import org.oopproject.deserializers.FilmDeserializer;
-
+import static org.oopproject.utils.CommandWaiter.*;
 import static org.oopproject.utils.Config.tmdbService;
 import static org.oopproject.utils.Validators.isCommand;
 import static org.oopproject.utils.Replies.getReply;
@@ -40,10 +41,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
     private final HashMap<Integer, Integer> yearMovieIndexMap = new HashMap<>();
     private final HashMap<String, Integer> genreMovieIndexMap = new HashMap<>();
-
-    private final Map<Long, Boolean> waitingForYearMap = new ConcurrentHashMap<>();
-    private final Map<Long, Boolean> waitingForGenreMap = new ConcurrentHashMap<>();
-    private final Map<Long, Boolean> waitingForAgeMap = new ConcurrentHashMap<>();
+    private final Map<Long, CommandWaiter> commandWaiter = new ConcurrentHashMap<>();
 
     public TelegramBot(String botToken) throws SQLException {
         telegramClient = new OkHttpTelegramClient(botToken);
@@ -59,30 +57,32 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             long chatId = update.getMessage().getChatId();
             database.insertChatId(chatId);
             loadGenreIndexFromDatabase(chatId);
-//            loadYearIndexFromDatabase(chatId);
+            loadYearIndexFromDatabase(chatId);
 
             String messageText = update.getMessage().getText();
             String responseMessage;
+            CommandWaiter waiter = commandWaiter.getOrDefault(userID, NONE);
 
-            boolean waitingForYear = waitingForYearMap.getOrDefault(chatId, false);
-            boolean waitingForGenre = waitingForGenreMap.getOrDefault(chatId, false);
-            boolean waitingForAge = waitingForAgeMap.getOrDefault(chatId, false);
-
-            if (waitingForYear) {
-                responseMessage = handleYear(messageText, chatId);
-                waitingForYearMap.put(chatId, false);
-            } else if (waitingForGenre) {
-                responseMessage = handleGenre(messageText, chatId);
-                waitingForGenreMap.put(chatId, false);
-            } else if (waitingForAge) {
-                responseMessage = handleAge(messageText, chatId);
-                waitingForAgeMap.put(chatId, false);
-            } else {
-                responseMessage = handleCommands(messageText, chatId);
+            switch (waiter) {
+                case YEAR:
+                    responseMessage = handleYear(messageText, userID);
+                    commandWaiter.put(userID, NONE);
+                    break;
+                case GENRE:
+                    responseMessage = handleGenre(messageText, userID);
+                    commandWaiter.put(userID, NONE);
+                    break;
+                case SETAGE:
+                    responseMessage = handleAge(messageText, userID);
+                    commandWaiter.put(userID, NONE);
+                    break;
+                default:
+                    responseMessage = handleCommands(messageText, userID);
+                    break;
             }
 
             SendMessage message = SendMessage.builder()
-                    .chatId(chatId)
+                    .chatId(userID)
                     .text(responseMessage)
                     .replyMarkup(createCommandKeyboard())
                     .build();
@@ -112,23 +112,24 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
 
 
-    private String handleCommands(String messageText, long chatId) {
+    protected String handleCommands(String messageText, long userID) {
         String responseMessage;
+
         switch (messageText) {
             case "/start": case "Start":
                 responseMessage = getReply("start");
                 break;
             case "/genre": case "Genre":
                 responseMessage = getReply("genre");
-                waitingForGenreMap.put(chatId, true);
+                commandWaiter.put(userID, GENRE);
                 break;
             case "/year": case "Year":
                 responseMessage = getReply("year");
-                waitingForYearMap.put(chatId, true);
+                commandWaiter.put(userID, YEAR);
                 break;
             case "/setage": case "Set Age":
                 responseMessage = getReply("set age");
-                waitingForAgeMap.put(chatId, true);
+                commandWaiter.put(userID, SETAGE);
                 break;
             case "/help": case "Help":
                 responseMessage = getReply("help");
@@ -167,20 +168,18 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         database.updateGenreIndexesJson(chatId, jsonGenreString);
     }
 
-    private String handleGenre(String messageText, long chatId) {
+    protected String handleGenre(String messageText, long chatId) {
         if (isCommand(messageText)) {
-            waitingForGenreMap.put(chatId, false);
-            return handleCommands(messageText, chatId);
+            commandWaiter.put(userID, NONE);
+            return handleCommands(messageText, userID);
         }
 
         String responseMessage;
 
-        String genreName = messageText;
         try {
-            String genreId = Genres.valueOf(genreName.toUpperCase()).genreId;
+            String genreId = Genres.valueOf(messageText.toUpperCase()).genreId;
 
             MovieParameters params = new ParametersBuilder()
-                    .withLanguage("ru")
                     .withGenres(genreId)
                     .withCertificationLte("PG-13")
                     .withCertificationCountry("US")
@@ -190,7 +189,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             if (moviesByGenre != null && moviesByGenre.results != null && !moviesByGenre.results.isEmpty()) {
                 List<FilmDeserializer> movies = moviesByGenre.results;
                 int currentIndex = genreMovieIndexMap.getOrDefault(genreId, 0);
-                StringBuilder movieListBuilder = new StringBuilder("Фильмы жанра " + genreName + ":\n");
+                StringBuilder movieListBuilder = new StringBuilder("Фильмы жанра " + messageText + ":" + "\n");
 
                 for (int i = 0; i < nOfFilms; i++) {
                     FilmDeserializer currentMovie = movies.get((currentIndex + i) % movies.size());
@@ -206,11 +205,11 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 responseMessage = movieListBuilder.toString();
 
             } else {
-                responseMessage = "Извините, я не нашел фильмов для жанра " + genreName + ".";
+                responseMessage = "Извините, я не нашел фильмов для жанра " + messageText;
             }
-            waitingForGenreMap.put(chatId, false);
+            commandWaiter.put(userID, NONE);
         } catch (IllegalArgumentException e) {
-            responseMessage = "Извините, я не знаю такого жанра. Попробуйте другой.";
+            responseMessage = "Извините, я не знаю такого жанра. Попробуйте другой";
         }
 
         return responseMessage;
@@ -221,10 +220,11 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         database.updateYearIndexesJson(chatId, jsonYearString);
     }
 
-    private String handleYear(String messageText, long chatId) {
+    protected String handleYear(String messageText, long chatId) {
+
         if (isCommand(messageText)) {
-            waitingForYearMap.put(chatId, false);
-            return handleCommands(messageText, chatId);
+            commandWaiter.put(userID, NONE);
+            return handleCommands(messageText, userID);
         }
 
         String responseMessage;
@@ -234,12 +234,11 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             int currentYear = java.time.Year.now().getValue();
 
             if (userYear < 1900 || userYear > currentYear) {
-                responseMessage = "Пожалуйста, введите год в диапазоне от 1900 до " + currentYear + ".";
+                responseMessage = "Пожалуйста, введите год в диапазоне от 1900 до " + currentYear;
                 return responseMessage;
             }
 
             MovieParameters params = new ParametersBuilder()
-                    .withLanguage("en")
                     .withYear(userYear)
                     .withCertificationLte("PG-13")
                     .withCertificationCountry("US")
@@ -249,7 +248,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             if (moviesByYear != null && moviesByYear.results != null && !moviesByYear.results.isEmpty()) {
                 List<FilmDeserializer> movies = moviesByYear.results;
                 int currentIndex = yearMovieIndexMap.getOrDefault(userYear, 0);
-                StringBuilder movieListBuilder = new StringBuilder("Фильмы, выпущенные в " + userYear + " году:\n");
+                StringBuilder movieListBuilder = new StringBuilder("Фильмы, выпущенные в " + userYear + " году:" + "\n");
 
                 for (int i = 0; i  < nOfFilms; i++) {
                     FilmDeserializer currentMovie = movies.get((currentIndex + i) % movies.size());
@@ -264,9 +263,9 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 responseMessage = movieListBuilder.toString();
 
             } else {
-                responseMessage = "Извините, я не нашел фильмов за " + userYear + " год.";
+                responseMessage = "Извините, я не нашел фильмов за " + userYear + " год";
             }
-            waitingForYearMap.put(chatId, false);
+            commandWaiter.put(userID, NONE);
         } catch (NumberFormatException e) {
             responseMessage = "Пожалуйста, введите корректный год!";
         }
@@ -274,10 +273,10 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         return responseMessage;
     }
 
-    private String handleAge(String messageText, long chatId) {
+    protected String handleAge(String messageText, long userID) {
         if (isCommand(messageText)) {
-            waitingForAgeMap.put(chatId, false);
-            return handleCommands(messageText, chatId);
+            commandWaiter.put(userID, NONE);
+            return handleCommands(messageText, userID);
         }
 
         String responseMessage;
@@ -287,7 +286,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
             if (userAge >= 0 && userAge <= 100) {
                 responseMessage = "Спасибо! Учтем ваш ответ";
-                waitingForAgeMap.put(chatId, false);
+                commandWaiter.put(userID, NONE);
             } else {
                 responseMessage = "Пожалуйста, введите корректное число (от 0 до 100)";
             }

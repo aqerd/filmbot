@@ -1,6 +1,8 @@
 package org.oopproject.utils;
 
 public enum Genres {
+    ACTION(28),
+    ADVENTURE(12),
     ANIMATION(16),
     COMEDY(35),
     CRIME(80),
@@ -25,3 +27,4 @@ public enum Genres {
         this.genreId = String.valueOf(genreId);
     }
 }
+
