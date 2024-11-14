@@ -1,5 +1,7 @@
 package org.oopproject;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import org.oopproject.deserializers.ListDeserializer;
 import org.oopproject.utils.CommandWaiter;
 import org.oopproject.utils.Genres;
@@ -10,6 +12,9 @@ import static org.oopproject.utils.CommandWaiter.*;
 import static org.oopproject.utils.Config.tmdbService;
 import static org.oopproject.utils.Validators.isCommand;
 import static org.oopproject.utils.Replies.getReply;
+
+import java.lang.reflect.Type;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +34,8 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     private final TelegramClient telegramClient;
     private final ExecutorService executorService = Executors.newFixedThreadPool(4);
+    private final Database database=new Database();
+    private final Gson gson = new Gson();
 
     public int nOfFilms = 10;
 
@@ -36,7 +43,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     private final HashMap<String, Integer> genreMovieIndexMap = new HashMap<>();
     private final Map<Long, CommandWaiter> commandWaiter = new ConcurrentHashMap<>();
 
-    public TelegramBot(String botToken) {
+    public TelegramBot(String botToken) throws SQLException {
         telegramClient = new OkHttpTelegramClient(botToken);
     }
 
@@ -47,8 +54,12 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
     public void handleUpdate(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
+            long chatId = update.getMessage().getChatId();
+            database.insertChatId(chatId);
+            loadGenreIndexFromDatabase(chatId);
+            loadYearIndexFromDatabase(chatId);
+
             String messageText = update.getMessage().getText();
-            long userID = update.getMessage().getChatId();
             String responseMessage;
             CommandWaiter waiter = commandWaiter.getOrDefault(userID, NONE);
 
@@ -83,6 +94,23 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             }
         }
     }
+    private void loadGenreIndexFromDatabase(long chatId) {
+        String jsonGenreString = database.getGenreIndexesJson(chatId);
+        if (jsonGenreString != null) {
+            Type type = new TypeToken<HashMap<String, Integer>>(){}.getType();
+            genreMovieIndexMap.putAll(gson.fromJson(jsonGenreString, type));
+        }
+    }
+
+    private void loadYearIndexFromDatabase(long chatId) {
+        String jsonYearString = database.getYearIndexesJson(chatId);
+        if (jsonYearString != null) {
+            Type type = new TypeToken<HashMap<Integer, Integer>>(){}.getType();
+            yearMovieIndexMap.putAll(gson.fromJson(jsonYearString, type));
+        }
+    }
+
+
 
     protected String handleCommands(String messageText, long userID) {
         String responseMessage;
@@ -135,7 +163,12 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         return keyboardMarkup;
     }
 
-    protected String handleGenre(String messageText, long userID) {
+    private void updateGenreIndexInDatabase(long chatId) {
+        String jsonGenreString = gson.toJson(genreMovieIndexMap);
+        database.updateGenreIndexesJson(chatId, jsonGenreString);
+    }
+
+    protected String handleGenre(String messageText, long chatId) {
         if (isCommand(messageText)) {
             commandWaiter.put(userID, NONE);
             return handleCommands(messageText, userID);
@@ -163,8 +196,12 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                     movieListBuilder.append(i + 1).append(". ").append(currentMovie.title).append("\n");
                 }
 
-                currentIndex = (currentIndex + nOfFilms) % movies.size(); // Цикличный просмотр фильмов
+                currentIndex = (currentIndex + nOfFilms) % movies.size();
                 genreMovieIndexMap.put(genreId, currentIndex);
+
+                updateGenreIndexInDatabase(chatId);
+
+
                 responseMessage = movieListBuilder.toString();
 
             } else {
@@ -178,7 +215,13 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         return responseMessage;
     }
 
-    protected String handleYear(String messageText, long userID) {
+    private void updateYearIndexInDatabase(long chatId) {
+        String jsonYearString = gson.toJson(yearMovieIndexMap);
+        database.updateYearIndexesJson(chatId, jsonYearString);
+    }
+
+    protected String handleYear(String messageText, long chatId) {
+
         if (isCommand(messageText)) {
             commandWaiter.put(userID, NONE);
             return handleCommands(messageText, userID);
@@ -214,6 +257,9 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
                 currentIndex = (currentIndex + nOfFilms) % movies.size();
                 yearMovieIndexMap.put(userYear, currentIndex);
+
+                updateYearIndexInDatabase(chatId);
+
                 responseMessage = movieListBuilder.toString();
 
             } else {
