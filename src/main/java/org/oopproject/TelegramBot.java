@@ -1,7 +1,7 @@
 package org.oopproject;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+//import com.google.gson.reflect.TypeToken;
 import org.oopproject.deserializers.ListDeserializer;
 import org.oopproject.utils.CommandWaiter;
 import org.oopproject.utils.Genres;
@@ -12,7 +12,7 @@ import static org.oopproject.utils.CommandWaiter.*;
 import static org.oopproject.utils.Config.tmdbService;
 import static org.oopproject.utils.Validators.isCommand;
 import static org.oopproject.utils.Replies.getReply;
-import java.lang.reflect.Type;
+//import java.lang.reflect.Type;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,7 +33,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     private final TelegramClient telegramClient;
     private final ExecutorService executorService = Executors.newFixedThreadPool(4);
-    private final Database database = new Database();
+//    private final Database database = new Database();
     private final Gson gson = new Gson();
 
     public int nOfFilms = 10;
@@ -54,9 +54,9 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     public void handleUpdate(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
             long chatId = update.getMessage().getChatId();
-            database.insertChatId(chatId);
-            loadGenreIndexFromDatabase(chatId);
-            loadYearIndexFromDatabase(chatId);
+//            database.insertChatId(chatId);
+//            loadGenreIndexFromDatabase(chatId);
+//            loadYearIndexFromDatabase(chatId);
 
             String messageText = update.getMessage().getText();
             String responseMessage;
@@ -93,23 +93,22 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             }
         }
     }
-    private void loadGenreIndexFromDatabase(long chatId) {
-        String jsonGenreString = database.getGenreIndexesJson(chatId);
-        if (jsonGenreString != null) {
-            Type type = new TypeToken<HashMap<String, Integer>>(){}.getType();
-            genreMovieIndexMap.putAll(gson.fromJson(jsonGenreString, type));
-        }
-    }
 
-    private void loadYearIndexFromDatabase(long chatId) {
-        String jsonYearString = database.getYearIndexesJson(chatId);
-        if (jsonYearString != null) {
-            Type type = new TypeToken<HashMap<Integer, Integer>>(){}.getType();
-            yearMovieIndexMap.putAll(gson.fromJson(jsonYearString, type));
-        }
-    }
-
-
+//    private void loadGenreIndexFromDatabase(long chatId) {
+//        String jsonGenreString = database.getGenreIndexesJson(chatId);
+//        if (jsonGenreString != null) {
+//            Type type = new TypeToken<HashMap<String, Integer>>(){}.getType();
+//            genreMovieIndexMap.putAll(gson.fromJson(jsonGenreString, type));
+//        }
+//    }
+//
+//    private void loadYearIndexFromDatabase(long chatId) {
+//        String jsonYearString = database.getYearIndexesJson(chatId);
+//        if (jsonYearString != null) {
+//            Type type = new TypeToken<HashMap<Integer, Integer>>(){}.getType();
+//            yearMovieIndexMap.putAll(gson.fromJson(jsonYearString, type));
+//        }
+//    }
 
     protected String handleCommands(String messageText, long chatId) {
         String responseMessage;
@@ -162,10 +161,10 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         return keyboardMarkup;
     }
 
-    private void updateGenreIndexInDatabase(long chatId) {
-        String jsonGenreString = gson.toJson(genreMovieIndexMap);
-        database.updateGenreIndexesJson(chatId, jsonGenreString);
-    }
+//    private void updateGenreIndexInDatabase(long chatId) {
+//        String jsonGenreString = gson.toJson(genreMovieIndexMap);
+//        database.updateGenreIndexesJson(chatId, jsonGenreString);
+//    }
 
     protected String handleGenre(String messageText, long chatId) {
         if (isCommand(messageText)) {
@@ -188,7 +187,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             if (moviesByGenre != null && moviesByGenre.results != null && !moviesByGenre.results.isEmpty()) {
                 List<FilmDeserializer> movies = moviesByGenre.results;
                 int currentIndex = genreMovieIndexMap.getOrDefault(genreId, 0);
-                StringBuilder movieListBuilder = new StringBuilder("Фильмы жанра " + messageText + ":" + "\n");
+                StringBuilder movieListBuilder = new StringBuilder("Фильмы жанра " + messageText + ":\n");
 
                 for (int i = 0; i < nOfFilms; i++) {
                     FilmDeserializer currentMovie = movies.get((currentIndex + i) % movies.size());
@@ -198,7 +197,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 currentIndex = (currentIndex + nOfFilms) % movies.size();
                 genreMovieIndexMap.put(genreId, currentIndex);
 
-                updateGenreIndexInDatabase(chatId);
+//                updateGenreIndexInDatabase(chatId);
 
 
                 responseMessage = movieListBuilder.toString();
@@ -214,10 +213,10 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         return responseMessage;
     }
 
-    private void updateYearIndexInDatabase(long chatId) {
-        String jsonYearString = gson.toJson(yearMovieIndexMap);
-        database.updateYearIndexesJson(chatId, jsonYearString);
-    }
+//    private void updateYearIndexInDatabase(long chatId) {
+//        String jsonYearString = gson.toJson(yearMovieIndexMap);
+//        database.updateYearIndexesJson(chatId, jsonYearString);
+//    }
 
     protected String handleYear(String messageText, long chatId) {
 
@@ -247,7 +246,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             if (moviesByYear != null && moviesByYear.results != null && !moviesByYear.results.isEmpty()) {
                 List<FilmDeserializer> movies = moviesByYear.results;
                 int currentIndex = yearMovieIndexMap.getOrDefault(userYear, 0);
-                StringBuilder movieListBuilder = new StringBuilder("Фильмы, выпущенные в " + userYear + " году:" + "\n");
+                StringBuilder movieListBuilder = new StringBuilder("Фильмы, выпущенные в " + userYear + " году:\n");
 
                 for (int i = 0; i  < nOfFilms; i++) {
                     FilmDeserializer currentMovie = movies.get((currentIndex + i) % movies.size());
@@ -257,7 +256,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 currentIndex = (currentIndex + nOfFilms) % movies.size();
                 yearMovieIndexMap.put(userYear, currentIndex);
 
-                updateYearIndexInDatabase(chatId);
+//                updateYearIndexInDatabase(chatId);
 
                 responseMessage = movieListBuilder.toString();
 
