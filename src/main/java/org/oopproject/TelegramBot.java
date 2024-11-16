@@ -107,10 +107,11 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                     break;
             }
 
+            CommandWaiter updatedWaiter = commandWaiter.getOrDefault(chatId, NONE);
             SendMessage message = SendMessage.builder()
                     .chatId(chatId)
                     .text(responseMessage)
-                    .replyMarkup(getKeyboardByWaiter(waiter))
+                    .replyMarkup(getKeyboardByWaiter(updatedWaiter))
                     .build();
 
             try {
@@ -203,7 +204,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         String responseMessage;
 
         try {
-            String genreId = Genres.valueOf(messageText.toUpperCase()).genreId;
+            String genreId = Genres.valueOf(messageText.toUpperCase().replace(" ", "_")).genreId;
 
             MovieParameters params = new ParametersBuilder()
                     .withGenres(genreId)
@@ -463,8 +464,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         row6.add("Music");
         row7.add("Mystery");
         row7.add("Romance");
-        row8.add("Science_Fiction");
-        row8.add("Tv_Movie");
+        row8.add("Science Fiction");
+        row8.add("TV Movie");
         row9.add("Thriller");
         row9.add("War");
         row10.add("Western");
