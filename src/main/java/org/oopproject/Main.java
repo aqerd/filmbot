@@ -42,8 +42,9 @@ public class Main {
 //            ListDeserializer m4 = tmdbService.findMovie(params);
 //            ListDeserializer m6 = tmdbService.getRecommendationsForMovie(TMDB_TOKEN, "725201");
 //            ListDeserializer m7 = tmdbService.searchMovie(TMDB_TOKEN, "Oppen", "en-US", 1, "2023");
+            ListDeserializer m8 = tmdbService.searchPerson(TMDB_TOKEN, "ryan", "en-US", 1);
 
-            printPrettyJson(m7);
+            printPrettyJson(m8);
             /****************************** PLAYGROUND ******************************/
 
         } catch (TelegramApiException e) {
