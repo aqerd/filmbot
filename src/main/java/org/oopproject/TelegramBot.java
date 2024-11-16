@@ -298,8 +298,6 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         return responseMessage;
     }
 
-
-
     protected String handlePopular(long chatId) {
         String responseMessage;
 
@@ -363,6 +361,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 } else {
                     filmBuilder.append("Link: ").append("https://www.themoviedb.org/movie/").append(filmID).append("\n");
                 }
+                // если ссылка == нулл то не выводить
 
                 responseMessage = filmBuilder.toString();
 
