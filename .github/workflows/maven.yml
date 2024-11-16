@@ -3,12 +3,14 @@ name: Java Maven CI
 on:
   push:
     branches:
-      - main
-      - no-db-branch
+      - '**'
+    paths:
+      - 'src/**'
   pull_request:
     branches:
-      - main
-      - no-db-branch
+      - '**'
+    paths:
+      - 'src/**'
 
 jobs:
   build-and-test:
