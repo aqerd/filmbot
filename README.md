@@ -1,11 +1,11 @@
 # Filmbot
 #### This bot helps you find films you want to watch based on some filters like genre, year and etc
 
-[![Follow @aqerd on GitHub](https://img.shields.io/github/followers/aqerd?label=RuslanSuleymanov&style=social)](https://github.com/aqerd)
-[![Follow @AnnaKhairillina on GitHub](https://img.shields.io/github/followers/AnnaKhairillina?label=AnnaKhairullina&style=social)](https://github.com/AnnaKhairillina)
-[![Watch filmbot on GitHub](https://img.shields.io/github/watchers/aqerd/filmbot?label=Watch&style=social)](https://github.com/aqerd/filmbot/subscription)
-[![Star filmbot on GitHub](https://img.shields.io/github/stars/aqerd/filmbot?label=Star&style=social)](https://github.com/aqerd/filmbot)
-[![Open issues for filmbot](https://img.shields.io/github/issues/aqerd/filmbot?label=Issues)](https://github.com/aqerd/filmbot/issues)
+[![Follow @aqerd on GitHub](https://img.shields.io/github/followers/aqerd?label=Ruslan%20Suleymanov&style=social-&labelColor=black&color=111111)](https://github.com/aqerd)
+[![Follow @AnnaKhairillina on GitHub](https://img.shields.io/github/followers/AnnaKhairillina?label=Anna%20Khairullina&style=social-&labelColor=black&color=111111)](https://github.com/AnnaKhairillina)
+[![Watch filmbot on GitHub](https://img.shields.io/github/watchers/aqerd/filmbot?label=Watch&style=social-&labelColor=black&color=111111)](https://github.com/aqerd/filmbot/subscription)
+[![Star filmbot on GitHub](https://img.shields.io/github/stars/aqerd/filmbot?label=Star&style=social-&labelColor=black&color=111111)](https://github.com/aqerd/filmbot)
+[![Open issues for filmbot](https://img.shields.io/github/issues/aqerd/filmbot?label=Issues&labelColor=black&color=111111)](https://github.com/aqerd/filmbot/issues)
 
 ## 🚀 Usage
 You can use bot [here](https://t.me/findfilmsbyfiltersbot) in Telegram
