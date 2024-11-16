@@ -15,15 +15,12 @@ public class Replies {
                         /help - Справка
                         /setage - Установить возрастное ограничение
                         Введи команду!""");
-        replies.put("genre", """
-                        Введите жанр, и я найду фильмы по нему.
-                        Вот список доступных жанров:
-                        animation, comedy, crime, documentary, drama, family, fantasy, history, horror, music, mystery, romance, science_fiction, tv_movie, thriller, war, western""");
         replies.put("help", """
                         Доступны следующие команды:
                         /genre - Поиск по жанру
                         /year - Поиск по году
                         /setage - Установить возрастное ограничение""");
+        replies.put("genre", "Введите жанр, и я найду фильмы по нему");
         replies.put("year", "Введите год, и я найду фильмы, выпущенные в этом году");
         replies.put("movie search", "вывод команды");
         replies.put("actor search", "вывод команды");

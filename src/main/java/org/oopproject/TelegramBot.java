@@ -228,7 +228,6 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
 //                updateGenreIndexInDatabase(chatId);
 
-
                 responseMessage = movieListBuilder.toString();
 
             } else {
@@ -298,8 +297,6 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
         return responseMessage;
     }
-
-
 
     protected String handlePopular(long chatId) {
         String responseMessage;
@@ -446,29 +443,26 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         KeyboardRow row5 = new KeyboardRow();
         KeyboardRow row6 = new KeyboardRow();
         KeyboardRow row7 = new KeyboardRow();
-        KeyboardRow row8 = new KeyboardRow();
-        KeyboardRow row9 = new KeyboardRow();
-        KeyboardRow row10 = new KeyboardRow();
 
+        row1.add("Fantasy");
+        row1.add("Horror");
         row1.add("Action");
-        row1.add("Adventure");
-        row2.add("Animation");
-        row2.add("Comedy");
-        row3.add("Crime");
-        row3.add("Documentary");
-        row4.add("Drama");
-        row4.add("Family");
-        row5.add("Fantasy");
-        row5.add("History");
-        row6.add("Horror");
-        row6.add("Music");
-        row7.add("Mystery");
-        row7.add("Romance");
-        row8.add("Science Fiction");
-        row8.add("TV Movie");
-        row9.add("Thriller");
-        row9.add("War");
-        row10.add("Western");
+        row2.add("Music");
+        row2.add("War");
+        row2.add("Drama");
+        row3.add("Western");
+        row3.add("Family");
+        row3.add("Comedy");
+        row4.add("History");
+        row4.add("Crime");
+        row4.add("Mystery");
+        row5.add("Romance");
+        row5.add("Thriller");
+        row5.add("TV Movie");
+        row6.add("Science Fiction");
+        row6.add("Adventure");
+        row7.add("Animation");
+        row7.add("Documentary");
 
         keyboard.add(row1);
         keyboard.add(row2);
@@ -477,9 +471,6 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         keyboard.add(row5);
         keyboard.add(row6);
         keyboard.add(row7);
-        keyboard.add(row8);
-        keyboard.add(row9);
-        keyboard.add(row10);
 
         keyboardMarkup.setKeyboard(keyboard);
         keyboardMarkup.setResizeKeyboard(true);
