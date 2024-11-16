@@ -110,7 +110,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             SendMessage message = SendMessage.builder()
                     .chatId(chatId)
                     .text(responseMessage)
-                    .replyMarkup(createCommandKeyboard())
+                    .replyMarkup(getKeyboardByWaiter(waiter))
                     .build();
 
             try {
@@ -432,6 +432,68 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         keyboardMarkup.setOneTimeKeyboard(true);
 
         return keyboardMarkup;
+    }
+
+    private ReplyKeyboardMarkup createGenreKeyboard() {
+        ReplyKeyboardMarkup keyboardMarkup = ReplyKeyboardMarkup.builder().build();
+        List<KeyboardRow> keyboard = new ArrayList<>();
+
+        KeyboardRow row1 = new KeyboardRow();
+        KeyboardRow row2 = new KeyboardRow();
+        KeyboardRow row3 = new KeyboardRow();
+        KeyboardRow row4 = new KeyboardRow();
+        KeyboardRow row5 = new KeyboardRow();
+        KeyboardRow row6 = new KeyboardRow();
+        KeyboardRow row7 = new KeyboardRow();
+        KeyboardRow row8 = new KeyboardRow();
+        KeyboardRow row9 = new KeyboardRow();
+        KeyboardRow row10 = new KeyboardRow();
+
+        row1.add("Action");
+        row1.add("Adventure");
+        row2.add("Animation");
+        row2.add("Comedy");
+        row3.add("Crime");
+        row3.add("Documentary");
+        row4.add("Drama");
+        row4.add("Family");
+        row5.add("Fantasy");
+        row5.add("History");
+        row6.add("Horror");
+        row6.add("Music");
+        row7.add("Mystery");
+        row7.add("Romance");
+        row8.add("Science_Fiction");
+        row8.add("Tv_Movie");
+        row9.add("Thriller");
+        row9.add("War");
+        row10.add("Western");
+
+        keyboard.add(row1);
+        keyboard.add(row2);
+        keyboard.add(row3);
+        keyboard.add(row4);
+        keyboard.add(row5);
+        keyboard.add(row6);
+        keyboard.add(row7);
+        keyboard.add(row8);
+        keyboard.add(row9);
+        keyboard.add(row10);
+
+        keyboardMarkup.setKeyboard(keyboard);
+        keyboardMarkup.setResizeKeyboard(true);
+        keyboardMarkup.setOneTimeKeyboard(true);
+
+        return keyboardMarkup;
+    }
+
+    private ReplyKeyboardMarkup getKeyboardByWaiter(CommandWaiter waiter) {
+        if (waiter == NONE) {
+            return createCommandKeyboard();
+        } else if (waiter == GENRE) {
+            return createGenreKeyboard();
+        }
+        return null;
     }
 }
 
