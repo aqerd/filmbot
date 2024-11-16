@@ -25,6 +25,12 @@ public class Replies {
                         /year - Поиск по году
                         /setage - Установить возрастное ограничение""");
         replies.put("year", "Введите год, и я найду фильмы, выпущенные в этом году");
+        replies.put("movie search", "вывод команды");
+        replies.put("actor search", "вывод команды");
+        replies.put("similar", "вывод команды");
+        replies.put("recommended", "вывод команды");
+        replies.put("popular", "вывод команды");
+        replies.put("find by id", "вывод команды");
         replies.put("set age", "Введите ваш полный возраст");
         replies.put("unknown", "Команда не распознана. Попробуйте /help для получения списка команд");
     }
