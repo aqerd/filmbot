@@ -70,16 +70,40 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             logger.info("ID: {}, Message: {}, Waiter: {}", chatId, messageText, waiter);
 
             switch (waiter) {
-                case YEAR:
-                    responseMessage = handleYear(messageText, chatId);
-                    commandWaiter.put(chatId, NONE);
-                    break;
                 case GENRE:
                     responseMessage = handleGenre(messageText, chatId);
                     commandWaiter.put(chatId, NONE);
                     break;
+                case YEAR:
+                    responseMessage = handleYear(messageText, chatId);
+                    commandWaiter.put(chatId, NONE);
+                    break;
+                case MOVIESEARCH:
+                    responseMessage = handleMovieSearch(messageText, chatId);
+                    commandWaiter.put(chatId, NONE);
+                    break;
+                case ACTORSEARCH:
+                    responseMessage = handleActorSearch(messageText, chatId);
+                    commandWaiter.put(chatId, NONE);
+                    break;
+                case SIMILAR:
+                    responseMessage = handleSimilar(messageText, chatId);
+                    commandWaiter.put(chatId, NONE);
+                    break;
+                case RECOMMENDED:
+                    responseMessage = handleRecommended(messageText, chatId);
+                    commandWaiter.put(chatId, NONE);
+                    break;
+                case POPULAR:
+                    responseMessage = handlePopular(messageText, chatId);
+                    commandWaiter.put(chatId, NONE);
+                    break;
+                case FINDBYID:
+                    responseMessage = handleFindById(messageText, chatId);
+                    commandWaiter.put(chatId, NONE);
+                    break;
                 case SETAGE:
-                    responseMessage = handleAge(messageText, chatId);
+                    responseMessage = handleSetAge(messageText, chatId);
                     commandWaiter.put(chatId, NONE);
                     break;
                 default:
@@ -131,6 +155,30 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             case "/year": case "Year":
                 responseMessage = getReply("year");
                 commandWaiter.put(chatId, YEAR);
+                break;
+            case "/moviesearch": case "Movie Search":
+                responseMessage = getReply("movie search");
+                commandWaiter.put(chatId, MOVIESEARCH);
+                break;
+            case "/actorsearch": case "Actor Search":
+                responseMessage = getReply("actor search");
+                commandWaiter.put(chatId, ACTORSEARCH);
+                break;
+            case "/similar": case "Similar":
+                responseMessage = getReply("similar");
+                commandWaiter.put(chatId, SIMILAR);
+                break;
+            case "/recommended": case "Recommended":
+                responseMessage = getReply("recommended");
+                commandWaiter.put(chatId, RECOMMENDED);
+                break;
+            case "/popular": case "Popular":
+                responseMessage = getReply("popular");
+                commandWaiter.put(chatId, POPULAR);
+                break;
+            case "/findbyid": case "Find by ID":
+                responseMessage = getReply("find by id");
+                commandWaiter.put(chatId, FINDBYID);
                 break;
             case "/setage": case "Set Age":
                 responseMessage = getReply("set age");
@@ -256,7 +304,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         return responseMessage;
     }
 
-    protected String handleAge(String messageText, long chatId) {
+    protected String handleSetAge(String messageText, long chatId) {
         if (isCommand(messageText)) {
             commandWaiter.put(chatId, NONE);
             return handleCommands(messageText, chatId);
