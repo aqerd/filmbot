@@ -52,6 +52,8 @@ public class Main {
         } catch (FeignException e) {
             if (e.status() == 401) {
                 logger.error("Invalid TMDB TOKEN");
+            } else if (e.status() == 404) {
+                logger.error("Could not find by user's parameters: {}", e.getMessage());
             } else {
                 logger.error("Something wrong went with Feign: {}", e.getMessage());
             }
