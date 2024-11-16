@@ -146,28 +146,6 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         return responseMessage;
     }
 
-    private ReplyKeyboardMarkup createCommandKeyboard() {
-        ReplyKeyboardMarkup keyboardMarkup = ReplyKeyboardMarkup.builder().build();
-        List<KeyboardRow> keyboard = new ArrayList<>();
-
-        KeyboardRow row1 = new KeyboardRow();
-        row1.add("Genre");
-        row1.add("Year");
-
-        KeyboardRow row2 = new KeyboardRow();
-        row2.add("Set Age");
-        row2.add("Help");
-
-        keyboard.add(row1);
-        keyboard.add(row2);
-
-        keyboardMarkup.setKeyboard(keyboard);
-        keyboardMarkup.setResizeKeyboard(true);
-        keyboardMarkup.setOneTimeKeyboard(true);
-
-        return keyboardMarkup;
-    }
-
 //    private void updateGenreIndexInDatabase(long chatId) {
 //        String jsonGenreString = gson.toJson(genreMovieIndexMap);
 //        database.updateGenreIndexesJson(chatId, jsonGenreString);
@@ -189,7 +167,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                     .withCertificationLte("PG-13")
                     .withCertificationCountry("US")
                     .build();
-            ListDeserializer moviesByGenre = tmdbService.findMovie(params);
+            ListDeserializer<FilmDeserializer> moviesByGenre = tmdbService.findMovie(params);
 
             if (moviesByGenre != null && moviesByGenre.results != null && !moviesByGenre.results.isEmpty()) {
                 List<FilmDeserializer> movies = moviesByGenre.results;
@@ -248,7 +226,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                     .withCertificationLte("PG-13")
                     .withCertificationCountry("US")
                     .build();
-            ListDeserializer moviesByYear = tmdbService.findMovie(params);
+            ListDeserializer<FilmDeserializer> moviesByYear = tmdbService.findMovie(params);
 
             if (moviesByYear != null && moviesByYear.results != null && !moviesByYear.results.isEmpty()) {
                 List<FilmDeserializer> movies = moviesByYear.results;
@@ -300,5 +278,39 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         }
 
         return responseMessage;
+    }
+
+    private ReplyKeyboardMarkup createCommandKeyboard() {
+        ReplyKeyboardMarkup keyboardMarkup = ReplyKeyboardMarkup.builder().build();
+        List<KeyboardRow> keyboard = new ArrayList<>();
+
+        KeyboardRow row1 = new KeyboardRow();
+        KeyboardRow row2 = new KeyboardRow();
+        KeyboardRow row3 = new KeyboardRow();
+        KeyboardRow row4 = new KeyboardRow();
+        KeyboardRow row5 = new KeyboardRow();
+
+        row1.add("Genre");
+        row1.add("Year");
+        row2.add("Movie Search");
+        row2.add("Actor Search");
+        row3.add("Similar");
+        row3.add("Recommended");
+        row4.add("Popular");
+        row4.add("Find by ID");
+        row5.add("Set Age");
+        row5.add("Help");
+
+        keyboard.add(row1);
+        keyboard.add(row2);
+        keyboard.add(row3);
+        keyboard.add(row4);
+        keyboard.add(row5);
+
+        keyboardMarkup.setKeyboard(keyboard);
+        keyboardMarkup.setResizeKeyboard(true);
+        keyboardMarkup.setOneTimeKeyboard(true);
+
+        return keyboardMarkup;
     }
 }
