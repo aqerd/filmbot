@@ -7,10 +7,10 @@ import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class HandleAgeTest extends TelegramBot {
+public class HandleSetAgeTest extends TelegramBot {
     private TelegramBot telegramBot;
 
-    public HandleAgeTest() throws SQLException {
+    public HandleSetAgeTest() throws SQLException {
         super("dummy_token");
     }
 
@@ -21,19 +21,19 @@ public class HandleAgeTest extends TelegramBot {
 
     @Test
     void testHandleAgeWithValidAge() {
-        String response = telegramBot.handleAge("25", 1L);
+        String response = telegramBot.handleSetAge("25", 1L);
         assertEquals("Спасибо! Учтем ваш ответ", response);
     }
 
     @Test
     void testHandleAgeWithInvalidAge() {
-        String response = telegramBot.handleAge("150", 1L);
+        String response = telegramBot.handleSetAge("150", 1L);
         assertEquals("Пожалуйста, введите корректное число (от 0 до 100)", response);
     }
 
     @Test
     void testHandleAgeWithNonNumericInput() {
-        String response = telegramBot.handleAge("invalidAge", 1L);
+        String response = telegramBot.handleSetAge("invalidAge", 1L);
         assertEquals("Пожалуйста, введите число", response);
     }
 }
