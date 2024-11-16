@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -31,8 +33,11 @@ import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateC
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
 public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
+    private static final Logger logger = LoggerFactory.getLogger(TelegramBot.class);
+
     private final TelegramClient telegramClient;
     private final ExecutorService executorService = Executors.newFixedThreadPool(4);
+
 //    private final Database database = new Database();
 //    private final Gson gson = new Gson();
 
@@ -61,6 +66,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             String messageText = update.getMessage().getText();
             String responseMessage;
             CommandWaiter waiter = commandWaiter.getOrDefault(chatId, NONE);
+
+            logger.info("ID: {}, Message: {}, Waiter: {}", chatId, messageText, waiter);
 
             switch (waiter) {
                 case YEAR:

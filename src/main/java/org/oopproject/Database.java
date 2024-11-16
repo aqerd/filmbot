@@ -1,5 +1,7 @@
 package org.oopproject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.*;
@@ -7,6 +9,7 @@ import java.util.Properties;
 
 public class Database {
     private Connection connection;
+    private static final Logger logger = LoggerFactory.getLogger(Database.class);
 
     public Database() {
         Properties properties = new Properties();
@@ -15,9 +18,8 @@ public class Database {
             String username = properties.getProperty("db.username");
             String password = properties.getProperty("db.password");
             String connectionUrl = properties.getProperty("db.url");
-
             connection = DriverManager.getConnection(connectionUrl, username, password);
-            System.out.println("Connected to database");
+            logger.info("Connected to database");
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
@@ -25,7 +27,6 @@ public class Database {
 
     public void insertChatId(long chatId) {
         String insertIdQuery = "INSERT INTO users (chatId) VALUES (?) ON DUPLICATE KEY UPDATE chatId=chatId";
-
         try (PreparedStatement insertStatement = connection.prepareStatement(insertIdQuery)) {
             insertStatement.setLong(1, chatId);
             insertStatement.executeUpdate();
