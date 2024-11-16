@@ -6,10 +6,9 @@ public class FilmDeserializer {
     public boolean adult;
     public String backdrop_path;
     public int budget;
-    public List<GenreDeserializer> genres;
-    public int[] genre_ids;
+    public List<Integer> genre_ids;
     public String homepage;
-    public String id;
+    public int id;
     public String imdb_id;
     public String[] origin_country;
     public String original_language;
@@ -28,6 +27,7 @@ public class FilmDeserializer {
     public double vote_average;
     public double vote_count;
 //    public boolean belongs_to_collection;
+//    public List<Integer> genres;
 //    public List<FilmDeserializer> production_companies;
 //    public List<FilmDeserializer> production_countries;
 }
