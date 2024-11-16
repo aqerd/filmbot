@@ -10,6 +10,7 @@ public class FilmDeserializer {
     public String homepage;
     public int id;
     public String imdb_id;
+    public String media_type;
     public String[] origin_country;
     public String original_language;
     public String original_title;
