@@ -1,5 +1,6 @@
 package org.oopproject.utils;
 
+import com.google.gson.Gson;
 import feign.Feign;
 import feign.gson.GsonDecoder;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -17,9 +18,8 @@ public class Config {
         TMDB_TOKEN = dotenv.get("TMDB_ACCESS_TOKEN");
         BASE_URL = "https://api.themoviedb.org/3";
 
-        tmdbService = Feign
-                .builder()
-                .decoder(new GsonDecoder())
+        tmdbService = Feign.builder()
+                .decoder(new GsonDecoder(new Gson()))
                 .target(SiteRequests.class, BASE_URL);
     }
 }
