@@ -3,6 +3,7 @@ package org.oopproject;
 import feign.Param;
 import feign.RequestLine;
 import org.oopproject.deserializers.FilmDeserializer;
+import org.oopproject.deserializers.PersonDeserializer;
 import org.oopproject.parameters.MovieParameters;
 import org.oopproject.deserializers.AuthDeserializer;
 import org.oopproject.deserializers.ListDeserializer;
@@ -12,7 +13,7 @@ public interface SiteRequests {
     AuthDeserializer checkAuthStatus(@Param("api_key") String token);
 
     @RequestLine("GET /movie/popular?api_key={api_key}")
-    ListDeserializer getPopularMovies(@Param("api_key") String token);
+    ListDeserializer<FilmDeserializer> getPopularMovies(@Param("api_key") String token);
 
     @RequestLine("GET /movie/{id}?api_key={api_key}")
     FilmDeserializer getMovieById(@Param("api_key") String token, @Param("id") String id);
@@ -45,7 +46,7 @@ public interface SiteRequests {
             // "&with_runtime.lte={with_runtime_lte}" +
             // "&without_genres={without_genres}"
             )
-    ListDeserializer findMovie(@Param("api_key") String token,
+    ListDeserializer<FilmDeserializer> findMovie(@Param("api_key") String token,
             @Param("certification_lte") String certificationLte,
             @Param("certification_country") String certificationCountry,
             @Param("include_adult") boolean includeAdult,
@@ -73,7 +74,7 @@ public interface SiteRequests {
             // @Param("without_genres") String withoutGenres,
     );
 
-    default ListDeserializer findMovie(MovieParameters params) {
+    default ListDeserializer<FilmDeserializer> findMovie(MovieParameters params) {
         return findMovie(
                 params.token(),
                 params.certificationLte(),
@@ -94,10 +95,10 @@ public interface SiteRequests {
     }
     
     @RequestLine("GET /movie/{id}/similar?api_key={api_key}")
-    ListDeserializer getSimilarMovies(@Param("api_key") String token, @Param("id") String id);
+    ListDeserializer<FilmDeserializer> getSimilarMovies(@Param("api_key") String token, @Param("id") String id);
 
     @RequestLine("GET /movie/{id}/recommendations?api_key={api_key}")
-    ListDeserializer getRecommendationsForMovie(@Param("api_key") String token, @Param("id") String id);
+    ListDeserializer<FilmDeserializer> getRecommendationsForMovie(@Param("api_key") String token, @Param("id") String id);
 
     @RequestLine("GET /search/movie" +
             "?api_key={api_key}" +
@@ -108,11 +109,27 @@ public interface SiteRequests {
             // +
             // "&include_adult={adult}"
     )
-    ListDeserializer searchMovie(@Param("api_key") String token,
+    ListDeserializer<FilmDeserializer> searchMovie(@Param("api_key") String token,
             @Param("query") String query,
             @Param("language") String language,
             @Param("page") int page,
             @Param("year") String year
+            // ,
+            // @Param("adult") boolean adult
+    );
+
+    @RequestLine("GET /search/person?" +
+            "api_key={api_key}" +
+            "&query={query}" +
+            "&language={language}" +
+            "&page={page}"
+            // +
+            // "&include_adult={adult}"
+    )
+    ListDeserializer<PersonDeserializer> searchPerson(@Param("api_key") String token,
+            @Param("query") String query,
+            @Param("language") String language,
+            @Param("page") int page
             // ,
             // @Param("adult") boolean adult
     );
