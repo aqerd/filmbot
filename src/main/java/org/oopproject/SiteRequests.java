@@ -99,11 +99,21 @@ public interface SiteRequests {
     @RequestLine("GET /movie/{id}/recommendations?api_key={api_key}")
     ListDeserializer getRecommendationsForMovie(@Param("api_key") String token, @Param("id") String id);
 
-    @RequestLine("GET /search/movie?query={query}&include_adult={adult}&language={language}&page={page}&year={year}")
+    @RequestLine("GET /search/movie" +
+            "?api_key={api_key}" +
+            "&query={query}" +
+            "&language={language}" +
+            "&page={page}" +
+            "&year={year}"
+            // +
+            // "&include_adult={adult}"
+    )
     ListDeserializer searchMovie(@Param("api_key") String token,
-                             @Param("query") String query,
-                             @Param("adult") boolean adult,
-                             @Param("language") String language,
-                             @Param("page") int page,
-                             @Param("year") String year);
+            @Param("query") String query,
+            @Param("language") String language,
+            @Param("page") int page,
+            @Param("year") String year
+            // ,
+            // @Param("adult") boolean adult
+    );
 }
