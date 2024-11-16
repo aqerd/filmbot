@@ -16,7 +16,7 @@ public class Validators {
         return COMMANDS.contains(text);
     }
 
-    public <Deserializer> void printPrettyJson(Deserializer des) {
+    public static <Deserializer> void printPrettyJson(Deserializer des) {
         String prettyJson = new GsonBuilder()
                 .setPrettyPrinting()
                 .create()
