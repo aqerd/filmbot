@@ -18,6 +18,46 @@ public interface SiteRequests {
     @RequestLine("GET /movie/{id}?api_key={api_key}")
     FilmDeserializer getMovieById(@Param("api_key") String token, @Param("id") String id);
 
+    @RequestLine("GET /movie/{id}/similar?api_key={api_key}")
+    ListDeserializer<FilmDeserializer> getSimilarMovies(@Param("api_key") String token, @Param("id") String id);
+
+    @RequestLine("GET /movie/{id}/recommendations?api_key={api_key}")
+    ListDeserializer<FilmDeserializer> getRecommendationsForMovie(@Param("api_key") String token, @Param("id") String id);
+
+    @RequestLine("GET /search/movie" +
+            "?api_key={api_key}" +
+            "&query={query}" +
+            "&language={language}" +
+            "&page={page}" +
+            "&year={year}"
+            // +
+            // "&include_adult={adult}"
+    )
+    ListDeserializer<FilmDeserializer> searchMovie(@Param("api_key") String token,
+            @Param("query") String query,
+            @Param("language") String language,
+            @Param("page") int page,
+            @Param("year") String year
+            // ,
+            // @Param("adult") boolean adult
+    );
+
+    @RequestLine("GET /search/person?" +
+            "api_key={api_key}" +
+            "&query={query}" +
+            "&language={language}" +
+            "&page={page}"
+            // +
+            // "&include_adult={adult}"
+    )
+    ListDeserializer<PersonDeserializer> searchPerson(@Param("api_key") String token,
+            @Param("query") String query,
+            @Param("language") String language,
+            @Param("page") int page
+            // ,
+            // @Param("adult") boolean adult
+    );
+
     @RequestLine("GET /discover/movie" +
             "?api_key={api_key}" +
             "&certification.lte={certification_lte}" +
@@ -93,44 +133,4 @@ public interface SiteRequests {
                 params.year()
         );
     }
-    
-    @RequestLine("GET /movie/{id}/similar?api_key={api_key}")
-    ListDeserializer<FilmDeserializer> getSimilarMovies(@Param("api_key") String token, @Param("id") String id);
-
-    @RequestLine("GET /movie/{id}/recommendations?api_key={api_key}")
-    ListDeserializer<FilmDeserializer> getRecommendationsForMovie(@Param("api_key") String token, @Param("id") String id);
-
-    @RequestLine("GET /search/movie" +
-            "?api_key={api_key}" +
-            "&query={query}" +
-            "&language={language}" +
-            "&page={page}" +
-            "&year={year}"
-            // +
-            // "&include_adult={adult}"
-    )
-    ListDeserializer<FilmDeserializer> searchMovie(@Param("api_key") String token,
-            @Param("query") String query,
-            @Param("language") String language,
-            @Param("page") int page,
-            @Param("year") String year
-            // ,
-            // @Param("adult") boolean adult
-    );
-
-    @RequestLine("GET /search/person?" +
-            "api_key={api_key}" +
-            "&query={query}" +
-            "&language={language}" +
-            "&page={page}"
-            // +
-            // "&include_adult={adult}"
-    )
-    ListDeserializer<PersonDeserializer> searchPerson(@Param("api_key") String token,
-            @Param("query") String query,
-            @Param("language") String language,
-            @Param("page") int page
-            // ,
-            // @Param("adult") boolean adult
-    );
 }
