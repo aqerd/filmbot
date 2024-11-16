@@ -4,12 +4,14 @@ on:
   push:
     branches:
       - main
+      - no-db-branch
   pull_request:
     branches:
       - main
+      - no-db-branch
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -33,5 +35,5 @@ jobs:
       - name: Build with Maven
         run: mvn -B package --file pom.xml
 
-      - name: Run Tests
+      - name: Run clean tests
         run: mvn clean test
