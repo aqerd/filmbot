@@ -10,7 +10,7 @@ public class Config {
     public static final String BOT_TOKEN;
     public static final String TMDB_TOKEN;
     public static final String BASE_URL;
-    public static SiteRequests tmdbService;
+    public static final SiteRequests tmdbService;
 
     static {
         Dotenv dotenv = Dotenv.configure().directory("assets").filename("token.env").load();
