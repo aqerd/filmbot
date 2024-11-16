@@ -1,14 +1,21 @@
 # Filmbot
 #### This bot helps you find films you want to watch based on some filters like genre, year and etc
-<a class="github-button" href="https://github.com/aqerd" data-color-scheme="no-preference: light; light: light; dark: dark_dimmed;" data-size="large" data-show-count="true" aria-label="Follow @aqerd on GitHub">Follow @aqerd</a>
-<a class="github-button" href="https://github.com/AnnaKhairillina" data-color-scheme="no-preference: light; light: light; dark: dark_dimmed;" data-size="large" data-show-count="true" aria-label="Follow @AnnaKhairillina on GitHub">Follow @AnnaKhairillina</a>
-<a class="github-button" href="https://github.com/aqerd/filmbot/subscription" data-color-scheme="no-preference: light; light: light; dark: dark_dimmed;" data-icon="octicon-eye" data-size="large" data-show-count="true" aria-label="Watch aqerd/filmbot on GitHub">Watch</a>
-<a class="github-button" href="https://github.com/aqerd/filmbot" data-color-scheme="no-preference: light; light: light; dark: dark_dimmed;" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star aqerd/filmbot on GitHub">Star</a>
-<a class="github-button" href="https://github.com/aqerd/filmbot/issues" data-color-scheme="no-preference: light; light: light; dark: dark_dimmed;" data-icon="octicon-issue-opened" data-size="large" data-show-count="true" aria-label="Issue aqerd/filmbot on GitHub">Issue</a>
 
 
-
-
+<!DOCTYPE HTML>
+<html lang="en">
+    <head>
+        <script async defer src="https://buttons.github.io/buttons.js"></script>
+        <title></title>
+    </head>
+    <body>
+        <a class="github-button" href="https://github.com/aqerd" data-color-scheme="no-preference: light; light: light; dark: dark_dimmed;" data-size="large" data-show-count="true" aria-label="Follow @aqerd on GitHub">Follow @aqerd</a>
+        <a class="github-button" href="https://github.com/AnnaKhairillina" data-color-scheme="no-preference: light; light: light; dark: dark_dimmed;" data-size="large" data-show-count="true" aria-label="Follow @AnnaKhairillina on GitHub">Follow @AnnaKhairillina</a>
+        <a class="github-button" href="https://github.com/aqerd/filmbot/subscription" data-color-scheme="no-preference: light; light: light; dark: dark_dimmed;" data-icon="octicon-eye" data-size="large" data-show-count="true" aria-label="Watch aqerd/filmbot on GitHub">Watch</a>
+        <a class="github-button" href="https://github.com/aqerd/filmbot" data-color-scheme="no-preference: light; light: light; dark: dark_dimmed;" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star aqerd/filmbot on GitHub">Star</a>
+        <a class="github-button" href="https://github.com/aqerd/filmbot/issues" data-color-scheme="no-preference: light; light: light; dark: dark_dimmed;" data-icon="octicon-issue-opened" data-size="large" data-show-count="true" aria-label="Issue aqerd/filmbot on GitHub">Issue</a>
+    </body>
+</html>
 
 ## 🚀 Usage
 You can use bot [here](https://t.me/findfilmsbyfiltersbot) in Telegram
