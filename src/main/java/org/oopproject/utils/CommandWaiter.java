@@ -8,7 +8,6 @@ public enum CommandWaiter {
     ACTORSEARCH,
     SIMILAR,
     RECOMMENDED,
-    POPULAR,
     FINDBYID,
     SETAGE;
 }

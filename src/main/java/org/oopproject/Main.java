@@ -36,16 +36,16 @@ public class Main {
                     .withCertificationCountry("US")
                     .build();
 
-            FilmDeserializer m1 = tmdbService.getMovieById(TMDB_TOKEN, "725201");
+            FilmDeserializer m1 = tmdbService.getMovieById(TMDB_TOKEN, 725201);
             ListDeserializer<FilmDeserializer> m2 = tmdbService.getPopularMovies(TMDB_TOKEN);
             AuthDeserializer m3 = tmdbService.checkAuthStatus(TMDB_TOKEN);
-            ListDeserializer<FilmDeserializer> m5 = tmdbService.getSimilarMovies(TMDB_TOKEN, "725201");
+            ListDeserializer<FilmDeserializer> m5 = tmdbService.getSimilarMovies(TMDB_TOKEN, 725201);
             ListDeserializer<FilmDeserializer> m4 = tmdbService.findMovie(params);
-            ListDeserializer<FilmDeserializer> m6 = tmdbService.getRecommendationsForMovie(TMDB_TOKEN, "725201");
+            ListDeserializer<FilmDeserializer> m6 = tmdbService.getRecommendationsForMovie(TMDB_TOKEN, 725201);
             ListDeserializer<FilmDeserializer> m7 = tmdbService.searchMovie(TMDB_TOKEN, "Oppen", "en-US", 1, "2023");
             ListDeserializer<PersonDeserializer> m8 = tmdbService.searchPerson(TMDB_TOKEN, "ryan", "en-US", 1);
 
-            printPrettyJson(m8);
+            printPrettyJson(m1);
             /****************************** PLAYGROUND ******************************/
 
         } catch (TelegramApiException e) {

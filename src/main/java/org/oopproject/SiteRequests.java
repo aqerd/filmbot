@@ -16,13 +16,13 @@ public interface SiteRequests {
     ListDeserializer<FilmDeserializer> getPopularMovies(@Param("api_key") String token);
 
     @RequestLine("GET /movie/{id}?api_key={api_key}")
-    FilmDeserializer getMovieById(@Param("api_key") String token, @Param("id") String id);
+    FilmDeserializer getMovieById(@Param("api_key") String token, @Param("id") int id);
 
     @RequestLine("GET /movie/{id}/similar?api_key={api_key}")
-    ListDeserializer<FilmDeserializer> getSimilarMovies(@Param("api_key") String token, @Param("id") String id);
+    ListDeserializer<FilmDeserializer> getSimilarMovies(@Param("api_key") String token, @Param("id") int id);
 
     @RequestLine("GET /movie/{id}/recommendations?api_key={api_key}")
-    ListDeserializer<FilmDeserializer> getRecommendationsForMovie(@Param("api_key") String token, @Param("id") String id);
+    ListDeserializer<FilmDeserializer> getRecommendationsForMovie(@Param("api_key") String token, @Param("id") int id);
 
     @RequestLine("GET /search/movie" +
             "?api_key={api_key}" +

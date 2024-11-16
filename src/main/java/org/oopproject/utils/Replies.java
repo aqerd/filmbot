@@ -29,7 +29,6 @@ public class Replies {
         replies.put("actor search", "вывод команды");
         replies.put("similar", "вывод команды");
         replies.put("recommended", "вывод команды");
-        replies.put("popular", "вывод команды");
         replies.put("find by id", "вывод команды");
         replies.put("set age", "Введите ваш полный возраст");
         replies.put("unknown", "Команда не распознана. Попробуйте /help для получения списка команд");
