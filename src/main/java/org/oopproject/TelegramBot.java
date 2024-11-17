@@ -171,7 +171,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
                 AnswerCallbackQuery answerCallbackQuery = AnswerCallbackQuery.builder()
                         .callbackQueryId(update.getCallbackQuery().getId())
-                        .text("Вы выбрали фильм " + film.title)
+                        .text("Выполнен поиск по " + film.title)
                         .showAlert(false)
                         .build();
                 answerCallbackQuery.setCallbackQueryId(update.getCallbackQuery().getId());
@@ -194,20 +194,28 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 }
                 actorsData.append(")").append("\n").append("Place of birth: ").append(actor.place_of_birth)
                         .append("\n").append("Popularity: ").append(actor.popularity)
-                        .append("\n").append("ID: ").append(actor.id).append("\n\n")
-                        .append(actor.biography).append("\n\n");
+                        .append("\n").append("ID: ").append(actor.id).append("\n\n");
+                if (!Objects.equals(actor.biography, "")) {
+                    actorsData.append(actor.biography).append("\n\n");
+                }
 
                 if ((actorsFilms.cast != null || actorsFilms.crew != null) && actor.known_for_department != null) {
                     StringBuilder actorsFilmsBuilder = new StringBuilder("Фильмы с участием " + actor.name + ":\n");
+
                     if (Objects.equals(actor.known_for_department, "Acting")) {
                         movies = actorsFilms.cast;
                     } else {
                         movies = actorsFilms.crew;
                     }
 
-                    for (int i = 0; i < constNumber; i++) {
-                        FilmDeserializer currentMovie = movies.get(i);
-                        actorsFilmsBuilder.append(i + 1).append(". ").append(currentMovie.title).append("\n");
+                    if (movies != null && !movies.isEmpty()) {
+                        int filmsToDisplay = Math.min(constNumber, movies.size());
+                        for (int i = 0; i < filmsToDisplay; i++) {
+                            FilmDeserializer currentMovie = movies.get(i);
+                            actorsFilmsBuilder.append(i + 1).append(". ").append(currentMovie.title).append("\n");
+                        }
+                    } else {
+                        actorsFilmsBuilder.append("Фильмов не найдено.\n");
                     }
 
                     responseMessage = actorsData.append(actorsFilmsBuilder).toString();
@@ -231,7 +239,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
                 AnswerCallbackQuery answerCallbackQuery = AnswerCallbackQuery.builder()
                         .callbackQueryId(update.getCallbackQuery().getId())
-                        .text("Вы выбрали актёра " + actor.name)
+                        .text("Выполнен поиск по " + actor.name)
                         .showAlert(false)
                         .build();
                 answerCallbackQuery.setCallbackQueryId(update.getCallbackQuery().getId());
