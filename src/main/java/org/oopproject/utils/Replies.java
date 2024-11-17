@@ -33,6 +33,7 @@ public class Replies {
                         /toprated - Высоко-оценённые фильмы
                         /findbyid - поиск фильма по ID TMDB
                         /setage - Установить возрастное ограничение""");
+        replies.put("genre", "Введите жанр, и я найду фильмы по нему");
         replies.put("year", "Введите год, и я найду фильмы, выпущенные в этом году");
         replies.put("movie search", "Введите фильм который вы хотите найти");
         replies.put("actor search", "Введите актёра который вы хотите найти");

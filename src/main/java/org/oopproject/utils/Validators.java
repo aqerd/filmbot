@@ -5,22 +5,22 @@ import java.util.Set;
 
 public class Validators {
     private static final Set<String> COMMANDS = Set.of(
-            "/start", "Start",
-            "/genre", "Genre",
-            "/year", "Year",
-            "/moviesearch", "Movie Search",
-            "/actorsearch", "Actor Search",
-            "/similar", "Similar",
-            "/recommended", "Recommended",
-            "/popular", "Popular",
-            "/toprated", "Top Rated",
-            "/findbyid", "Find by ID",
-            "/setage", "Set Age",
-            "/help", "Help"
+            "/start", "start",
+            "/genre", "genre",
+            "/year", "year",
+            "/moviesearch", "movie search",
+            "/actorsearch", "actor search",
+            "/similar", "similar",
+            "/recommended", "recommended",
+            "/popular", "popular",
+            "/toprated", "top rated",
+            "/findbyid", "find by id",
+            "/setage", "set age",
+            "/help", "help"
     );
 
     public static boolean isCommand(String text) {
-        return COMMANDS.contains(text);
+        return COMMANDS.contains(text.toLowerCase());
     }
 
     public static <Deserializer> void printPrettyJson(Deserializer des) {

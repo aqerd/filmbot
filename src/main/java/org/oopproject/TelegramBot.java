@@ -113,10 +113,11 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                     break;
             }
 
+            CommandWaiter updatedWaiter = commandWaiter.getOrDefault(chatId, NONE);
             SendMessage message = SendMessage.builder()
                     .chatId(chatId)
                     .text(responseMessage)
-                    .replyMarkup(createCommandKeyboard())
+                    .replyMarkup(getKeyboardByWaiter(updatedWaiter))
                     .build();
 
             try {
@@ -215,35 +216,35 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     protected String handleCommands(String messageText, long chatId) {
         String responseMessage;
 
-        switch (messageText) {
-            case "/start": case "Start":
+        switch (messageText.toLowerCase()) {
+            case "/start": case "start":
                 responseMessage = getReply("start");
                 break;
-            case "/genre": case "Genre":
+            case "/genre": case "genre":
                 responseMessage = getReply("genre");
                 commandWaiter.put(chatId, GENRE);
                 break;
-            case "/year": case "Year":
+            case "/year": case "year":
                 responseMessage = getReply("year");
                 commandWaiter.put(chatId, YEAR);
                 break;
-            case "/moviesearch": case "Movie Search":
+            case "/moviesearch": case "movie search":
                 responseMessage = getReply("movie search");
                 commandWaiter.put(chatId, MOVIESEARCH);
                 break;
-            case "/actorsearch": case "Actor Search":
+            case "/actorsearch": case "actor search":
                 responseMessage = getReply("actor search");
                 commandWaiter.put(chatId, ACTORSEARCH);
                 break;
-            case "/similar": case "Similar":
+            case "/similar": case "similar":
                 responseMessage = getReply("similar");
                 commandWaiter.put(chatId, SIMILAR);
                 break;
-            case "/recommended": case "Recommended":
+            case "/recommended": case "recommended":
                 responseMessage = getReply("recommended");
                 commandWaiter.put(chatId, RECOMMENDED);
                 break;
-            case "/popular": case "Popular":
+            case "/popular": case "popular":
                 responseMessage = handlePopular(chatId);
                 break;
             case "/toprated": case "Top Rated":
@@ -253,11 +254,11 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 responseMessage = getReply("find by id");
                 commandWaiter.put(chatId, FINDBYID);
                 break;
-            case "/setage": case "Set Age":
+            case "/setage": case "set age":
                 responseMessage = getReply("set age");
                 commandWaiter.put(chatId, SETAGE);
                 break;
-            case "/help": case "Help":
+            case "/help": case "help":
                 responseMessage = getReply("help");
                 break;
             default:
@@ -281,7 +282,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         String responseMessage;
 
         try {
-            String genreId = Genres.valueOf(messageText.toUpperCase()).genreId;
+            String genreId = Genres.valueOf(messageText.toUpperCase().replace(" ", "_")).genreId;
 
             MovieParameters params = new ParametersBuilder()
                     .withGenres(genreId)
@@ -304,7 +305,6 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 genreMovieIndexMap.put(genreId, currentIndex);
 
 //                updateGenreIndexInDatabase(chatId);
-
 
                 responseMessage = movieListBuilder.toString();
 
@@ -696,5 +696,61 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         keyboardMarkup.setOneTimeKeyboard(true);
 
         return keyboardMarkup;
+    }
+
+    private ReplyKeyboardMarkup createGenreKeyboard() {
+        ReplyKeyboardMarkup keyboardMarkup = ReplyKeyboardMarkup.builder().build();
+        List<KeyboardRow> keyboard = new ArrayList<>();
+
+        KeyboardRow row1 = new KeyboardRow();
+        KeyboardRow row2 = new KeyboardRow();
+        KeyboardRow row3 = new KeyboardRow();
+        KeyboardRow row4 = new KeyboardRow();
+        KeyboardRow row5 = new KeyboardRow();
+        KeyboardRow row6 = new KeyboardRow();
+        KeyboardRow row7 = new KeyboardRow();
+
+        row1.add("Fantasy");
+        row1.add("Horror");
+        row1.add("Action");
+        row2.add("Music");
+        row2.add("War");
+        row2.add("Drama");
+        row3.add("Western");
+        row3.add("Family");
+        row3.add("Comedy");
+        row4.add("History");
+        row4.add("Crime");
+        row4.add("Mystery");
+        row5.add("Romance");
+        row5.add("Thriller");
+        row5.add("TV Movie");
+        row6.add("Science Fiction");
+        row6.add("Adventure");
+        row7.add("Animation");
+        row7.add("Documentary");
+
+        keyboard.add(row1);
+        keyboard.add(row2);
+        keyboard.add(row3);
+        keyboard.add(row4);
+        keyboard.add(row5);
+        keyboard.add(row6);
+        keyboard.add(row7);
+
+        keyboardMarkup.setKeyboard(keyboard);
+        keyboardMarkup.setResizeKeyboard(true);
+        keyboardMarkup.setOneTimeKeyboard(true);
+
+        return keyboardMarkup;
+    }
+
+    private ReplyKeyboardMarkup getKeyboardByWaiter(CommandWaiter waiter) {
+        if (waiter == NONE) {
+            return createCommandKeyboard();
+        } else if (waiter == GENRE) {
+            return createGenreKeyboard();
+        }
+        return null;
     }
 }

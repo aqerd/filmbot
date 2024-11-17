@@ -2,9 +2,7 @@ package org.oopproject;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import java.sql.SQLException;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.oopproject.utils.Replies.getReply;
 
