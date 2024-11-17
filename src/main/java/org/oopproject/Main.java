@@ -42,7 +42,7 @@ public class Main {
             ListDeserializer<FilmDeserializer> m5 = tmdbService.getSimilarMovies(TMDB_TOKEN, 725201);
             ListDeserializer<FilmDeserializer> m4 = tmdbService.findMovie(params);
             ListDeserializer<FilmDeserializer> m6 = tmdbService.getRecommendationsForMovie(TMDB_TOKEN, 725201);
-            ListDeserializer<FilmDeserializer> m7 = tmdbService.searchMovie(TMDB_TOKEN, "Oppen", "en-US", 1, "2023");
+            ListDeserializer<FilmDeserializer> m7 = tmdbService.searchMovie(TMDB_TOKEN, "Oppen", "en-US", 1);
             ListDeserializer<PersonDeserializer> m8 = tmdbService.searchPerson(TMDB_TOKEN, "ryan", "en-US", 1);
             ListDeserializer<FilmDeserializer> m9 = tmdbService.getUpcoming(TMDB_TOKEN);
 

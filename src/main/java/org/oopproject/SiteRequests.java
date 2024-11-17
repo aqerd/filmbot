@@ -39,10 +39,10 @@ public interface SiteRequests {
     ListDeserializer<FilmDeserializer> searchMovie(@Param("api_key") String token,
             @Param("query") String query,
             @Param("language") String language,
-            @Param("page") int page,
-            @Param("year") String year
+            @Param("page") int page
             // ,
-            // @Param("adult") boolean adult
+            // @Param("adult") boolean adult,
+            // @Param("year") String year
     );
 
     @RequestLine("GET /search/person?" +
