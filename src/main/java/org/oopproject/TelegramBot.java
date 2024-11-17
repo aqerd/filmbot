@@ -45,7 +45,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 //    private final Database database = new Database();
 //    private final Gson gson = new Gson();
 
-    private final int nOfFilms = 10;
+    private final int constNumber = 10;
 
     private final HashMap<Integer, Integer> yearMovieIndexMap = new HashMap<>();
     private final HashMap<String, Integer> genreMovieIndexMap = new HashMap<>();
@@ -293,12 +293,12 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 int currentIndex = genreMovieIndexMap.getOrDefault(genreId, 0);
                 StringBuilder movieListBuilder = new StringBuilder("Фильмы жанра " + messageText + ":\n");
 
-                for (int i = 0; i < nOfFilms; i++) {
+                for (int i = 0; i < constNumber; i++) {
                     FilmDeserializer currentMovie = movies.get((currentIndex + i) % movies.size());
                     movieListBuilder.append(i + 1).append(". ").append(currentMovie.title).append("\n");
                 }
 
-                currentIndex = (currentIndex + nOfFilms) % movies.size();
+                currentIndex = (currentIndex + constNumber) % movies.size();
                 genreMovieIndexMap.put(genreId, currentIndex);
 
 //                updateGenreIndexInDatabase(chatId);
@@ -351,12 +351,12 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 int currentIndex = yearMovieIndexMap.getOrDefault(userYear, 0);
                 StringBuilder movieListBuilder = new StringBuilder("Фильмы, выпущенные в " + userYear + " году:\n");
 
-                for (int i = 0; i  < nOfFilms; i++) {
+                for (int i = 0; i  < constNumber; i++) {
                     FilmDeserializer currentMovie = movies.get((currentIndex + i) % movies.size());
                     movieListBuilder.append(i + 1).append(". ").append(currentMovie.title).append("\n");
                 }
 
-                currentIndex = (currentIndex + nOfFilms) % movies.size();
+                currentIndex = (currentIndex + constNumber) % movies.size();
                 yearMovieIndexMap.put(userYear, currentIndex);
 
 //                updateYearIndexInDatabase(chatId);
@@ -385,7 +385,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         ListDeserializer<FilmDeserializer> films = tmdbService.searchMovie(TMDB_TOKEN, messageText, "en-US", 1);
 
         List<FilmDeserializer> movies = films.results;
-        int filmsToProcess = Math.min(nOfFilms, movies.size());
+        int filmsToProcess = Math.min(constNumber, movies.size());
 
         if (filmsToProcess == 0) {
             return "Ничего не найдено";
@@ -433,7 +433,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         ListDeserializer<PersonDeserializer> humans = tmdbService.searchPerson(TMDB_TOKEN, messageText, "en-US", 1);
 
         List<PersonDeserializer> people = humans.results;
-        int actorsToProcess = Math.min(nOfFilms, people.size());
+        int actorsToProcess = Math.min(constNumber, people.size());
 
         if (actorsToProcess == 0) {
             return "Ничего не найдено";
@@ -479,12 +479,12 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 List<FilmDeserializer> movies = popularFilms.results;
                 StringBuilder moviesListBuilder = new StringBuilder("Популярные фильмы:\n");
 
-                for (int i = 0; i < nOfFilms; i++) {
+                for (int i = 0; i < constNumber; i++) {
                     FilmDeserializer currentMovie = movies.get((popularMovieIndex + i) % movies.size());
                     moviesListBuilder.append(popularMovieIndex + i + 1).append(". ").append(currentMovie.title).append("\n");
                 }
 
-                popularMovieIndex = (popularMovieIndex + nOfFilms) % movies.size();
+                popularMovieIndex = (popularMovieIndex + constNumber) % movies.size();
                 responseMessage = moviesListBuilder.toString();
             } else {
                 responseMessage = "Данные не найдены";
@@ -626,12 +626,12 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 //                int currentIndex = yearMovieIndexMap.getOrDefault(userYear, 0);
 //                StringBuilder movieListBuilder = new StringBuilder("Фильмы, выпущенные в " + userYear + " году:\n");
 //
-//                for (int i = 0; i  < nOfFilms; i++) {
+//                for (int i = 0; i  < constNumber; i++) {
 //                    FilmDeserializer currentMovie = movies.get((currentIndex + i) % movies.size());
 //                    movieListBuilder.append(i + 1).append(". ").append(currentMovie.title).append("\n");
 //                }
 //
-//                currentIndex = (currentIndex + nOfFilms) % movies.size();
+//                currentIndex = (currentIndex + constNumber) % movies.size();
 //                yearMovieIndexMap.put(userYear, currentIndex);
 //
 ////                updateYearIndexInDatabase(chatId);
