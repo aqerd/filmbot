@@ -8,7 +8,8 @@ public class Validators {
             "/genre", "Genre",
             "/year", "Year",
             "/help", "Help",
-            "/setage", "Set Age"
+            "/setage", "Set Age",
+            "/subscribe", "Subscribe"
     );
 
     public static boolean isCommand(String text) {
