@@ -4,6 +4,7 @@ package org.oopproject;
 //import com.google.gson.reflect.TypeToken;
 import feign.FeignException;
 import org.oopproject.deserializers.ListDeserializer;
+import org.oopproject.deserializers.PersonDeserializer;
 import org.oopproject.utils.CommandWaiter;
 import org.oopproject.utils.Genres;
 import org.oopproject.parameters.MovieParameters;
@@ -88,10 +89,10 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                     responseMessage = handleMovieSearch(messageText, chatId);
                     commandWaiter.put(chatId, NONE);
                     break;
-//                case ACTORSEARCH:
-//                    responseMessage = handleActorSearch(messageText, chatId);
-//                    commandWaiter.put(chatId, NONE);
-//                    break;
+                case ACTORSEARCH:
+                    responseMessage = handleActorSearch(messageText, chatId);
+                    commandWaiter.put(chatId, NONE);
+                    break;
 //                case SIMILAR:
 //                    responseMessage = handleSimilar(messageText, chatId);
 //                    commandWaiter.put(chatId, NONE);
@@ -374,43 +375,95 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     }
 
     protected String handleMovieSearch(String messageText, long chatId) {
+        if (isCommand(messageText)) {
+            commandWaiter.put(chatId, NONE);
+            return handleCommands(messageText, chatId);
+        }
+
         String responseMessage = "Поиск по \"" + messageText + "\"\nВыберите фильм: ";
         List<InlineKeyboardRow> cols = new ArrayList<>();
         ListDeserializer<FilmDeserializer> films = tmdbService.searchMovie(TMDB_TOKEN, messageText, "en-US", 1);
 
-//        if (films != null && films.results != null && !films.results.isEmpty()) {
-//            return "Ничего не найдено";
-//        }
-
         List<FilmDeserializer> movies = films.results;
-        for (int i = 0; i < nOfFilms; i++) {
+        int filmsToProcess = Math.min(nOfFilms, movies.size());
+
+        if (filmsToProcess == 0) {
+            return "Ничего не найдено";
+        }
+
+        for (int i = 0; i < filmsToProcess; i++) {
             String currentTitle = String.valueOf(movies.get(i).title);
             InlineKeyboardButton button = InlineKeyboardButton.builder()
                     .text(currentTitle)
                     .callbackData("movie_" + currentTitle)
                     .build();
-
-            // Создаем строку для каждой кнопки и добавляем ее в список
             InlineKeyboardRow row = new InlineKeyboardRow();
             row.add(button);
             cols.add(row);
         }
 
-        // Создаем InlineKeyboardMarkup и передаем список строк кнопок
         InlineKeyboardMarkup markupInline = InlineKeyboardMarkup.builder()
-                .keyboard(cols)  // Устанавливаем все строки кнопок
+                .keyboard(cols)
                 .build();
-        markupInline.setKeyboard(cols);  // Устанавливаем все строки кнопок
+        markupInline.setKeyboard(cols);
 
-        // Отправляем сообщение с клавиатурой
         SendMessage response = SendMessage.builder()
                 .chatId(String.valueOf(chatId))
                 .text(responseMessage)
-                .replyMarkup(markupInline)  // Добавляем клавиатуру в сообщение
+                .replyMarkup(markupInline)
                 .build();
         try {
-            telegramClient.execute(response); // Отправка сообщения с кнопками
+            telegramClient.execute(response);
         } catch (TelegramApiException e) {
+            System.err.println("Error while sending message: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    protected String handleActorSearch(String messageText, long chatId) {
+        if (isCommand(messageText)) {
+            commandWaiter.put(chatId, NONE);
+            return handleCommands(messageText, chatId);
+        }
+
+
+        String responseMessage = "Поиск по \"" + messageText + "\"\nВыберите актёра: ";
+        List<InlineKeyboardRow> cols = new ArrayList<>();
+        ListDeserializer<PersonDeserializer> humans = tmdbService.searchPerson(TMDB_TOKEN, messageText, "en-US", 1);
+
+        List<PersonDeserializer> people = humans.results;
+        int actorsToProcess = Math.min(nOfFilms, people.size());
+
+        if (actorsToProcess == 0) {
+            return "Ничего не найдено";
+        }
+
+        for (int i = 0; i < actorsToProcess; i++) {
+            String currentTitle = String.valueOf(people.get(i).name);
+            InlineKeyboardButton button = InlineKeyboardButton.builder()
+                    .text(currentTitle)
+                    .callbackData("actor_" + currentTitle)
+                    .build();
+            InlineKeyboardRow row = new InlineKeyboardRow();
+            row.add(button);
+            cols.add(row);
+        }
+
+        InlineKeyboardMarkup markupInline = InlineKeyboardMarkup.builder()
+                .keyboard(cols)
+                .build();
+        markupInline.setKeyboard(cols);
+
+        SendMessage response = SendMessage.builder()
+                .chatId(String.valueOf(chatId))
+                .text(responseMessage)
+                .replyMarkup(markupInline)
+                .build();
+        try {
+            telegramClient.execute(response);
+        } catch (TelegramApiException e) {
+            System.err.println("Error while sending message: " + e.getMessage());
             e.printStackTrace();
         }
         return "";
@@ -426,7 +479,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 List<FilmDeserializer> movies = popularFilms.results;
                 StringBuilder moviesListBuilder = new StringBuilder("Популярные фильмы:\n");
 
-                for (int i = 0; i  < nOfFilms; i++) {
+                for (int i = 0; i < nOfFilms; i++) {
                     FilmDeserializer currentMovie = movies.get((popularMovieIndex + i) % movies.size());
                     moviesListBuilder.append(popularMovieIndex + i + 1).append(". ").append(currentMovie.title).append("\n");
                 }
