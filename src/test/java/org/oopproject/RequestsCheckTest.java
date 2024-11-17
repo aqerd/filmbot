@@ -60,7 +60,7 @@ public class RequestsCheckTest {
     @Test
     void searchMovieTest() {
         ListDeserializer<FilmDeserializer> films = tmdbService
-                .searchMovie(TMDB_TOKEN, "Oppenheimer", "en-US", 1, "2023");
+                .searchMovie(TMDB_TOKEN, "Oppenheimer", "en-US", 1);
         assertNotNull(films.results, "Results should not be null");
         assertFalse(films.results.isEmpty(), "Results should not be empty");
     }

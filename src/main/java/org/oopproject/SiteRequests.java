@@ -34,9 +34,9 @@ public interface SiteRequests {
             "?api_key={api_key}" +
             "&query={query}" +
             "&language={language}" +
-            "&page={page}" +
-            "&year={year}"
+            "&page={page}"
             // +
+            // "&year={year}" +
             // "&include_adult={adult}"
     )
     ListDeserializer<FilmDeserializer> searchMovie(@Param("api_key") String token,
