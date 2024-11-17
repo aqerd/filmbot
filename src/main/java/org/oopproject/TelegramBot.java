@@ -195,7 +195,46 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         return responseMessage;
     }
 
+    public void handleButtons(Update update) {
+        if (update.hasCallbackQuery()) {
+            String callbackData = update.getCallbackQuery().getData();
+            long chatId = update.getCallbackQuery().getMessage().getChatId();
 
+            // Проверяем, какая кнопка была нажата
+            if (callbackData.startsWith("movie_")) {
+                String number = callbackData.substring(7); // Получаем число после "movie_"
+                String responseMessage = "Выбранный фильм: " + number;
+
+                // Отправляем сообщение с результатом
+                SendMessage response = SendMessage
+                        .builder()
+                        .chatId(String.valueOf(chatId)) // Устанавливаем chatId
+                        .text("Выберите число:")
+                        .build();
+                response.setChatId(String.valueOf(chatId));
+                response.setText(responseMessage);
+
+                try {
+                    telegramClient.execute(response);
+                } catch (TelegramApiException e) {
+                    e.printStackTrace();
+                }
+
+                // Закрываем "загрузку" кнопки
+                AnswerCallbackQuery answerCallbackQuery = AnswerCallbackQuery.builder()
+                        .callbackQueryId(update.getCallbackQuery().getId()) // Устанавливаем ID callback запроса
+                        .text("Вы выбрали фильм " + number) // Текст ответа
+                        .showAlert(false) // Можно показать или не показать уведомление
+                        .build();
+                answerCallbackQuery.setCallbackQueryId(update.getCallbackQuery().getId());
+                try {
+                    telegramClient.execute(answerCallbackQuery);
+                } catch (TelegramApiException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 
 //    private void updateGenreIndexInDatabase(long chatId) {
 //        String jsonGenreString = gson.toJson(genreMovieIndexMap);
