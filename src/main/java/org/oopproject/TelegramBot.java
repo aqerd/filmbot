@@ -200,16 +200,14 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             String callbackData = update.getCallbackQuery().getData();
             long chatId = update.getCallbackQuery().getMessage().getChatId();
 
-            // Проверяем, какая кнопка была нажата
             if (callbackData.startsWith("movie_")) {
-                String number = callbackData.substring(7); // Получаем число после "movie_"
-                String responseMessage = "Выбранный фильм: " + number;
+                String film = callbackData.substring(6);
+                String responseMessage = "Выбранный фильм: " + film;
 
-                // Отправляем сообщение с результатом
                 SendMessage response = SendMessage
                         .builder()
-                        .chatId(String.valueOf(chatId)) // Устанавливаем chatId
-                        .text("Выберите число:")
+                        .chatId(String.valueOf(chatId))
+                        .text("Выберите фильм:")
                         .build();
                 response.setChatId(String.valueOf(chatId));
                 response.setText(responseMessage);
@@ -220,13 +218,43 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                     e.printStackTrace();
                 }
 
-                // Закрываем "загрузку" кнопки
                 AnswerCallbackQuery answerCallbackQuery = AnswerCallbackQuery.builder()
-                        .callbackQueryId(update.getCallbackQuery().getId()) // Устанавливаем ID callback запроса
-                        .text("Вы выбрали фильм " + number) // Текст ответа
-                        .showAlert(false) // Можно показать или не показать уведомление
+                        .callbackQueryId(update.getCallbackQuery().getId())
+                        .text("Вы выбрали фильм " + film)
+                        .showAlert(false)
                         .build();
                 answerCallbackQuery.setCallbackQueryId(update.getCallbackQuery().getId());
+
+                try {
+                    telegramClient.execute(answerCallbackQuery);
+                } catch (TelegramApiException e) {
+                    e.printStackTrace();
+                }
+            } else if (callbackData.startsWith("actor_")) {
+                String actor = callbackData.substring(6);
+                String responseMessage = "Выбранный актёр: " + actor;
+
+                SendMessage response = SendMessage
+                        .builder()
+                        .chatId(String.valueOf(chatId))
+                        .text("Выберите актёра:")
+                        .build();
+                response.setChatId(String.valueOf(chatId));
+                response.setText(responseMessage);
+
+                try {
+                    telegramClient.execute(response);
+                } catch (TelegramApiException e) {
+                    e.printStackTrace();
+                }
+
+                AnswerCallbackQuery answerCallbackQuery = AnswerCallbackQuery.builder()
+                        .callbackQueryId(update.getCallbackQuery().getId())
+                        .text("Вы выбрали актёра " + actor)
+                        .showAlert(false)
+                        .build();
+                answerCallbackQuery.setCallbackQueryId(update.getCallbackQuery().getId());
+
                 try {
                     telegramClient.execute(answerCallbackQuery);
                 } catch (TelegramApiException e) {
