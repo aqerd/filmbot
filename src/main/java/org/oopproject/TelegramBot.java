@@ -107,10 +107,11 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                     break;
             }
 
+            CommandWaiter updatedWaiter = commandWaiter.getOrDefault(chatId, NONE);
             SendMessage message = SendMessage.builder()
                     .chatId(chatId)
                     .text(responseMessage)
-                    .replyMarkup(createCommandKeyboard())
+                    .replyMarkup(getKeyboardByWaiter(updatedWaiter))
                     .build();
 
             try {
@@ -203,7 +204,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         String responseMessage;
 
         try {
-            String genreId = Genres.valueOf(messageText.toUpperCase()).genreId;
+            String genreId = Genres.valueOf(messageText.toUpperCase().replace(" ", "_")).genreId;
 
             MovieParameters params = new ParametersBuilder()
                     .withGenres(genreId)
@@ -226,7 +227,6 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 genreMovieIndexMap.put(genreId, currentIndex);
 
 //                updateGenreIndexInDatabase(chatId);
-
 
                 responseMessage = movieListBuilder.toString();
 
@@ -431,6 +431,62 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         keyboardMarkup.setOneTimeKeyboard(true);
 
         return keyboardMarkup;
+    }
+
+    private ReplyKeyboardMarkup createGenreKeyboard() {
+        ReplyKeyboardMarkup keyboardMarkup = ReplyKeyboardMarkup.builder().build();
+        List<KeyboardRow> keyboard = new ArrayList<>();
+
+        KeyboardRow row1 = new KeyboardRow();
+        KeyboardRow row2 = new KeyboardRow();
+        KeyboardRow row3 = new KeyboardRow();
+        KeyboardRow row4 = new KeyboardRow();
+        KeyboardRow row5 = new KeyboardRow();
+        KeyboardRow row6 = new KeyboardRow();
+        KeyboardRow row7 = new KeyboardRow();
+
+        row1.add("Fantasy");
+        row1.add("Horror");
+        row1.add("Action");
+        row2.add("Music");
+        row2.add("War");
+        row2.add("Drama");
+        row3.add("Western");
+        row3.add("Family");
+        row3.add("Comedy");
+        row4.add("History");
+        row4.add("Crime");
+        row4.add("Mystery");
+        row5.add("Romance");
+        row5.add("Thriller");
+        row5.add("TV Movie");
+        row6.add("Science Fiction");
+        row6.add("Adventure");
+        row7.add("Animation");
+        row7.add("Documentary");
+
+        keyboard.add(row1);
+        keyboard.add(row2);
+        keyboard.add(row3);
+        keyboard.add(row4);
+        keyboard.add(row5);
+        keyboard.add(row6);
+        keyboard.add(row7);
+
+        keyboardMarkup.setKeyboard(keyboard);
+        keyboardMarkup.setResizeKeyboard(true);
+        keyboardMarkup.setOneTimeKeyboard(true);
+
+        return keyboardMarkup;
+    }
+
+    private ReplyKeyboardMarkup getKeyboardByWaiter(CommandWaiter waiter) {
+        if (waiter == NONE) {
+            return createCommandKeyboard();
+        } else if (waiter == GENRE) {
+            return createGenreKeyboard();
+        }
+        return null;
     }
 }
 
