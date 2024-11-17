@@ -416,9 +416,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 .build();
         try {
             telegramClient.execute(response);
-        } catch (TelegramApiException e) {
-            System.err.println("Error while sending message: " + e.getMessage());
-            e.printStackTrace();
+        } catch (Exception e) {
+            logger.error("Error while sending message to chatId {}: {}", chatId, e.getMessage(), e);
         }
         return "";
     }
@@ -428,7 +427,6 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             commandWaiter.put(chatId, NONE);
             return handleCommands(messageText, chatId);
         }
-
 
         String responseMessage = "Поиск по \"" + messageText + "\"\nВыберите актёра: ";
         List<InlineKeyboardRow> cols = new ArrayList<>();
@@ -465,8 +463,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         try {
             telegramClient.execute(response);
         } catch (TelegramApiException e) {
-            System.err.println("Error while sending message: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Error while sending message to chatId {}: {}", chatId, e.getMessage(), e);
         }
         return "";
     }
