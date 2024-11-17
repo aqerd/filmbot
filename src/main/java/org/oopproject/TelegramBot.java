@@ -192,8 +192,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 if (actor.deathday != null) {
                     actorsData.append(" - ").append(actor.deathday, 0, 4);
                 }
-                actorsData.append(")").append("\n").append("Place of birth: ").append(actor.place_of_birth)
-                        .append("\n").append("Popularity: ").append(actor.popularity)
+                actorsData.append(")").append("\n").append("Place of birth: ").append(actor.place_of_birth.trim())
+                        .append("\n").append("Popularity: ").append(actor.popularity.trim())
                         .append("\n").append("ID: ").append(actor.id).append("\n\n");
                 if (!Objects.equals(actor.biography, "")) {
                     actorsData.append(actor.biography).append("\n\n");
