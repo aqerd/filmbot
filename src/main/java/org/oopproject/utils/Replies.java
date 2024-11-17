@@ -36,7 +36,7 @@ public class Replies {
         replies.put("genre", "Введите жанр, и я найду фильмы по нему");
         replies.put("year", "Введите год, и я найду фильмы, выпущенные в этом году");
         replies.put("movie search", "Введите фильм который вы хотите найти");
-        replies.put("actor search", "Введите актёра который вы хотите найти");
+        replies.put("actor search", "Введите актёра которого вы хотите найти");
         replies.put("similar", "Введите ID фильма к которому вы хотите найти похожие фильмы");
         replies.put("recommended", "Введите ID фильма к которому вы хотите найти рекомендации");
         replies.put("find by id", "Введите ID фильма из сервиса TMDB");
