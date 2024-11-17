@@ -19,9 +19,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.*;
+
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -34,6 +33,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     private final TelegramClient telegramClient;
     private final ExecutorService executorService = Executors.newFixedThreadPool(4);
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private final Database database=new Database();
     private final Gson gson = new Gson();
 
@@ -45,6 +45,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
     public TelegramBot(String botToken) throws SQLException {
         telegramClient = new OkHttpTelegramClient(botToken);
+        startBroadcasting();
     }
 
     @Override
@@ -61,28 +62,32 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
             String messageText = update.getMessage().getText();
             String responseMessage;
-            CommandWaiter waiter = commandWaiter.getOrDefault(userID, NONE);
+            CommandWaiter waiter = commandWaiter.getOrDefault(chatId, NONE);
 
             switch (waiter) {
                 case YEAR:
-                    responseMessage = handleYear(messageText, userID);
-                    commandWaiter.put(userID, NONE);
+                    responseMessage = handleYear(messageText, chatId);
+                    commandWaiter.put(chatId, NONE);
                     break;
                 case GENRE:
-                    responseMessage = handleGenre(messageText, userID);
-                    commandWaiter.put(userID, NONE);
+                    responseMessage = handleGenre(messageText, chatId);
+                    commandWaiter.put(chatId, NONE);
                     break;
                 case SETAGE:
-                    responseMessage = handleAge(messageText, userID);
-                    commandWaiter.put(userID, NONE);
+                    responseMessage = handleAge(messageText, chatId);
+                    commandWaiter.put(chatId, NONE);
+                    break;
+                case SUBSCRIBE:
+                    responseMessage = handleSubscription(messageText, chatId);
+                    commandWaiter.put(chatId, NONE);
                     break;
                 default:
-                    responseMessage = handleCommands(messageText, userID);
+                    responseMessage = handleCommands(messageText, chatId);
                     break;
             }
 
             SendMessage message = SendMessage.builder()
-                    .chatId(userID)
+                    .chatId(chatId)
                     .text(responseMessage)
                     .replyMarkup(createCommandKeyboard())
                     .build();
@@ -112,7 +117,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
 
 
-    protected String handleCommands(String messageText, long userID) {
+    protected String handleCommands(String messageText, long chatId) {
         String responseMessage;
 
         switch (messageText) {
@@ -121,15 +126,19 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 break;
             case "/genre": case "Genre":
                 responseMessage = getReply("genre");
-                commandWaiter.put(userID, GENRE);
+                commandWaiter.put(chatId, GENRE);
                 break;
             case "/year": case "Year":
                 responseMessage = getReply("year");
-                commandWaiter.put(userID, YEAR);
+                commandWaiter.put(chatId, YEAR);
                 break;
             case "/setage": case "Set Age":
                 responseMessage = getReply("set age");
-                commandWaiter.put(userID, SETAGE);
+                commandWaiter.put(chatId, SETAGE);
+                break;
+            case "/subscribe": case "Subscribe":
+                responseMessage = getReply("subscribe");
+                commandWaiter.put(chatId, SUBSCRIBE);
                 break;
             case "/help": case "Help":
                 responseMessage = getReply("help");
@@ -153,8 +162,12 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         row2.add("Set Age");
         row2.add("Help");
 
+        KeyboardRow row3 = new KeyboardRow();
+        row3.add("Subscribe");
+
         keyboard.add(row1);
         keyboard.add(row2);
+        keyboard.add(row3);
 
         keyboardMarkup.setKeyboard(keyboard);
         keyboardMarkup.setResizeKeyboard(true);
@@ -170,8 +183,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
     protected String handleGenre(String messageText, long chatId) {
         if (isCommand(messageText)) {
-            commandWaiter.put(userID, NONE);
-            return handleCommands(messageText, userID);
+            commandWaiter.put(chatId, NONE);
+            return handleCommands(messageText, chatId);
         }
 
         String responseMessage;
@@ -207,7 +220,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             } else {
                 responseMessage = "Извините, я не нашел фильмов для жанра " + messageText;
             }
-            commandWaiter.put(userID, NONE);
+            commandWaiter.put(chatId, NONE);
         } catch (IllegalArgumentException e) {
             responseMessage = "Извините, я не знаю такого жанра. Попробуйте другой";
         }
@@ -223,8 +236,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     protected String handleYear(String messageText, long chatId) {
 
         if (isCommand(messageText)) {
-            commandWaiter.put(userID, NONE);
-            return handleCommands(messageText, userID);
+            commandWaiter.put(chatId, NONE);
+            return handleCommands(messageText, chatId);
         }
 
         String responseMessage;
@@ -265,7 +278,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             } else {
                 responseMessage = "Извините, я не нашел фильмов за " + userYear + " год";
             }
-            commandWaiter.put(userID, NONE);
+            commandWaiter.put(chatId, NONE);
         } catch (NumberFormatException e) {
             responseMessage = "Пожалуйста, введите корректный год!";
         }
@@ -273,10 +286,18 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         return responseMessage;
     }
 
-    protected String handleAge(String messageText, long userID) {
+    protected void handleSubscribe(long chatId) {
+        database.updateSubscribe(chatId, true);
+    }
+    protected void handleUnsubscribe(long chatId) {
+        database.updateSubscribe(chatId, false);
+    }
+
+
+    protected String handleAge(String messageText, long chatId) {
         if (isCommand(messageText)) {
-            commandWaiter.put(userID, NONE);
-            return handleCommands(messageText, userID);
+            commandWaiter.put(chatId, NONE);
+            return handleCommands(messageText, chatId);
         }
 
         String responseMessage;
@@ -286,14 +307,78 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
             if (userAge >= 0 && userAge <= 100) {
                 responseMessage = "Спасибо! Учтем ваш ответ";
-                commandWaiter.put(userID, NONE);
+                commandWaiter.put(chatId, NONE);
+                database.updateUserAge(chatId, userAge);
+
             } else {
                 responseMessage = "Пожалуйста, введите корректное число (от 0 до 100)";
             }
         } catch (NumberFormatException e) {
             responseMessage = "Пожалуйста, введите число";
         }
+//        handleGetAge(chatId);
+        return responseMessage;
+    }
+
+    public void startBroadcasting() {
+        scheduler.scheduleAtFixedRate(()-> {
+            List<Long> subscribedUsers = database.getSubscribedUsers();
+            for (Long chatId : subscribedUsers) {
+                sendMessage(chatId, "Подписчику");
+            }
+        },0,1, TimeUnit.MINUTES);
+    }
+    private void sendMessage(long chatId, String text) {
+        SendMessage message=SendMessage.builder()
+                .chatId(chatId)
+                .text(text)
+                .build();
+        try {
+            telegramClient.execute(message);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+    public String handleSubscription(String messageText, long chatId) {
+        if (isCommand(messageText)) {
+            commandWaiter.put(chatId, NONE);
+            return handleCommands(messageText, chatId);
+        }
+
+        String responseMessage;
+
+        try {
+            int userInput = Integer.parseInt(messageText);
+
+            if (userInput == 1) {
+                handleSubscribe(chatId);
+                responseMessage = "Вы успешно подписались на рассылку!";
+            } else if (userInput == 0) {
+                handleUnsubscribe(chatId);
+                responseMessage = "Вы успешно отписались от рассылки.";
+            } else {
+                responseMessage = "Пожалуйста, введите 1 для подписки или 0 для отписки.";
+            }
+        } catch (NumberFormatException e) {
+            responseMessage = "Пожалуйста, введите число (1 для подписки, 0 для отписки).";
+        }
 
         return responseMessage;
     }
+
+//    protected void broadcastMessage(String message) {
+//        List<Long> users = database.getSubscribedUsers();
+//        for (Long chatId : users) {
+//            new SendMessage(chatId, message);
+//        }
+//    }
+//    protected void handleGetAge( long chatId) {
+//        Integer userAge = database.getUserAge(chatId);
+//        if (userAge != null) {
+//            System.out.println("возраст "+ userAge);
+//        }
+//        else {
+//            System.out.println("не нашли возраст");
+//        }
+//    }
 }

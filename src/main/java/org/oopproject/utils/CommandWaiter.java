@@ -4,5 +4,6 @@ public enum CommandWaiter {
     NONE,
     GENRE,
     YEAR,
-    SETAGE;
+    SETAGE,
+    SUBSCRIBE;
 }
