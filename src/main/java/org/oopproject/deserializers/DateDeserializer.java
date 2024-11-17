@@ -1,6 +1,6 @@
 package org.oopproject.deserializers;
 
-public class DatesDeserializer {
+public class DateDeserializer {
     private String maximum;
     private String minimum;
 
