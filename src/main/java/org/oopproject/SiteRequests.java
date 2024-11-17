@@ -2,11 +2,8 @@ package org.oopproject;
 
 import feign.Param;
 import feign.RequestLine;
-import org.oopproject.deserializers.FilmDeserializer;
-import org.oopproject.deserializers.PersonDeserializer;
+import org.oopproject.deserializers.*;
 import org.oopproject.parameters.MovieParameters;
-import org.oopproject.deserializers.AuthDeserializer;
-import org.oopproject.deserializers.ListDeserializer;
 
 public interface SiteRequests {
     @RequestLine("GET /authentication?api_key={api_key}")
@@ -24,22 +21,34 @@ public interface SiteRequests {
     @RequestLine("GET /movie/{id}/recommendations?api_key={api_key}")
     ListDeserializer<FilmDeserializer> getRecommendationsForMovie(@Param("api_key") String token, @Param("id") int id);
 
+    @RequestLine("GET /movie/upcoming?api_key={api_key}")
+    ListDeserializer<FilmDeserializer> getUpcoming(@Param("api_key") String token);
+
+    @RequestLine("GET /movie/top_rated?api_key={api_key}")
+    ListDeserializer<FilmDeserializer> getTopRated(@Param("api_key") String token);
+
+    @RequestLine("GET /person/{id}/movie_credits?api_key={api_key}")
+    CreditsDeserializer getActorsFilms(@Param("api_key") String token, @Param("id") int id);
+
+    @RequestLine("GET /person/{id}?api_key={api_key}")
+    PersonDeserializer getActor(@Param("api_key") String token, @Param("id") int id);
+
     @RequestLine("GET /search/movie" +
             "?api_key={api_key}" +
             "&query={query}" +
             "&language={language}" +
-            "&page={page}" +
-            "&year={year}"
+            "&page={page}"
             // +
+            // "&year={year}" +
             // "&include_adult={adult}"
     )
     ListDeserializer<FilmDeserializer> searchMovie(@Param("api_key") String token,
             @Param("query") String query,
             @Param("language") String language,
-            @Param("page") int page,
-            @Param("year") String year
+            @Param("page") int page
             // ,
-            // @Param("adult") boolean adult
+            // @Param("adult") boolean adult,
+            // @Param("year") String year
     );
 
     @RequestLine("GET /search/person?" +

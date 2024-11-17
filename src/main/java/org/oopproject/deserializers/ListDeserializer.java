@@ -3,6 +3,7 @@ package org.oopproject.deserializers;
 import java.util.List;
 
 public class ListDeserializer<T> {
+    public DateDeserializer dates;
     public int page;
     public List<T> results;
     public int total_pages;

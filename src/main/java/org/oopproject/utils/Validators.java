@@ -13,6 +13,7 @@ public class Validators {
             "/similar", "similar",
             "/recommended", "recommended",
             "/popular", "popular",
+            "/toprated", "top rated",
             "/findbyid", "find by id",
             "/setage", "set age",
             "/help", "help"
