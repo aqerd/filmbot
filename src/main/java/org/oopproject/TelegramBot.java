@@ -487,7 +487,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
             if (films != null && films.results != null && !films.results.isEmpty()) {
                 List<FilmDeserializer> movies = films.results;
-                StringBuilder movieListBuilder = new StringBuilder("Похожие фильмы для фильма " + requestedFilm.title + "\n");
+                StringBuilder movieListBuilder = new StringBuilder("Похожие фильмы для " + requestedFilm.title + "\n");
                 for (int i = 0; i  < constNumber; i++) {
                     FilmDeserializer currentMovie = movies.get(i);
                     movieListBuilder.append(i + 1).append(". ").append(currentMovie.title).append("\n");
