@@ -3,7 +3,6 @@ package org.oopproject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
-
 import static org.mockito.Mockito.*;
 
 class MainTest {

@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class ValidatorsTest extends Validators{
-
     @Test
     void testValidCommands() {
         for (String command : Validators.COMMANDS) {
