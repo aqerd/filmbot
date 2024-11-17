@@ -513,7 +513,6 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
         try {
             int filmID = Integer.parseInt(messageText);
-
             FilmDeserializer film = tmdbService.getMovieById(TMDB_TOKEN, filmID);
 
             if (film != null) {
@@ -529,13 +528,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
                 if (film.homepage != null) {
                     filmBuilder.append("Link: ").append(film.homepage).append("\n");
-                } else {
-                    filmBuilder.append("Link: ").append("https://www.themoviedb.org/movie/").append(filmID).append("\n");
                 }
-                // если ссылка == нулл то не выводить
-
                 responseMessage = filmBuilder.toString();
-
         } else {
             responseMessage = "Извините, я не нашел фильм";
         }
