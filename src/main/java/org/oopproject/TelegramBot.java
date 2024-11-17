@@ -47,7 +47,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 //    private final Database database = new Database();
 //    private final Gson gson = new Gson();
 
-    private final int constNumber = 15;
+    private final int constNumber = 12;
 
     private final HashMap<Integer, Integer> yearMovieIndexMap = new HashMap<>();
     private final HashMap<String, Integer> genreMovieIndexMap = new HashMap<>();
