@@ -4,7 +4,7 @@ import com.google.gson.GsonBuilder;
 import java.util.Set;
 
 public class Validators {
-    private static final Set<String> COMMANDS = Set.of(
+    protected static final Set<String> COMMANDS = Set.of(
             "/start", "start",
             "/genre", "genre",
             "/year", "year",
