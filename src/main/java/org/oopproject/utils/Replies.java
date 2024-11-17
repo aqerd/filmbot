@@ -25,11 +25,11 @@ public class Replies {
                         /year - Поиск по году
                         /setage - Установить возрастное ограничение""");
         replies.put("year", "Введите год, и я найду фильмы, выпущенные в этом году");
-        replies.put("movie search", "вывод команды");
-        replies.put("actor search", "вывод команды");
-        replies.put("similar", "вывод команды");
-        replies.put("recommended", "вывод команды");
-        replies.put("find by id", "вывод команды");
+        replies.put("movie search", "Введите фильм который вы хотите найти");
+        replies.put("actor search", "Введите актёра который вы хотите найти");
+        replies.put("similar", "Введите фильм к которому вы хотите найти похожие фильмы");
+        replies.put("recommended", "Введите фильм к которому вы хотите найти рекомендации");
+        replies.put("find by id", "Введите ID фильма из сервиса The Movie Database");
         replies.put("set age", "Введите ваш полный возраст");
         replies.put("unknown", "Команда не распознана. Попробуйте /help для получения списка команд");
     }
