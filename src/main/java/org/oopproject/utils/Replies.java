@@ -12,17 +12,26 @@ public class Replies {
                         У меня есть следующие команды:
                         /genre - Поиск по жанру
                         /year - Поиск по году
-                        /help - Справка
-                        /stage - Установить возрастное ограничение
-                        Введи команду!""");
-        replies.put("genre", """
-                        Введите жанр, и я найду фильмы по нему.
-                        Вот список доступных жанров:
-                        animation, comedy, crime, documentary, drama, family, fantasy, history, horror, music, mystery, romance, science_fiction, tv_movie, thriller, war, western""");
+                        /moviesearch - Поиск фильма
+                        /actorsearch - Поиск актёра
+                        /similar - Похожие фильмы
+                        /recommended - Рекомендуемые фильмы
+                        /popular - Популярные фильмы
+                        /toprated - Высоко-оценённые фильмы
+                        /findbyid - поиск фильма по ID TMDB
+                        /setage - Установить возрастное ограничение
+                        /help - Справка""");
         replies.put("help", """
                         Доступны следующие команды:
                         /genre - Поиск по жанру
                         /year - Поиск по году
+                        /moviesearch - Поиск фильма
+                        /actorsearch - Поиск актёра
+                        /similar - Похожие фильмы
+                        /recommended - Рекомендуемые фильмы
+                        /popular - Популярные фильмы
+                        /toprated - Высоко-оценённые фильмы
+                        /findbyid - поиск фильма по ID TMDB
                         /setage - Установить возрастное ограничение""");
         replies.put("year", "Введите год, и я найду фильмы, выпущенные в этом году");
         replies.put("movie search", "Введите фильм который вы хотите найти");
@@ -31,7 +40,8 @@ public class Replies {
         replies.put("recommended", "Введите фильм к которому вы хотите найти рекомендации");
         replies.put("find by id", "Введите ID фильма из сервиса The Movie Database");
         replies.put("set age", "Введите ваш полный возраст");
-        replies.put("unknown", "Команда не распознана. Попробуйте /help для получения списка команд");
+        replies.put("genre", "Введите жанр, и я найду фильмы по нему");
+        replies.put("unknown", "Команда не распознана. Введите /help для получения списка команд");
     }
 
     public static String getReply(String command) {
