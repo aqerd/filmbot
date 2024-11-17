@@ -1,30 +1,31 @@
 package org.oopproject;
 
 import org.junit.jupiter.api.Test;
+import org.oopproject.utils.Validators;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.oopproject.utils.Validators.isCommand;
 
-class ValidatorsTest {
+class ValidatorsTest extends Validators{
     @Test
     void testValidCommands() {
-        assertTrue(isCommand("/start"));
-        assertTrue(isCommand("Start"));
-        assertTrue(isCommand("/genre"));
-        assertTrue(isCommand("Genre"));
-        assertTrue(isCommand("/year"));
-        assertTrue(isCommand("Year"));
-        assertTrue(isCommand("/help"));
-        assertTrue(isCommand("Help"));
-        assertTrue(isCommand("/setage"));
-        assertTrue(isCommand("Set Age"));
+        for (String command : Validators.COMMANDS) {
+            assertTrue(Validators.isCommand(command), "Command should be valid: " + command);
+        }
     }
 
     @Test
     void testInvalidCommands() {
-        assertFalse(isCommand("/unknown"));
-        assertFalse(isCommand("RandomCommand"));
-        assertFalse(isCommand(" "));
-        assertFalse(isCommand("setage"));
+        String[] invalidCommands = {"/unknown", "RandomCommand", " ", "setage", "/unset", "/find"};
+
+        for (String command : invalidCommands) {
+            assertFalse(Validators.isCommand(command), "Command should be invalid: " + command);
+        }
+    }
+
+    @Test
+    void testCaseInsensitiveMatching() {
+        assertTrue(Validators.isCommand("/start".toUpperCase()), "Command should be valid: /START (case insensitive)");
+        assertTrue(Validators.isCommand("start".toLowerCase()), "Command should be valid: start (case insensitive)");
+        assertTrue(Validators.isCommand("Set Age".toUpperCase()), "Command should be valid: Set Age (case insensitive)");
     }
 }
