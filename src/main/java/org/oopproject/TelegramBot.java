@@ -12,7 +12,6 @@ import static org.oopproject.utils.CommandWaiter.*;
 import static org.oopproject.utils.Config.tmdbService;
 import static org.oopproject.utils.Validators.isCommand;
 import static org.oopproject.utils.Replies.getReply;
-
 import java.lang.reflect.Type;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -20,7 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
-
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -33,8 +31,9 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     private final TelegramClient telegramClient;
     private final ExecutorService executorService = Executors.newFixedThreadPool(4);
+
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-    private final Database database=new Database();
+    private final Database database = new Database();
     private final Gson gson = new Gson();
 
     public int nOfFilms = 10;
@@ -99,6 +98,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             }
         }
     }
+  
     private void loadGenreIndexFromDatabase(long chatId) {
         String jsonGenreString = database.getGenreIndexesJson(chatId);
         if (jsonGenreString != null) {
@@ -114,8 +114,6 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             yearMovieIndexMap.putAll(gson.fromJson(jsonYearString, type));
         }
     }
-
-
 
     protected String handleCommands(String messageText, long chatId) {
         String responseMessage;
@@ -289,10 +287,10 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     protected void handleSubscribe(long chatId) {
         database.updateSubscribe(chatId, true);
     }
+  
     protected void handleUnsubscribe(long chatId) {
         database.updateSubscribe(chatId, false);
     }
-
 
     protected String handleAge(String messageText, long chatId) {
         if (isCommand(messageText)) {
@@ -309,7 +307,6 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 responseMessage = "Спасибо! Учтем ваш ответ";
                 commandWaiter.put(chatId, NONE);
                 database.updateUserAge(chatId, userAge);
-
             } else {
                 responseMessage = "Пожалуйста, введите корректное число (от 0 до 100)";
             }
@@ -326,8 +323,9 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             for (Long chatId : subscribedUsers) {
                 sendMessage(chatId, "Подписчику");
             }
-        },0,1, TimeUnit.MINUTES);
+        }, 0, 1, TimeUnit.MINUTES);
     }
+  
     private void sendMessage(long chatId, String text) {
         SendMessage message=SendMessage.builder()
                 .chatId(chatId)
@@ -339,6 +337,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             e.printStackTrace();
         }
     }
+  
     public String handleSubscription(String messageText, long chatId) {
         if (isCommand(messageText)) {
             commandWaiter.put(chatId, NONE);
@@ -362,7 +361,6 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         } catch (NumberFormatException e) {
             responseMessage = "Пожалуйста, введите число (1 для подписки, 0 для отписки).";
         }
-
         return responseMessage;
     }
 

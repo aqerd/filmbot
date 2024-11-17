@@ -2,17 +2,20 @@ package org.oopproject;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.sql.SQLException;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class HandleAgeTest extends TelegramBot {
     private TelegramBot telegramBot;
 
-    public HandleAgeTest() {
+    public HandleAgeTest() throws SQLException {
         super("dummy_token");
     }
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws SQLException {
         telegramBot = new TelegramBot("dummy_token");
     }
 

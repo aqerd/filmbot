@@ -47,6 +47,7 @@ public class Database {
             e.printStackTrace();
         }
     }
+  
     public Integer getUserAge(long chatId) {
         String selectUserAgeQuery = "SELECT userAge FROM users WHERE chatId = ?";
         try (PreparedStatement selectStatement = connection.prepareStatement(selectUserAgeQuery)) {
@@ -61,7 +62,6 @@ public class Database {
         return null;
 
     }
-
 
     public void updateGenreIndexesJson(long chatId, String genreIndexesJson) {
         String updateQuery = "UPDATE users SET genreIndexesJson = ? WHERE chatId = ?";
@@ -112,7 +112,8 @@ public class Database {
         }
         return null;
     }
-    public void updateSubscribe(long chatId, boolean subscribed) {
+
+  public void updateSubscribe(long chatId, boolean subscribed) {
         String query = "UPDATE users SET subscribed = ? WHERE chatId = ?";
         try (PreparedStatement updateStatement = connection.prepareStatement(query)) {
             updateStatement.setBoolean(1, subscribed);
@@ -137,4 +138,3 @@ public class Database {
         return users;
     }
 }
-
