@@ -22,6 +22,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -40,7 +44,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 //    private final Database database = new Database();
 //    private final Gson gson = new Gson();
 
-    public int nOfFilms = 10;
+    private final int nOfFilms = 10;
 
     private final HashMap<Integer, Integer> yearMovieIndexMap = new HashMap<>();
     private final HashMap<String, Integer> genreMovieIndexMap = new HashMap<>();
@@ -57,6 +61,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     }
 
     public void handleUpdate(Update update) {
+        handleButtons(update);
+
         if (update.hasMessage() && update.getMessage().hasText()) {
             long chatId = update.getMessage().getChatId();
 //            database.insertChatId(chatId);
@@ -78,10 +84,10 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                     responseMessage = handleYear(messageText, chatId);
                     commandWaiter.put(chatId, NONE);
                     break;
-//                case MOVIESEARCH:
-//                    responseMessage = handleMovieSearch(messageText, chatId);
-//                    commandWaiter.put(chatId, NONE);
-//                    break;
+                case MOVIESEARCH:
+                    responseMessage = handleMovieSearch(messageText, chatId);
+                    commandWaiter.put(chatId, NONE);
+                    break;
 //                case ACTORSEARCH:
 //                    responseMessage = handleActorSearch(messageText, chatId);
 //                    commandWaiter.put(chatId, NONE);
@@ -188,6 +194,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         }
         return responseMessage;
     }
+
+
 
 //    private void updateGenreIndexInDatabase(long chatId) {
 //        String jsonGenreString = gson.toJson(genreMovieIndexMap);
@@ -296,6 +304,49 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         }
 
         return responseMessage;
+    }
+
+    protected String handleMovieSearch(String messageText, long chatId) {
+        String responseMessage = "Поиск по \"" + messageText + "\"\nВыберите фильм: ";
+        List<InlineKeyboardRow> cols = new ArrayList<>();
+        ListDeserializer<FilmDeserializer> films = tmdbService.searchMovie(TMDB_TOKEN, messageText, "en-US", 1);
+
+//        if (films != null && films.results != null && !films.results.isEmpty()) {
+//            return "Ничего не найдено";
+//        }
+
+        List<FilmDeserializer> movies = films.results;
+        for (int i = 0; i < nOfFilms; i++) {
+            String currentTitle = String.valueOf(movies.get(i).title);
+            InlineKeyboardButton button = InlineKeyboardButton.builder()
+                    .text(currentTitle)
+                    .callbackData("movie_" + currentTitle)
+                    .build();
+
+            // Создаем строку для каждой кнопки и добавляем ее в список
+            InlineKeyboardRow row = new InlineKeyboardRow();
+            row.add(button);
+            cols.add(row);
+        }
+
+        // Создаем InlineKeyboardMarkup и передаем список строк кнопок
+        InlineKeyboardMarkup markupInline = InlineKeyboardMarkup.builder()
+                .keyboard(cols)  // Устанавливаем все строки кнопок
+                .build();
+        markupInline.setKeyboard(cols);  // Устанавливаем все строки кнопок
+
+        // Отправляем сообщение с клавиатурой
+        SendMessage response = SendMessage.builder()
+                .chatId(String.valueOf(chatId))
+                .text(responseMessage)
+                .replyMarkup(markupInline)  // Добавляем клавиатуру в сообщение
+                .build();
+        try {
+            telegramClient.execute(response); // Отправка сообщения с кнопками
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 
     protected String handlePopular(long chatId) {
