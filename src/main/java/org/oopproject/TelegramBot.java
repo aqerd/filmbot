@@ -127,74 +127,6 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         }
     }
 
-//    private void loadGenreIndexFromDatabase(long chatId) {
-//        String jsonGenreString = database.getGenreIndexesJson(chatId);
-//        if (jsonGenreString != null) {
-//            Type type = new TypeToken<HashMap<String, Integer>>(){}.getType();
-//            genreMovieIndexMap.putAll(gson.fromJson(jsonGenreString, type));
-//        }
-//    }
-//
-//    private void loadYearIndexFromDatabase(long chatId) {
-//        String jsonYearString = database.getYearIndexesJson(chatId);
-//        if (jsonYearString != null) {
-//            Type type = new TypeToken<HashMap<Integer, Integer>>(){}.getType();
-//            yearMovieIndexMap.putAll(gson.fromJson(jsonYearString, type));
-//        }
-//    }
-
-    protected String handleCommands(String messageText, long chatId) {
-        String responseMessage;
-
-        switch (messageText) {
-            case "/start": case "Start":
-                responseMessage = getReply("start");
-                break;
-            case "/genre": case "Genre":
-                responseMessage = getReply("genre");
-                commandWaiter.put(chatId, GENRE);
-                break;
-            case "/year": case "Year":
-                responseMessage = getReply("year");
-                commandWaiter.put(chatId, YEAR);
-                break;
-            case "/moviesearch": case "Movie Search":
-                responseMessage = getReply("movie search");
-                commandWaiter.put(chatId, MOVIESEARCH);
-                break;
-            case "/actorsearch": case "Actor Search":
-                responseMessage = getReply("actor search");
-                commandWaiter.put(chatId, ACTORSEARCH);
-                break;
-            case "/similar": case "Similar":
-                responseMessage = getReply("similar");
-                commandWaiter.put(chatId, SIMILAR);
-                break;
-            case "/recommended": case "Recommended":
-                responseMessage = getReply("recommended");
-                commandWaiter.put(chatId, RECOMMENDED);
-                break;
-            case "/popular": case "Popular":
-                responseMessage = handlePopular(chatId);
-                break;
-            case "/findbyid": case "Find by ID":
-                responseMessage = getReply("find by id");
-                commandWaiter.put(chatId, FINDBYID);
-                break;
-            case "/setage": case "Set Age":
-                responseMessage = getReply("set age");
-                commandWaiter.put(chatId, SETAGE);
-                break;
-            case "/help": case "Help":
-                responseMessage = getReply("help");
-                break;
-            default:
-                responseMessage = getReply("unknown");
-                break;
-        }
-        return responseMessage;
-    }
-
     public void handleButtons(Update update) {
         if (update.hasCallbackQuery()) {
             String callbackData = update.getCallbackQuery().getData();
@@ -262,6 +194,74 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 }
             }
         }
+    }
+
+//    private void loadGenreIndexFromDatabase(long chatId) {
+//        String jsonGenreString = database.getGenreIndexesJson(chatId);
+//        if (jsonGenreString != null) {
+//            Type type = new TypeToken<HashMap<String, Integer>>(){}.getType();
+//            genreMovieIndexMap.putAll(gson.fromJson(jsonGenreString, type));
+//        }
+//    }
+//
+//    private void loadYearIndexFromDatabase(long chatId) {
+//        String jsonYearString = database.getYearIndexesJson(chatId);
+//        if (jsonYearString != null) {
+//            Type type = new TypeToken<HashMap<Integer, Integer>>(){}.getType();
+//            yearMovieIndexMap.putAll(gson.fromJson(jsonYearString, type));
+//        }
+//    }
+
+    protected String handleCommands(String messageText, long chatId) {
+        String responseMessage;
+
+        switch (messageText) {
+            case "/start": case "Start":
+                responseMessage = getReply("start");
+                break;
+            case "/genre": case "Genre":
+                responseMessage = getReply("genre");
+                commandWaiter.put(chatId, GENRE);
+                break;
+            case "/year": case "Year":
+                responseMessage = getReply("year");
+                commandWaiter.put(chatId, YEAR);
+                break;
+            case "/moviesearch": case "Movie Search":
+                responseMessage = getReply("movie search");
+                commandWaiter.put(chatId, MOVIESEARCH);
+                break;
+            case "/actorsearch": case "Actor Search":
+                responseMessage = getReply("actor search");
+                commandWaiter.put(chatId, ACTORSEARCH);
+                break;
+            case "/similar": case "Similar":
+                responseMessage = getReply("similar");
+                commandWaiter.put(chatId, SIMILAR);
+                break;
+            case "/recommended": case "Recommended":
+                responseMessage = getReply("recommended");
+                commandWaiter.put(chatId, RECOMMENDED);
+                break;
+            case "/popular": case "Popular":
+                responseMessage = handlePopular(chatId);
+                break;
+            case "/findbyid": case "Find by ID":
+                responseMessage = getReply("find by id");
+                commandWaiter.put(chatId, FINDBYID);
+                break;
+            case "/setage": case "Set Age":
+                responseMessage = getReply("set age");
+                commandWaiter.put(chatId, SETAGE);
+                break;
+            case "/help": case "Help":
+                responseMessage = getReply("help");
+                break;
+            default:
+                responseMessage = getReply("unknown");
+                break;
+        }
+        return responseMessage;
     }
 
 //    private void updateGenreIndexInDatabase(long chatId) {
