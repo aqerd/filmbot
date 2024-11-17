@@ -42,12 +42,13 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     private static final Logger logger = LoggerFactory.getLogger(TelegramBot.class);
 
     private final TelegramClient telegramClient;
-    private final ExecutorService executorService = Executors.newFixedThreadPool(4);
+    private final ExecutorService executorService = Executors.newFixedThreadPool(10);
 
 //    private final Database database = new Database();
 //    private final Gson gson = new Gson();
 
     private final int constNumber = 12;
+    private final int searchNumber = 6;
 
     private final HashMap<Integer, Integer> yearMovieIndexMap = new HashMap<>();
     private final HashMap<String, Integer> genreMovieIndexMap = new HashMap<>();
@@ -434,7 +435,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         ListDeserializer<FilmDeserializer> films = tmdbService.searchMovie(TMDB_TOKEN, messageText, "en-US", 1);
 
         List<FilmDeserializer> movies = films.results;
-        int filmsToProcess = Math.min(constNumber, movies.size());
+        int filmsToProcess = Math.min(searchNumber, movies.size());
 
         if (filmsToProcess == 0) {
             return "Ничего не найдено";
@@ -481,7 +482,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         ListDeserializer<PersonDeserializer> humans = tmdbService.searchPerson(TMDB_TOKEN, messageText, "en-US", 1);
 
         List<PersonDeserializer> people = humans.results;
-        int actorsToProcess = Math.min(constNumber, people.size());
+        int actorsToProcess = Math.min(searchNumber, people.size());
 
         if (actorsToProcess == 0) {
             return "Ничего не найдено";
