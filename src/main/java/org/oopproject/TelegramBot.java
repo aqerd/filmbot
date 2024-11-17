@@ -14,7 +14,6 @@ import static org.oopproject.utils.CommandWaiter.*;
 import static org.oopproject.utils.Config.*;
 import static org.oopproject.utils.Validators.isCommand;
 import static org.oopproject.utils.Replies.getReply;
-import static org.oopproject.utils.Validators.printPrettyJson;
 //import java.lang.reflect.Type;
 import java.sql.SQLException;
 import java.util.*;
@@ -93,14 +92,14 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                     responseMessage = handleActorSearch(messageText, chatId);
                     commandWaiter.put(chatId, NONE);
                     break;
-//                case SIMILAR:
-//                    responseMessage = handleSimilar(messageText, chatId);
-//                    commandWaiter.put(chatId, NONE);
-//                    break;
-//                case RECOMMENDED:
-//                    responseMessage = handleRecommended(messageText, chatId);
-//                    commandWaiter.put(chatId, NONE);
-//                    break;
+                case SIMILAR:
+                    responseMessage = handleSimilar(messageText, chatId);
+                    commandWaiter.put(chatId, NONE);
+                    break;
+                case RECOMMENDED:
+                    responseMessage = handleRecommended(messageText, chatId);
+                    commandWaiter.put(chatId, NONE);
+                    break;
                 case FINDBYID:
                     responseMessage = handleFindById(messageText, chatId);
                     commandWaiter.put(chatId, NONE);
@@ -246,6 +245,9 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 break;
             case "/popular": case "Popular":
                 responseMessage = handlePopular(chatId);
+                break;
+            case "/toprated": case "Top Rated":
+                responseMessage = handleTopRated(chatId);
                 break;
             case "/findbyid": case "Find by ID":
                 responseMessage = getReply("find by id");
@@ -469,6 +471,72 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         return "";
     }
 
+    protected String handleSimilar(String messageText, long chatId) {
+        if (isCommand(messageText)) {
+            commandWaiter.put(chatId, NONE);
+            return handleCommands(messageText, chatId);
+        }
+
+        String responseMessage;
+
+        try {
+            int filmId = Integer.parseInt(messageText);
+
+            ListDeserializer<FilmDeserializer> films = tmdbService.getSimilarMovies(TMDB_TOKEN, filmId);
+            FilmDeserializer requestedFilm = tmdbService.getMovieById(TMDB_TOKEN, filmId);
+
+            if (films != null && films.results != null && !films.results.isEmpty()) {
+                List<FilmDeserializer> movies = films.results;
+                StringBuilder movieListBuilder = new StringBuilder("Похожие фильмы для фильма " + requestedFilm.title + "\n");
+                for (int i = 0; i  < constNumber; i++) {
+                    FilmDeserializer currentMovie = movies.get(i);
+                    movieListBuilder.append(i + 1).append(". ").append(currentMovie.title).append("\n");
+                }
+                responseMessage = movieListBuilder.toString();
+            } else {
+                responseMessage = "Фильм с индексом " + filmId + " не найден";
+            }
+            commandWaiter.put(chatId, NONE);
+        } catch (NumberFormatException e) {
+            responseMessage = "Введите корректный ID!";
+        }
+        return responseMessage;
+    }
+
+    protected String handleRecommended(String messageText, long chatId) {
+        if (isCommand(messageText)) {
+            commandWaiter.put(chatId, NONE);
+            return handleCommands(messageText, chatId);
+        }
+
+        String responseMessage;
+
+        try {
+            int filmId = Integer.parseInt(messageText);
+
+            // вызов реквеста
+            ListDeserializer<FilmDeserializer> films = tmdbService.getRecommendationsForMovie(TMDB_TOKEN, filmId);
+            FilmDeserializer requestedFilm = tmdbService.getMovieById(TMDB_TOKEN, filmId);
+
+            if (films != null && films.results != null && !films.results.isEmpty()) {
+                List<FilmDeserializer> movies = films.results;
+                StringBuilder movieListBuilder = new StringBuilder("Рекомендуемые фильмы для фильма " + requestedFilm.title + "\n");
+
+                for (int i = 0; i  < constNumber; i++) {
+                    FilmDeserializer currentMovie = movies.get(i);
+                    movieListBuilder.append(i + 1).append(". ").append(currentMovie.title).append("\n");
+                }
+                responseMessage = movieListBuilder.toString();
+        } else {
+            responseMessage = "Фильм с индексом " + filmId + " не найден";
+        }
+        commandWaiter.put(chatId, NONE);
+        } catch (NumberFormatException e) {
+            responseMessage = "Введите корректный ID!";
+        }
+        return responseMessage;
+    }
+
     protected String handlePopular(long chatId) {
         String responseMessage;
 
@@ -500,6 +568,35 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             responseMessage = "Пожалуйста, введите корректные данные";
         }
 
+        return responseMessage;
+    }
+
+    protected String handleTopRated(long chatId) {
+        String responseMessage;
+        try {
+            ListDeserializer<FilmDeserializer> popularFilms = tmdbService.getTopRated(TMDB_TOKEN);
+            if (popularFilms != null && popularFilms.results != null && !popularFilms.results.isEmpty()) {
+                List<FilmDeserializer> movies = popularFilms.results;
+                StringBuilder moviesListBuilder = new StringBuilder("Высоко-оцененные фильмы:\n");
+                for (int i = 0; i < constNumber; i++) {
+                    FilmDeserializer currentMovie = movies.get((popularMovieIndex + i) % movies.size());
+                    moviesListBuilder.append(popularMovieIndex + i + 1).append(". ").append(currentMovie.title).append("\n");
+                }
+                popularMovieIndex = (popularMovieIndex + constNumber) % movies.size();
+                responseMessage = moviesListBuilder.toString();
+            } else {
+                responseMessage = "Данные не найдены";
+            }
+            commandWaiter.put(chatId, NONE);
+        } catch (FeignException e) {
+            if (e.status() == 404) {
+                responseMessage = "404: Данные не найдены";
+            } else {
+                responseMessage = "Что-то пошло не так";
+            }
+        } catch (Exception e) {
+            responseMessage = "Пожалуйста, введите корректные данные";
+        }
         return responseMessage;
     }
 
@@ -573,6 +670,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         KeyboardRow row3 = new KeyboardRow();
         KeyboardRow row4 = new KeyboardRow();
         KeyboardRow row5 = new KeyboardRow();
+        KeyboardRow row6 = new KeyboardRow();
 
         row1.add("Genre");
         row1.add("Year");
@@ -582,14 +680,16 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         row3.add("Recommended");
         row4.add("Popular");
         row4.add("Find by ID");
+        row5.add("Top Rated");
         row5.add("Set Age");
-        row5.add("Help");
+        row6.add("Help");
 
         keyboard.add(row1);
         keyboard.add(row2);
         keyboard.add(row3);
         keyboard.add(row4);
         keyboard.add(row5);
+        keyboard.add(row6);
 
         keyboardMarkup.setKeyboard(keyboard);
         keyboardMarkup.setResizeKeyboard(true);

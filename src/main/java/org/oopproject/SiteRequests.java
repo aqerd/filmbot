@@ -27,6 +27,9 @@ public interface SiteRequests {
     @RequestLine("GET /movie/upcoming?api_key={api_key}")
     ListDeserializer<FilmDeserializer> getUpcoming(@Param("api_key") String token);
 
+    @RequestLine("GET /movie/top_rated?api_key={api_key}")
+    ListDeserializer<FilmDeserializer> getTopRated(@Param("api_key") String token);
+
     @RequestLine("GET /search/movie" +
             "?api_key={api_key}" +
             "&query={query}" +
