@@ -1,7 +1,7 @@
 package org.oopproject.validators;
 
 public class YearValidator implements Validator<String> {
-    private final int minYear = 1900;
+    private final int minYear = 1895;
     private final int maxYear = java.time.Year.now().getValue();
 
     @Override

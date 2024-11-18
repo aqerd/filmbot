@@ -308,10 +308,10 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             case "/popular": case "popular":
                 responseMessage = handlePopular(chatId);
                 break;
-            case "/toprated": case "Top Rated":
+            case "/toprated": case "top rated":
                 responseMessage = handleTopRated(chatId);
                 break;
-            case "/findbyid": case "Find by ID":
+            case "/findbyid": case "find by id":
                 responseMessage = getReply("find by id");
                 commandWaiter.put(chatId, FINDBYID);
                 break;
