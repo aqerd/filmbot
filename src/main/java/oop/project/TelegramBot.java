@@ -155,6 +155,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 if (film.homepage != null) {
                     filmBuilder.append("Link: ").append(film.homepage).append("\n");
                 }
+
                 for (int i = 0; i < videos.results.size(); i++) {
                     if (videos.results.get(i).id != null &&
                             Objects.equals(videos.results.get(i).name, "Official Trailer") &&
@@ -165,6 +166,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                                 append("https://youtube.com/watch?v=").append(videos.results.get(i).key).append("\n");
                     }
                 }
+
                 String responseMessage = filmBuilder.toString();
 
                 SendMessage response = SendMessage
@@ -672,6 +674,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         try {
             int filmID = Integer.parseInt(messageText);
             FilmDeserializer film = TMDB_SERVICE.getMovieById(TMDB_TOKEN, filmID);
+            ListDeserializer<VideoDeserializer> videos = TMDB_SERVICE.getVideosForFilm(TMDB_TOKEN, filmID);
 
             if (film != null) {
                 StringBuilder filmBuilder = new StringBuilder(film.title);
@@ -687,6 +690,18 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 if (film.homepage != null) {
                     filmBuilder.append("Link: ").append(film.homepage).append("\n");
                 }
+
+                for (int i = 0; i < videos.results.size(); i++) {
+                    if (videos.results.get(i).id != null &&
+                            Objects.equals(videos.results.get(i).name, "Official Trailer") &&
+                            Objects.equals(videos.results.get(i).site, "YouTube") &&
+                            Objects.equals(videos.results.get(i).type, "Trailer") &&
+                            videos.results.get(i).official) {
+                        filmBuilder.append("Trailer: ").
+                                append("https://youtube.com/watch?v=").append(videos.results.get(i).key).append("\n");
+                    }
+                }
+
                 responseMessage = filmBuilder.toString();
             } else {
                 responseMessage = "Извините, я не нашел фильм";
