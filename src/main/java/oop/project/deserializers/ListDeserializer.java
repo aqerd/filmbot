@@ -5,6 +5,7 @@ import java.util.List;
 public class ListDeserializer<T> {
     public DateDeserializer dates;
     public int page;
+    public int id;
     public List<T> results;
     public int total_pages;
     public int total_results;

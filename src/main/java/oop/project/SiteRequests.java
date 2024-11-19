@@ -33,6 +33,9 @@ public interface SiteRequests {
     @RequestLine("GET /person/{id}/movie_credits?api_key={api_key}")
     CreditsDeserializer getActorsFilms(@Param("api_key") String token, @Param("id") int id);
 
+    @RequestLine("GET /movie/{id}/videos?api_key={api_key}")
+    ListDeserializer<VideoDeserializer> getVideosForFilm(@Param("api_key") String token, @Param("id") int id);
+
     @RequestLine("GET /search/movie" +
             "?api_key={api_key}" +
             "&query={query}" +

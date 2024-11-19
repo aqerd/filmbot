@@ -10,7 +10,7 @@ public class Config {
     public static final String BOT_TOKEN;
     public static final String TMDB_TOKEN;
     public static final String BASE_URL;
-    public static final SiteRequests tmdbService;
+    public static final SiteRequests TMDB_SERVICE;
 
     static {
         Dotenv dotenv = Dotenv.configure().directory("assets").filename("token.env").load();
@@ -18,7 +18,7 @@ public class Config {
         TMDB_TOKEN = dotenv.get("TMDB_ACCESS_TOKEN");
         BASE_URL = "https://api.themoviedb.org/3";
 
-        tmdbService = Feign.builder()
+        TMDB_SERVICE = Feign.builder()
                 .decoder(new GsonDecoder(new Gson()))
                 .target(SiteRequests.class, BASE_URL);
     }
