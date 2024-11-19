@@ -142,7 +142,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
             if (callbackData.startsWith("movie_")) {
                 int id = parseInt(callbackData.substring(6));
-                FilmDeserializer film = tmdbService.getMovieById(TMDB_TOKEN, id);
+                FilmDeserializer film = TMDB_SERVICE.getMovieById(TMDB_TOKEN, id);
 
                 StringBuilder filmBuilder = new StringBuilder(film.title);
                 if (!Objects.equals(film.original_language, "en")) {
@@ -188,8 +188,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 int id = parseInt(callbackData.substring(6));
                 String responseMessage;
                 List<FilmDeserializer> movies;
-                CreditsDeserializer actorsFilms = tmdbService.getActorsFilms(TMDB_TOKEN, id);
-                PersonDeserializer actor = tmdbService.getActor(TMDB_TOKEN, id);
+                CreditsDeserializer actorsFilms = TMDB_SERVICE.getActorsFilms(TMDB_TOKEN, id);
+                PersonDeserializer actor = TMDB_SERVICE.getActor(TMDB_TOKEN, id);
 
                 StringBuilder actorsData = new StringBuilder(actor.name).append(" (").append(actor.birthday, 0, 4);
                 if (actor.deathday != null) {
@@ -348,7 +348,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                     .withCertificationLte("PG-13")
                     .withCertificationCountry("US")
                     .build();
-            ListDeserializer<FilmDeserializer> moviesByGenre = tmdbService.findMovie(params);
+            ListDeserializer<FilmDeserializer> moviesByGenre = TMDB_SERVICE.findMovie(params);
 
             if (moviesByGenre != null && moviesByGenre.results != null && !moviesByGenre.results.isEmpty()) {
                 List<FilmDeserializer> movies = moviesByGenre.results;
@@ -399,7 +399,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                     .withCertificationLte("PG-13")
                     .withCertificationCountry("US")
                     .build();
-            ListDeserializer<FilmDeserializer> moviesByYear = tmdbService.findMovie(params);
+            ListDeserializer<FilmDeserializer> moviesByYear = TMDB_SERVICE.findMovie(params);
 
             if (moviesByYear != null && moviesByYear.results != null && !moviesByYear.results.isEmpty()) {
                 List<FilmDeserializer> movies = moviesByYear.results;
@@ -434,7 +434,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
         String responseMessage = "Поиск по \"" + messageText + "\"\nВыберите фильм: ";
         List<InlineKeyboardRow> cols = new ArrayList<>();
-        ListDeserializer<FilmDeserializer> films = tmdbService.searchMovie(TMDB_TOKEN, messageText, "en-US", 1);
+        ListDeserializer<FilmDeserializer> films = TMDB_SERVICE.searchMovie(TMDB_TOKEN, messageText, "en-US", 1);
 
         List<FilmDeserializer> movies = films.results;
         int filmsToProcess = Math.min(searchNumber, movies.size());
@@ -481,7 +481,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
         String responseMessage = "Поиск по \"" + messageText + "\"\nВыберите актёра: ";
         List<InlineKeyboardRow> cols = new ArrayList<>();
-        ListDeserializer<PersonDeserializer> humans = tmdbService.searchPerson(TMDB_TOKEN, messageText, "en-US", 1);
+        ListDeserializer<PersonDeserializer> humans = TMDB_SERVICE.searchPerson(TMDB_TOKEN, messageText, "en-US", 1);
 
         List<PersonDeserializer> people = humans.results;
         int actorsToProcess = Math.min(searchNumber, people.size());
@@ -531,8 +531,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         try {
             int filmId = Integer.parseInt(messageText);
 
-            ListDeserializer<FilmDeserializer> films = tmdbService.getSimilarMovies(TMDB_TOKEN, filmId);
-            FilmDeserializer requestedFilm = tmdbService.getMovieById(TMDB_TOKEN, filmId);
+            ListDeserializer<FilmDeserializer> films = TMDB_SERVICE.getSimilarMovies(TMDB_TOKEN, filmId);
+            FilmDeserializer requestedFilm = TMDB_SERVICE.getMovieById(TMDB_TOKEN, filmId);
 
             if (films != null && films.results != null && !films.results.isEmpty()) {
                 List<FilmDeserializer> movies = films.results;
@@ -566,8 +566,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         try {
             int filmId = Integer.parseInt(messageText);
 
-            ListDeserializer<FilmDeserializer> films = tmdbService.getRecommendationsForMovie(TMDB_TOKEN, filmId);
-            FilmDeserializer requestedFilm = tmdbService.getMovieById(TMDB_TOKEN, filmId);
+            ListDeserializer<FilmDeserializer> films = TMDB_SERVICE.getRecommendationsForMovie(TMDB_TOKEN, filmId);
+            FilmDeserializer requestedFilm = TMDB_SERVICE.getMovieById(TMDB_TOKEN, filmId);
 
             if (films != null && films.results != null && !films.results.isEmpty()) {
                 List<FilmDeserializer> movies = films.results;
@@ -593,7 +593,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         String responseMessage;
 
         try {
-            ListDeserializer<FilmDeserializer> popularFilms = tmdbService.getPopularMovies(TMDB_TOKEN);
+            ListDeserializer<FilmDeserializer> popularFilms = TMDB_SERVICE.getPopularMovies(TMDB_TOKEN);
 
             if (popularFilms != null && popularFilms.results != null && !popularFilms.results.isEmpty()) {
                 List<FilmDeserializer> movies = popularFilms.results;
@@ -626,7 +626,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     protected String handleTopRated(long chatId) {
         String responseMessage;
         try {
-            ListDeserializer<FilmDeserializer> popularFilms = tmdbService.getTopRated(TMDB_TOKEN);
+            ListDeserializer<FilmDeserializer> popularFilms = TMDB_SERVICE.getTopRated(TMDB_TOKEN);
             if (popularFilms != null && popularFilms.results != null && !popularFilms.results.isEmpty()) {
                 List<FilmDeserializer> movies = popularFilms.results;
                 StringBuilder moviesListBuilder = new StringBuilder("Высоко-оцененные фильмы:\n");
@@ -662,7 +662,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         String responseMessage;
         try {
             int filmID = Integer.parseInt(messageText);
-            FilmDeserializer film = tmdbService.getMovieById(TMDB_TOKEN, filmID);
+            FilmDeserializer film = TMDB_SERVICE.getMovieById(TMDB_TOKEN, filmID);
 
             if (film != null) {
                 StringBuilder filmBuilder = new StringBuilder(film.title);
