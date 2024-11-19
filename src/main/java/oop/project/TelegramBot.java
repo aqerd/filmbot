@@ -3,14 +3,12 @@ package oop.project;
 // import com.google.gson.Gson;
 // import com.google.gson.reflect.TypeToken;
 import feign.FeignException;
-import oop.project.deserializers.CreditsDeserializer;
-import oop.project.deserializers.ListDeserializer;
-import oop.project.deserializers.PersonDeserializer;
+import oop.project.deserializers.*;
 import oop.project.shared.CommandWaiter;
 import oop.project.shared.Genres;
 import oop.project.parameters.MovieParameters;
 import oop.project.parameters.ParametersBuilder;
-import oop.project.deserializers.FilmDeserializer;
+
 import static java.lang.Integer.parseInt;
 import static oop.project.shared.CommandWaiter.*;
 import static oop.project.shared.Config.*;
@@ -143,6 +141,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             if (callbackData.startsWith("movie_")) {
                 int id = parseInt(callbackData.substring(6));
                 FilmDeserializer film = TMDB_SERVICE.getMovieById(TMDB_TOKEN, id);
+                ListDeserializer<VideoDeserializer> videos = TMDB_SERVICE.getVideosForFilm(TMDB_TOKEN, id);
 
                 StringBuilder filmBuilder = new StringBuilder(film.title);
                 if (!Objects.equals(film.original_language, "en")) {
@@ -155,6 +154,16 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                         .append("Runtime: ").append(film.runtime).append(" min \n");
                 if (film.homepage != null) {
                     filmBuilder.append("Link: ").append(film.homepage).append("\n");
+                }
+                for (int i = 0; i < videos.results.size(); i++) {
+                    if (videos.results.get(i).id != null &&
+                            Objects.equals(videos.results.get(i).name, "Official Trailer") &&
+                            Objects.equals(videos.results.get(i).site, "YouTube") &&
+                            Objects.equals(videos.results.get(i).type, "Trailer") &&
+                            videos.results.get(i).official) {
+                        filmBuilder.append("Trailer: ").
+                                append("https://youtube.com/watch?v=").append(videos.results.get(i).key).append("\n");
+                    }
                 }
                 String responseMessage = filmBuilder.toString();
 
