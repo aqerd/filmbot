@@ -202,21 +202,21 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 CreditsDeserializer actorsFilms = TMDB_SERVICE.getActorsFilms(TMDB_TOKEN, id);
                 PersonDeserializer actor = TMDB_SERVICE.getActor(TMDB_TOKEN, id);
 
-                StringBuilder actorsData = new StringBuilder(actor.name).append(" (").append(actor.birthday, 0, 4);
-                if (actor.deathday != null) {
-                    actorsData.append(" - ").append(actor.deathday, 0, 4);
+                StringBuilder actorsData = new StringBuilder(actor.getName()).append(" (").append(actor.getBirthday(), 0, 4);
+                if (actor.getDeathday() != null) {
+                    actorsData.append(" - ").append(actor.getDeathday(), 0, 4);
                 }
-                actorsData.append(")").append("\n").append("Place of birth: ").append(actor.place_of_birth.trim())
-                        .append("\n").append("Popularity: ").append(actor.popularity.trim())
-                        .append("\n").append("ID: ").append(actor.id).append("\n\n");
-                if (!Objects.equals(actor.biography, "")) {
-                    actorsData.append(actor.biography).append("\n\n");
+                actorsData.append(")").append("\n").append("Place of birth: ").append(actor.getPlace_of_birth().trim())
+                        .append("\n").append("Popularity: ").append(actor.getPopularity().trim())
+                        .append("\n").append("ID: ").append(actor.getId()).append("\n\n");
+                if (!Objects.equals(actor.getBiography(), "")) {
+                    actorsData.append(actor.getBiography()).append("\n\n");
                 }
 
-                if ((actorsFilms.getCast() != null || actorsFilms.getCrew() != null) && actor.known_for_department != null) {
-                    StringBuilder actorsFilmsBuilder = new StringBuilder("Фильмы с участием " + actor.name + ":\n");
+                if ((actorsFilms.getCast() != null || actorsFilms.getCrew() != null) && actor.getKnown_for_department() != null) {
+                    StringBuilder actorsFilmsBuilder = new StringBuilder("Фильмы с участием " + actor.getName() + ":\n");
 
-                    if (Objects.equals(actor.known_for_department, "Acting")) {
+                    if (Objects.equals(actor.getKnown_for_department(), "Acting")) {
                         movies = actorsFilms.getCast();
                     } else {
                         movies = actorsFilms.getCrew();
@@ -253,7 +253,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
                 AnswerCallbackQuery answerCallbackQuery = AnswerCallbackQuery.builder()
                         .callbackQueryId(update.getCallbackQuery().getId())
-                        .text("Выполнен поиск по " + actor.name)
+                        .text("Выполнен поиск по " + actor.getName())
                         .showAlert(false)
                         .build();
                 answerCallbackQuery.setCallbackQueryId(update.getCallbackQuery().getId());
@@ -502,8 +502,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         }
 
         for (int i = 0; i < actorsToProcess; i++) {
-            String currentName = String.valueOf(people.get(i).name);
-            String currentId = String.valueOf(people.get(i).id);
+            String currentName = String.valueOf(people.get(i).getName());
+            String currentId = String.valueOf(people.get(i).getId());
             InlineKeyboardButton button = InlineKeyboardButton.builder()
                     .text(currentName)
                     .callbackData("actor_" + currentId)
