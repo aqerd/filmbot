@@ -80,8 +80,8 @@ public class RequestsCheckTest {
     void getActorsFilmsTest() {
         CreditsDeserializer response = TMDB_SERVICE.getActorsFilms(TMDB_TOKEN, ACTOR_ID);
         assertNotNull(response, "Response should not be null");
-        assertNotNull(response.crew, "Results should not be null");
-        assertNotNull(response.cast, "Results should not be null");
+        assertNotNull(response.getCrew(), "Results should not be null");
+        assertNotNull(response.getCast(), "Results should not be null");
     }
     
     @Test

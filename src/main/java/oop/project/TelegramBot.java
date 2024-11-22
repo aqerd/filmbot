@@ -213,13 +213,13 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                     actorsData.append(actor.biography).append("\n\n");
                 }
 
-                if ((actorsFilms.cast != null || actorsFilms.crew != null) && actor.known_for_department != null) {
+                if ((actorsFilms.getCast() != null || actorsFilms.getCrew() != null) && actor.known_for_department != null) {
                     StringBuilder actorsFilmsBuilder = new StringBuilder("Фильмы с участием " + actor.name + ":\n");
 
                     if (Objects.equals(actor.known_for_department, "Acting")) {
-                        movies = actorsFilms.cast;
+                        movies = actorsFilms.getCast();
                     } else {
-                        movies = actorsFilms.crew;
+                        movies = actorsFilms.getCrew();
                     }
 
                     if (movies != null && !movies.isEmpty()) {
