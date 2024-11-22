@@ -559,7 +559,6 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         } catch (Exception e) {
             responseMessage = "Что-то пошло не так";
         }
-
         return responseMessage;
     }
 
@@ -574,7 +573,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         try {
             int filmId = Integer.parseInt(messageText);
 
-            ListDeserializer<FilmDeserializer> films = tmdbService().getRecommendations(apiToken(), filmId);
+            ListDeserializer<FilmDeserializer> films = tmdbService().getRecommended(apiToken(), filmId);
             FilmDeserializer requestedFilm = tmdbService().getMovieById(apiToken(), filmId);
 
             if (films != null && films.getResults() != null && !films.getResults().isEmpty()) {

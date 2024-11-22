@@ -19,7 +19,7 @@ public interface SiteRequests {
     ListDeserializer<FilmDeserializer> getSimilar(@Param("api_key") String token, @Param("id") int id);
 
     @RequestLine("GET /movie/{id}/recommendations?api_key={api_key}")
-    ListDeserializer<FilmDeserializer> getRecommendations(@Param("api_key") String token, @Param("id") int id);
+    ListDeserializer<FilmDeserializer> getRecommended(@Param("api_key") String token, @Param("id") int id);
 
     @RequestLine("GET /movie/upcoming?api_key={api_key}")
     ListDeserializer<FilmDeserializer> getUpcoming(@Param("api_key") String token);
