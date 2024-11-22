@@ -157,13 +157,13 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 }
 
                 for (int i = 0; i < videos.results.size(); i++) {
-                    if (videos.results.get(i).id != null &&
-                            Objects.equals(videos.results.get(i).name, "Official Trailer") &&
-                            Objects.equals(videos.results.get(i).site, "YouTube") &&
-                            Objects.equals(videos.results.get(i).type, "Trailer") &&
-                            videos.results.get(i).official) {
+                    if (videos.results.get(i).getId() != null &&
+                            Objects.equals(videos.results.get(i).getName(), "Official Trailer") &&
+                            Objects.equals(videos.results.get(i).getSite(), "YouTube") &&
+                            Objects.equals(videos.results.get(i).getType(), "Trailer") &&
+                            videos.results.get(i).isOfficial()) {
                         filmBuilder.append("Trailer: ").
-                                append("https://youtube.com/watch?v=").append(videos.results.get(i).key).append("\n");
+                                append("https://youtube.com/watch?v=").append(videos.results.get(i).getKey()).append("\n");
                     }
                 }
 
@@ -692,13 +692,13 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 }
 
                 for (int i = 0; i < videos.results.size(); i++) {
-                    if (videos.results.get(i).id != null &&
-                            Objects.equals(videos.results.get(i).name, "Official Trailer") &&
-                            Objects.equals(videos.results.get(i).site, "YouTube") &&
-                            Objects.equals(videos.results.get(i).type, "Trailer") &&
-                            videos.results.get(i).official) {
+                    if (videos.results.get(i).getId() != null &&
+                            Objects.equals(videos.results.get(i).getName(), "Official Trailer") &&
+                            Objects.equals(videos.results.get(i).getSite(), "YouTube") &&
+                            Objects.equals(videos.results.get(i).getType(), "Trailer") &&
+                            videos.results.get(i).isOfficial()) {
                         filmBuilder.append("Trailer: ").
-                                append("https://youtube.com/watch?v=").append(videos.results.get(i).key).append("\n");
+                                append("https://youtube.com/watch?v=").append(videos.results.get(i).getKey()).append("\n");
                     }
                 }
 
