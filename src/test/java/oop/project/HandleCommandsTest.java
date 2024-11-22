@@ -8,6 +8,7 @@ import static oop.project.shared.Replies.reply;
 
 public class HandleCommandsTest extends TelegramBot {
     private TelegramBot telegramBot;
+    private final long CHAT_ID = 1L;
 
     public HandleCommandsTest() throws SQLException {
         super("dummy_token");
@@ -20,25 +21,25 @@ public class HandleCommandsTest extends TelegramBot {
 
     @Test
     void testHandleStartCommand() {
-        String response = telegramBot.handleCommands("/start", 1L);
+        String response = telegramBot.handleCommands("/start", CHAT_ID);
         assertEquals(reply("start"), response);
     }
 
     @Test
     void testHandleGenreCommand() {
-        String response = telegramBot.handleCommands("/genre", 1L);
+        String response = telegramBot.handleCommands("/genre", CHAT_ID);
         assertEquals(reply("genre"), response);
     }
 
     @Test
     void testHandleYearCommand() {
-        String response = telegramBot.handleCommands("/year", 1L);
+        String response = telegramBot.handleCommands("/year", CHAT_ID);
         assertEquals(reply("year"), response);
     }
 
     @Test
     void testHandleUnknownCommand() {
-        String response = telegramBot.handleCommands("/unknown", 1L);
+        String response = telegramBot.handleCommands("/unknown", CHAT_ID);
         assertEquals(reply("unknown"), response);
     }
 }

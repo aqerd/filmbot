@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class HandleGenreTest extends TelegramBot {
     private TelegramBot telegramBot;
+    private final long CHAT_ID = 1L;
 
     public HandleGenreTest() throws SQLException {
         super("dummy_token");
@@ -21,13 +22,13 @@ public class HandleGenreTest extends TelegramBot {
     @Test
     void testHandleGenreWithValidGenre() {
         String testGenreName = "Action";
-        String response = telegramBot.handleGenre(testGenreName, 1L);
+        String response = telegramBot.handleGenre(testGenreName, CHAT_ID);
         assertTrue(response.contains("Фильмы жанра " + testGenreName + ":"));
     }
 
     @Test
     void testHandleGenreWithUnknownGenre() {
-        String response = telegramBot.handleGenre("NonexistentGenre", 1L);
+        String response = telegramBot.handleGenre("NonexistentGenre", CHAT_ID);
         assertEquals("Извините, я не знаю такого жанра. Попробуйте другой", response);
     }
 }

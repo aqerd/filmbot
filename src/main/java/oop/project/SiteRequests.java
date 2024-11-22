@@ -7,19 +7,19 @@ import oop.project.parameters.MovieParameters;
 
 public interface SiteRequests {
     @RequestLine("GET /authentication?api_key={api_key}")
-    AuthDeserializer checkAuthStatus(@Param("api_key") String token);
+    AuthDeserializer authStatus(@Param("api_key") String token);
 
     @RequestLine("GET /movie/popular?api_key={api_key}")
-    ListDeserializer<FilmDeserializer> getPopularMovies(@Param("api_key") String token);
+    ListDeserializer<FilmDeserializer> getPopular(@Param("api_key") String token);
 
     @RequestLine("GET /movie/{id}?api_key={api_key}")
     FilmDeserializer getMovieById(@Param("api_key") String token, @Param("id") int id);
 
     @RequestLine("GET /movie/{id}/similar?api_key={api_key}")
-    ListDeserializer<FilmDeserializer> getSimilarMovies(@Param("api_key") String token, @Param("id") int id);
+    ListDeserializer<FilmDeserializer> getSimilar(@Param("api_key") String token, @Param("id") int id);
 
     @RequestLine("GET /movie/{id}/recommendations?api_key={api_key}")
-    ListDeserializer<FilmDeserializer> getRecommendationsForMovie(@Param("api_key") String token, @Param("id") int id);
+    ListDeserializer<FilmDeserializer> getRecommendations(@Param("api_key") String token, @Param("id") int id);
 
     @RequestLine("GET /movie/upcoming?api_key={api_key}")
     ListDeserializer<FilmDeserializer> getUpcoming(@Param("api_key") String token);
@@ -28,13 +28,13 @@ public interface SiteRequests {
     ListDeserializer<FilmDeserializer> getTopRated(@Param("api_key") String token);
 
     @RequestLine("GET /person/{id}?api_key={api_key}")
-    PersonDeserializer getActor(@Param("api_key") String token, @Param("id") int id);
+    PersonDeserializer getActorById(@Param("api_key") String token, @Param("id") int id);
 
     @RequestLine("GET /person/{id}/movie_credits?api_key={api_key}")
-    CreditsDeserializer getActorsFilms(@Param("api_key") String token, @Param("id") int id);
+    CreditsDeserializer getActorsMovies(@Param("api_key") String token, @Param("id") int id);
 
     @RequestLine("GET /movie/{id}/videos?api_key={api_key}")
-    ListDeserializer<VideoDeserializer> getVideosForFilm(@Param("api_key") String token, @Param("id") int id);
+    ListDeserializer<VideoDeserializer> getVideosForMovie(@Param("api_key") String token, @Param("id") int id);
 
     @RequestLine("GET /search/movie" +
             "?api_key={api_key}" +

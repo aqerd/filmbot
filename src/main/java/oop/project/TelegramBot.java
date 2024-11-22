@@ -13,6 +13,7 @@ import static oop.project.shared.CommandWaiter.*;
 import static oop.project.shared.Config.*;
 import static oop.project.shared.Utils.isCommand;
 import static oop.project.shared.Replies.reply;
+import static oop.project.Keyboards.setKeyboard;
 // import java.lang.reflect.Type;
 import java.sql.SQLException;
 import java.util.*;
@@ -29,39 +30,37 @@ import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
 public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
-    private static final Logger logger = LoggerFactory.getLogger(TelegramBot.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TelegramBot.class);
 
-    private final TelegramClient telegramClient;
-    private final ExecutorService executorService = Executors.newFixedThreadPool(10);
+    private final TelegramClient TG_CLIENT;
+    private final ExecutorService EXECUTOR = Executors.newFixedThreadPool(10);
 
 //    private final Database database = new Database();
 //    private final Gson gson = new Gson();
 
-    private final int constNumber = 12;
-    private final int searchNumber = 6;
+    private final int CONST_NUM = 12;
+    private final int SEARCH_NUM = 6;
 
     private final HashMap<Integer, Integer> yearMovieIndexMap = new HashMap<>();
     private final HashMap<String, Integer> genreMovieIndexMap = new HashMap<>();
     private int popularMovieIndex = 0;
-    private final Map<Long, CommandWaiter> commandWaiter = new ConcurrentHashMap<>();
+    private final Map<Long, CommandWaiter> COMMAND_WAITER = new ConcurrentHashMap<>();
 
     public TelegramBot(String botToken) throws SQLException {
-        telegramClient = new OkHttpTelegramClient(botToken);
+        TG_CLIENT = new OkHttpTelegramClient(botToken);
     }
 
     @Override
     public void consume(Update update) {
-        executorService.submit(() -> handleUpdate(update));
+        EXECUTOR.submit(() -> handleUpdate(update));
     }
 
     public void handleUpdate(Update update) {
@@ -75,57 +74,57 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
             String messageText = update.getMessage().getText();
             String responseMessage;
-            CommandWaiter waiter = commandWaiter.getOrDefault(chatId, NONE);
+            CommandWaiter waiter = COMMAND_WAITER.getOrDefault(chatId, NONE);
 
-            logger.info("ID: {}, Message: {}, Waiter: {}", chatId, messageText, waiter);
+            LOG.info("ID: {}, Message: {}, Waiter: {}", chatId, messageText, waiter);
 
             switch (waiter) {
                 case GENRE:
                     responseMessage = handleGenre(messageText, chatId);
-                    commandWaiter.put(chatId, NONE);
+                    COMMAND_WAITER.put(chatId, NONE);
                     break;
                 case YEAR:
                     responseMessage = handleYear(messageText, chatId);
-                    commandWaiter.put(chatId, NONE);
+                    COMMAND_WAITER.put(chatId, NONE);
                     break;
                 case MOVIESEARCH:
                     responseMessage = handleMovieSearch(messageText, chatId);
-                    commandWaiter.put(chatId, NONE);
+                    COMMAND_WAITER.put(chatId, NONE);
                     break;
                 case ACTORSEARCH:
                     responseMessage = handleActorSearch(messageText, chatId);
-                    commandWaiter.put(chatId, NONE);
+                    COMMAND_WAITER.put(chatId, NONE);
                     break;
                 case SIMILAR:
                     responseMessage = handleSimilar(messageText, chatId);
-                    commandWaiter.put(chatId, NONE);
+                    COMMAND_WAITER.put(chatId, NONE);
                     break;
                 case RECOMMENDED:
                     responseMessage = handleRecommended(messageText, chatId);
-                    commandWaiter.put(chatId, NONE);
+                    COMMAND_WAITER.put(chatId, NONE);
                     break;
                 case FINDBYID:
                     responseMessage = handleFindById(messageText, chatId);
-                    commandWaiter.put(chatId, NONE);
+                    COMMAND_WAITER.put(chatId, NONE);
                     break;
                 case SETAGE:
                     responseMessage = handleSetAge(messageText, chatId);
-                    commandWaiter.put(chatId, NONE);
+                    COMMAND_WAITER.put(chatId, NONE);
                     break;
                 default:
                     responseMessage = handleCommands(messageText, chatId);
                     break;
             }
 
-            CommandWaiter updatedWaiter = commandWaiter.getOrDefault(chatId, NONE);
+            CommandWaiter updatedWaiter = COMMAND_WAITER.getOrDefault(chatId, NONE);
             SendMessage message = SendMessage.builder()
                     .chatId(chatId)
                     .text(responseMessage)
-                    .replyMarkup(getKeyboardByWaiter(updatedWaiter))
+                    .replyMarkup(setKeyboard(updatedWaiter))
                     .build();
 
             try {
-                telegramClient.execute(message);
+                TG_CLIENT.execute(message);
             } catch (TelegramApiException err) {
                 err.printStackTrace();
             }
@@ -140,7 +139,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             if (callbackData.startsWith("movie_")) {
                 int id = parseInt(callbackData.substring(6));
                 FilmDeserializer film = tmdbService().getMovieById(apiToken(), id);
-                ListDeserializer<VideoDeserializer> videos = tmdbService().getVideosForFilm(apiToken(), id);
+                ListDeserializer<VideoDeserializer> videos = tmdbService().getVideosForMovie(apiToken(), id);
 
                 StringBuilder filmBuilder = new StringBuilder(film.getTitle());
                 if (!Objects.equals(film.getOriginal_language(), "en")) {
@@ -177,7 +176,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 response.setText(responseMessage);
 
                 try {
-                    telegramClient.execute(response);
+                    TG_CLIENT.execute(response);
                 } catch (TelegramApiException e) {
                     e.printStackTrace();
                 }
@@ -190,7 +189,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 answerCallbackQuery.setCallbackQueryId(update.getCallbackQuery().getId());
 
                 try {
-                    telegramClient.execute(answerCallbackQuery);
+                    TG_CLIENT.execute(answerCallbackQuery);
                 } catch (TelegramApiException e) {
                     e.printStackTrace();
                 }
@@ -198,8 +197,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 int id = parseInt(callbackData.substring(6));
                 String responseMessage;
                 List<FilmDeserializer> movies;
-                CreditsDeserializer actorsFilms = tmdbService().getActorsFilms(apiToken(), id);
-                PersonDeserializer actor = tmdbService().getActor(apiToken(), id);
+                CreditsDeserializer actorsFilms = tmdbService().getActorsMovies(apiToken(), id);
+                PersonDeserializer actor = tmdbService().getActorById(apiToken(), id);
 
                 StringBuilder actorsData = new StringBuilder(actor.getName()).append(" (").append(actor.getBirthday(), 0, 4);
                 if (actor.getDeathday() != null) {
@@ -222,7 +221,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                     }
 
                     if (movies != null && !movies.isEmpty()) {
-                        int filmsToDisplay = Math.min(constNumber, movies.size());
+                        int filmsToDisplay = Math.min(CONST_NUM, movies.size());
                         for (int i = 0; i < filmsToDisplay; i++) {
                             FilmDeserializer currentMovie = movies.get(i);
                             actorsFilmsBuilder.append(i + 1).append(". ").append(currentMovie.getTitle()).append("\n");
@@ -245,7 +244,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 response.setText(responseMessage);
 
                 try {
-                    telegramClient.execute(response);
+                    TG_CLIENT.execute(response);
                 } catch (TelegramApiException e) {
                     e.printStackTrace();
                 }
@@ -258,7 +257,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 answerCallbackQuery.setCallbackQueryId(update.getCallbackQuery().getId());
 
                 try {
-                    telegramClient.execute(answerCallbackQuery);
+                    TG_CLIENT.execute(answerCallbackQuery);
                 } catch (TelegramApiException e) {
                     e.printStackTrace();
                 }
@@ -291,27 +290,27 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 break;
             case "/genre": case "genre":
                 responseMessage = reply("genre");
-                commandWaiter.put(chatId, GENRE);
+                COMMAND_WAITER.put(chatId, GENRE);
                 break;
             case "/year": case "year":
                 responseMessage = reply("year");
-                commandWaiter.put(chatId, YEAR);
+                COMMAND_WAITER.put(chatId, YEAR);
                 break;
             case "/moviesearch": case "movie search":
                 responseMessage = reply("movie search");
-                commandWaiter.put(chatId, MOVIESEARCH);
+                COMMAND_WAITER.put(chatId, MOVIESEARCH);
                 break;
             case "/actorsearch": case "actor search":
                 responseMessage = reply("actor search");
-                commandWaiter.put(chatId, ACTORSEARCH);
+                COMMAND_WAITER.put(chatId, ACTORSEARCH);
                 break;
             case "/similar": case "similar":
                 responseMessage = reply("similar");
-                commandWaiter.put(chatId, SIMILAR);
+                COMMAND_WAITER.put(chatId, SIMILAR);
                 break;
             case "/recommended": case "recommended":
                 responseMessage = reply("recommended");
-                commandWaiter.put(chatId, RECOMMENDED);
+                COMMAND_WAITER.put(chatId, RECOMMENDED);
                 break;
             case "/popular": case "popular":
                 responseMessage = handlePopular(chatId);
@@ -321,11 +320,11 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 break;
             case "/findbyid": case "find by id":
                 responseMessage = reply("find by id");
-                commandWaiter.put(chatId, FINDBYID);
+                COMMAND_WAITER.put(chatId, FINDBYID);
                 break;
             case "/setage": case "set age":
                 responseMessage = reply("set age");
-                commandWaiter.put(chatId, SETAGE);
+                COMMAND_WAITER.put(chatId, SETAGE);
                 break;
             case "/help": case "help":
                 responseMessage = reply("help");
@@ -344,7 +343,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
     protected String handleGenre(String messageText, long chatId) {
         if (isCommand(messageText)) {
-            commandWaiter.put(chatId, NONE);
+            COMMAND_WAITER.put(chatId, NONE);
             return handleCommands(messageText, chatId);
         }
 
@@ -365,12 +364,12 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 int currentIndex = genreMovieIndexMap.getOrDefault(genreId, 0);
                 StringBuilder movieListBuilder = new StringBuilder("Фильмы жанра " + messageText + ":\n");
 
-                for (int i = 0; i < constNumber; i++) {
+                for (int i = 0; i < CONST_NUM; i++) {
                     FilmDeserializer currentMovie = movies.get((currentIndex + i) % movies.size());
                     movieListBuilder.append(i + 1).append(". ").append(currentMovie.getTitle()).append("\n");
                 }
 
-                currentIndex = (currentIndex + constNumber) % movies.size();
+                currentIndex = (currentIndex + CONST_NUM) % movies.size();
                 genreMovieIndexMap.put(genreId, currentIndex);
 
 //                updateGenreIndexInDatabase(chatId);
@@ -380,7 +379,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             } else {
                 responseMessage = "Извините, я не нашел фильмов для жанра " + messageText;
             }
-            commandWaiter.put(chatId, NONE);
+            COMMAND_WAITER.put(chatId, NONE);
         } catch (IllegalArgumentException e) {
             responseMessage = "Извините, я не знаю такого жанра. Попробуйте другой";
         }
@@ -416,19 +415,19 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 int currentIndex = yearMovieIndexMap.getOrDefault(userYear, 0);
                 StringBuilder movieListBuilder = new StringBuilder("Фильмы, выпущенные в " + userYear + " году:\n");
 
-                for (int i = 0; i < constNumber; i++) {
+                for (int i = 0; i < CONST_NUM; i++) {
                     FilmDeserializer currentMovie = movies.get((currentIndex + i) % movies.size());
                     movieListBuilder.append(i + 1).append(". ").append(currentMovie.getTitle()).append("\n");
                 }
 
-                currentIndex = (currentIndex + constNumber) % movies.size();
+                currentIndex = (currentIndex + CONST_NUM) % movies.size();
                 yearMovieIndexMap.put(userYear, currentIndex);
 
                 responseMessage = movieListBuilder.toString();
             } else {
                 responseMessage = "Извините, я не нашел фильмов за " + userYear + " год";
             }
-            commandWaiter.put(chatId, NONE);
+            COMMAND_WAITER.put(chatId, NONE);
         } catch (Exception e) {
             responseMessage = "Что-то пошло не так";
         }
@@ -438,7 +437,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
     protected String handleMovieSearch(String messageText, long chatId) {
         if (isCommand(messageText)) {
-            commandWaiter.put(chatId, NONE);
+            COMMAND_WAITER.put(chatId, NONE);
             return handleCommands(messageText, chatId);
         }
 
@@ -447,7 +446,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         ListDeserializer<FilmDeserializer> films = tmdbService().searchMovie(apiToken(), messageText, "en-US", 1);
 
         List<FilmDeserializer> movies = films.getResults();
-        int filmsToProcess = Math.min(searchNumber, movies.size());
+        int filmsToProcess = Math.min(SEARCH_NUM, movies.size());
 
         if (filmsToProcess == 0) {
             return "Ничего не найдено";
@@ -476,16 +475,16 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 .replyMarkup(markupInline)
                 .build();
         try {
-            telegramClient.execute(response);
+            TG_CLIENT.execute(response);
         } catch (Exception e) {
-            logger.error("Error while sending message to chatId {}: {}", chatId, e.getMessage(), e);
+            LOG.error("Error while sending message to chatId {}: {}", chatId, e.getMessage(), e);
         }
         return "";
     }
 
     protected String handleActorSearch(String messageText, long chatId) {
         if (isCommand(messageText)) {
-            commandWaiter.put(chatId, NONE);
+            COMMAND_WAITER.put(chatId, NONE);
             return handleCommands(messageText, chatId);
         }
 
@@ -494,7 +493,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         ListDeserializer<PersonDeserializer> humans = tmdbService().searchPerson(apiToken(), messageText, "en-US", 1);
 
         List<PersonDeserializer> people = humans.getResults();
-        int actorsToProcess = Math.min(searchNumber, people.size());
+        int actorsToProcess = Math.min(SEARCH_NUM, people.size());
 
         if (actorsToProcess == 0) {
             return "Ничего не найдено";
@@ -523,9 +522,9 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 .replyMarkup(markupInline)
                 .build();
         try {
-            telegramClient.execute(response);
+            TG_CLIENT.execute(response);
         } catch (TelegramApiException e) {
-            logger.error("Error while sending message to chatId {}: {}", chatId, e.getMessage(), e);
+            LOG.error("Error while sending message to chatId {}: {}", chatId, e.getMessage(), e);
         }
         return "";
     }
@@ -541,14 +540,14 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         try {
             int filmId = Integer.parseInt(messageText);
 
-            ListDeserializer<FilmDeserializer> films = tmdbService().getSimilarMovies(apiToken(), filmId);
+            ListDeserializer<FilmDeserializer> films = tmdbService().getSimilar(apiToken(), filmId);
             FilmDeserializer requestedFilm = tmdbService().getMovieById(apiToken(), filmId);
 
             if (films != null && films.getResults() != null && !films.getResults().isEmpty()) {
                 List<FilmDeserializer> movies = films.getResults();
                 StringBuilder movieListBuilder = new StringBuilder("Похожие фильмы для " + requestedFilm.getTitle() + ":\n");
 
-                for (int i = 0; i < constNumber; i++) {
+                for (int i = 0; i < CONST_NUM; i++) {
                     FilmDeserializer currentMovie = movies.get(i);
                     movieListBuilder.append(i + 1).append(". ").append(currentMovie.getTitle()).append("\n");
                 }
@@ -556,14 +555,13 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             } else {
                 responseMessage = "Фильм с индексом " + filmId + " не найден";
             }
-            commandWaiter.put(chatId, NONE);
+            COMMAND_WAITER.put(chatId, NONE);
         } catch (Exception e) {
             responseMessage = "Что-то пошло не так";
         }
 
         return responseMessage;
     }
-
 
     protected String handleRecommended(String messageText, long chatId) {
         Validator<String> validator = new IdValidator();
@@ -576,14 +574,14 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         try {
             int filmId = Integer.parseInt(messageText);
 
-            ListDeserializer<FilmDeserializer> films = tmdbService().getRecommendationsForMovie(apiToken(), filmId);
+            ListDeserializer<FilmDeserializer> films = tmdbService().getRecommendations(apiToken(), filmId);
             FilmDeserializer requestedFilm = tmdbService().getMovieById(apiToken(), filmId);
 
             if (films != null && films.getResults() != null && !films.getResults().isEmpty()) {
                 List<FilmDeserializer> movies = films.getResults();
                 StringBuilder movieListBuilder = new StringBuilder("Рекомендуемые фильмы для фильма " + requestedFilm.getTitle() + ":\n");
 
-                for (int i = 0; i < constNumber; i++) {
+                for (int i = 0; i < CONST_NUM; i++) {
                     FilmDeserializer currentMovie = movies.get(i);
                     movieListBuilder.append(i + 1).append(". ").append(currentMovie.getTitle()).append("\n");
                 }
@@ -591,7 +589,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             } else {
                 responseMessage = "Фильм с индексом " + filmId + " не найден";
             }
-            commandWaiter.put(chatId, NONE);
+            COMMAND_WAITER.put(chatId, NONE);
         } catch (Exception e) {
             responseMessage = "Что-то пошло не так";
         }
@@ -603,23 +601,23 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         String responseMessage;
 
         try {
-            ListDeserializer<FilmDeserializer> popularFilms = tmdbService().getPopularMovies(apiToken());
+            ListDeserializer<FilmDeserializer> popularFilms = tmdbService().getPopular(apiToken());
 
             if (popularFilms != null && popularFilms.getResults() != null && !popularFilms.getResults().isEmpty()) {
                 List<FilmDeserializer> movies = popularFilms.getResults();
                 StringBuilder moviesListBuilder = new StringBuilder("Популярные фильмы:\n");
 
-                for (int i = 0; i < constNumber; i++) {
+                for (int i = 0; i < CONST_NUM; i++) {
                     FilmDeserializer currentMovie = movies.get((popularMovieIndex + i) % movies.size());
                     moviesListBuilder.append(popularMovieIndex + i + 1).append(". ").append(currentMovie.getTitle()).append("\n");
                 }
 
-                popularMovieIndex = (popularMovieIndex + constNumber) % movies.size();
+                popularMovieIndex = (popularMovieIndex + CONST_NUM) % movies.size();
                 responseMessage = moviesListBuilder.toString();
             } else {
                 responseMessage = "Данные не найдены";
             }
-            commandWaiter.put(chatId, NONE);
+            COMMAND_WAITER.put(chatId, NONE);
         } catch (FeignException e) {
             if (e.status() == 404) {
                 responseMessage = "404: Данные не найдены";
@@ -640,16 +638,16 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             if (popularFilms != null && popularFilms.getResults() != null && !popularFilms.getResults().isEmpty()) {
                 List<FilmDeserializer> movies = popularFilms.getResults();
                 StringBuilder moviesListBuilder = new StringBuilder("Высоко-оцененные фильмы:\n");
-                for (int i = 0; i < constNumber; i++) {
+                for (int i = 0; i < CONST_NUM; i++) {
                     FilmDeserializer currentMovie = movies.get((popularMovieIndex + i) % movies.size());
                     moviesListBuilder.append(popularMovieIndex + i + 1).append(". ").append(currentMovie.getTitle()).append("\n");
                 }
-                popularMovieIndex = (popularMovieIndex + constNumber) % movies.size();
+                popularMovieIndex = (popularMovieIndex + CONST_NUM) % movies.size();
                 responseMessage = moviesListBuilder.toString();
             } else {
                 responseMessage = "Данные не найдены";
             }
-            commandWaiter.put(chatId, NONE);
+            COMMAND_WAITER.put(chatId, NONE);
         } catch (FeignException e) {
             if (e.status() == 404) {
                 responseMessage = "404: Данные не найдены";
@@ -673,7 +671,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         try {
             int filmID = Integer.parseInt(messageText);
             FilmDeserializer film = tmdbService().getMovieById(apiToken(), filmID);
-            ListDeserializer<VideoDeserializer> videos = tmdbService().getVideosForFilm(apiToken(), filmID);
+            ListDeserializer<VideoDeserializer> videos = tmdbService().getVideosForMovie(apiToken(), filmID);
 
             if (film != null) {
                 StringBuilder filmBuilder = new StringBuilder(film.getTitle());
@@ -697,7 +695,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                             Objects.equals(videos.getResults().get(i).getType(), "Trailer") &&
                             videos.getResults().get(i).isOfficial()) {
                         filmBuilder.append("Trailer: ").
-                                append("https://youtube.com/watch?v=").append(videos.getResults().get(i).getKey()).append("\n");
+                                append(youtubeUrl()).append(videos.getResults().get(i).getKey()).append("\n");
                     }
                 }
 
@@ -705,14 +703,13 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             } else {
                 responseMessage = "Извините, я не нашел фильм";
             }
-            commandWaiter.put(chatId, NONE);
+            COMMAND_WAITER.put(chatId, NONE);
         } catch (Exception e) {
             responseMessage = "Что-то пошло не так";
         }
 
         return responseMessage;
     }
-
 
     protected String handleSetAge(String messageText, long chatId) {
         Validator<String> validator = new AgeValidator();
@@ -722,99 +719,5 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         }
 
         return "Спасибо! Учтем ваш ответ";
-    }
-
-
-    private ReplyKeyboardMarkup createCommandKeyboard() {
-        ReplyKeyboardMarkup keyboardMarkup = ReplyKeyboardMarkup.builder().build();
-        List<KeyboardRow> keyboard = new ArrayList<>();
-
-        KeyboardRow row1 = new KeyboardRow();
-        KeyboardRow row2 = new KeyboardRow();
-        KeyboardRow row3 = new KeyboardRow();
-        KeyboardRow row4 = new KeyboardRow();
-        KeyboardRow row5 = new KeyboardRow();
-        KeyboardRow row6 = new KeyboardRow();
-
-        row1.add("Genre");
-        row1.add("Year");
-        row2.add("Movie Search");
-        row2.add("Actor Search");
-        row3.add("Similar");
-        row3.add("Recommended");
-        row4.add("Popular");
-        row4.add("Find by ID");
-        row5.add("Top Rated");
-        row5.add("Set Age");
-        row6.add("Help");
-
-        keyboard.add(row1);
-        keyboard.add(row2);
-        keyboard.add(row3);
-        keyboard.add(row4);
-        keyboard.add(row5);
-        keyboard.add(row6);
-
-        keyboardMarkup.setKeyboard(keyboard);
-        keyboardMarkup.setResizeKeyboard(true);
-        keyboardMarkup.setOneTimeKeyboard(true);
-
-        return keyboardMarkup;
-    }
-
-    private ReplyKeyboardMarkup createGenreKeyboard() {
-        ReplyKeyboardMarkup keyboardMarkup = ReplyKeyboardMarkup.builder().build();
-        List<KeyboardRow> keyboard = new ArrayList<>();
-
-        KeyboardRow row1 = new KeyboardRow();
-        KeyboardRow row2 = new KeyboardRow();
-        KeyboardRow row3 = new KeyboardRow();
-        KeyboardRow row4 = new KeyboardRow();
-        KeyboardRow row5 = new KeyboardRow();
-        KeyboardRow row6 = new KeyboardRow();
-        KeyboardRow row7 = new KeyboardRow();
-
-        row1.add("Fantasy");
-        row1.add("Horror");
-        row1.add("Action");
-        row2.add("Music");
-        row2.add("War");
-        row2.add("Drama");
-        row3.add("Western");
-        row3.add("Family");
-        row3.add("Comedy");
-        row4.add("History");
-        row4.add("Crime");
-        row4.add("Mystery");
-        row5.add("Romance");
-        row5.add("Thriller");
-        row5.add("TV Movie");
-        row6.add("Science Fiction");
-        row6.add("Adventure");
-        row7.add("Animation");
-        row7.add("Documentary");
-
-        keyboard.add(row1);
-        keyboard.add(row2);
-        keyboard.add(row3);
-        keyboard.add(row4);
-        keyboard.add(row5);
-        keyboard.add(row6);
-        keyboard.add(row7);
-
-        keyboardMarkup.setKeyboard(keyboard);
-        keyboardMarkup.setResizeKeyboard(true);
-        keyboardMarkup.setOneTimeKeyboard(true);
-
-        return keyboardMarkup;
-    }
-
-    private ReplyKeyboardMarkup getKeyboardByWaiter(CommandWaiter waiter) {
-        if (waiter == NONE) {
-            return createCommandKeyboard();
-        } else if (waiter == GENRE) {
-            return createGenreKeyboard();
-        }
-        return null;
     }
 }

@@ -14,7 +14,7 @@ public class RequestsCheckTest {
 
     @Test
     void checkAuthStatusTest() {
-        AuthDeserializer response = tmdbService().checkAuthStatus(apiToken());
+        AuthDeserializer response = tmdbService().authStatus(apiToken());
         assertNotNull(response, "Response should not be null");
         assertTrue(Boolean.parseBoolean(response.getSuccess()), "Expected status should be true");
         assertEquals(1, response.getStatus_code(), "Expected status code should be 1");
@@ -23,7 +23,7 @@ public class RequestsCheckTest {
 
     @Test
     void getPopularMoviesTest() {
-        ListDeserializer<FilmDeserializer> response = tmdbService().getPopularMovies(apiToken());
+        ListDeserializer<FilmDeserializer> response = tmdbService().getPopular(apiToken());
         assertNotNull(response, "Response should not be null");
         assertNotNull(response.getResults(), "Results should not be null");
         assertFalse(response.getResults().isEmpty(), "Results should not be empty");
@@ -38,7 +38,7 @@ public class RequestsCheckTest {
 
     @Test
     void getSimilarMovies() {
-        ListDeserializer<FilmDeserializer> response = tmdbService().getSimilarMovies(apiToken(), FILM_ID);
+        ListDeserializer<FilmDeserializer> response = tmdbService().getSimilar(apiToken(), FILM_ID);
         assertNotNull(response, "Response should not be null");
         assertNotNull(response.getResults(), "Results should not be null");
         assertFalse(response.getResults().isEmpty(), "Results should not be empty");
@@ -46,7 +46,7 @@ public class RequestsCheckTest {
 
     @Test
     void getRecommendationsForMovieTest() {
-        ListDeserializer<FilmDeserializer> response = tmdbService().getRecommendationsForMovie(apiToken(), FILM_ID);
+        ListDeserializer<FilmDeserializer> response = tmdbService().getRecommendations(apiToken(), FILM_ID);
         assertNotNull(response, "Response should not be null");
         assertNotNull(response.getResults(), "Results should not be null");
         assertFalse(response.getResults().isEmpty(), "Results should not be empty");
@@ -70,7 +70,7 @@ public class RequestsCheckTest {
 
     @Test
     void getActorTest() {
-        PersonDeserializer response = tmdbService().getActor(apiToken(),ACTOR_ID);
+        PersonDeserializer response = tmdbService().getActorById(apiToken(),ACTOR_ID);
         assertNotNull(response, "Response should not be null");
         assertNotNull(response.getBirthday(), "Result should not be null");
         assertEquals(response.getName(), "Ryan Gosling", "Result should be Ryan Gosling");
@@ -78,7 +78,7 @@ public class RequestsCheckTest {
 
     @Test
     void getActorsFilmsTest() {
-        CreditsDeserializer response = tmdbService().getActorsFilms(apiToken(), ACTOR_ID);
+        CreditsDeserializer response = tmdbService().getActorsMovies(apiToken(), ACTOR_ID);
         assertNotNull(response, "Response should not be null");
         assertNotNull(response.getCrew(), "Results should not be null");
         assertNotNull(response.getCast(), "Results should not be null");
@@ -86,7 +86,7 @@ public class RequestsCheckTest {
     
     @Test
     void getVideosForFilmTest() {
-        ListDeserializer<VideoDeserializer> response = tmdbService().getVideosForFilm(apiToken(), FILM_ID);
+        ListDeserializer<VideoDeserializer> response = tmdbService().getVideosForMovie(apiToken(), FILM_ID);
         assertNotNull(response, "Response should not be null");
         assertNotNull(response.getResults(), "Results should not be null");
         assertNotEquals(0, response.getId(), "Id should not be null");

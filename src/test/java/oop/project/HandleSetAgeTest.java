@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class HandleSetAgeTest extends TelegramBot {
     private TelegramBot telegramBot;
+    private final long CHAT_ID = 1L;
 
     public HandleSetAgeTest() throws SQLException {
         super("dummy_token");
@@ -19,19 +20,19 @@ public class HandleSetAgeTest extends TelegramBot {
 
     @Test
     void testHandleAgeWithValidAge() {
-        String response = telegramBot.handleSetAge("25", 1L);
+        String response = telegramBot.handleSetAge("25", CHAT_ID);
         assertEquals("Спасибо! Учтем ваш ответ", response);
     }
 
     @Test
     void testHandleAgeWithInvalidAge() {
-        String response = telegramBot.handleSetAge("150", 1L);
+        String response = telegramBot.handleSetAge("150", CHAT_ID);
         assertEquals("Пожалуйста, введите корректное число (от 0 до 100)", response);
     }
 
     @Test
     void testHandleAgeWithNonNumericInput() {
-        String response = telegramBot.handleSetAge("invalidAge", 1L);
+        String response = telegramBot.handleSetAge("invalidAge", CHAT_ID);
         assertEquals("Пожалуйста, введите корректное число (от 0 до 100)", response);
     }
 }
