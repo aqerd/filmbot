@@ -21,10 +21,14 @@ public enum Genres {
     WAR(10752),
     WESTERN(37);
 
-    public final String genreId;
+    private final String genreId;
 
     Genres(int genreId) {
         this.genreId = String.valueOf(genreId);
+    }
+
+    public String getGenreId() {
+        return genreId;
     }
 }
 

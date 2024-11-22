@@ -351,7 +351,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         String responseMessage;
 
         try {
-            String genreId = Genres.valueOf(messageText.toUpperCase().replace(" ", "_")).genreId;
+            String genreId = Genres.valueOf(messageText.toUpperCase().replace(" ", "_")).getGenreId();
 
             MovieParameters params = new ParametersBuilder()
                     .withGenres(genreId)
