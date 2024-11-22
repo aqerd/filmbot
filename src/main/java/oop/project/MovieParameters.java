@@ -1,4 +1,4 @@
-package oop.project.parameters;
+package oop.project;
 
 import static oop.project.shared.Config.apiToken;
 
@@ -19,6 +19,10 @@ public record MovieParameters(
         float withRuntimeGte,
         int year
 ) {
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public static class Builder {
         private String token = apiToken();
         private String certificationLte = "G";

@@ -6,8 +6,7 @@ import feign.FeignException;
 import oop.project.deserializers.*;
 import oop.project.shared.CommandWaiter;
 import oop.project.shared.Genres;
-import oop.project.parameters.MovieParameters;
-import oop.project.parameters.ParametersBuilder;
+
 import static java.lang.Integer.parseInt;
 import static oop.project.shared.CommandWaiter.*;
 import static oop.project.shared.Config.*;
@@ -352,7 +351,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         try {
             String genreId = Genres.valueOf(messageText.toUpperCase().replace(" ", "_")).getGenreId();
 
-            MovieParameters params = new ParametersBuilder()
+            MovieParameters params = MovieParameters.builder()
                     .withGenres(genreId)
                     .withCertificationLte("PG-13")
                     .withCertificationCountry("US")
@@ -403,7 +402,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         String responseMessage;
 
         try {
-            MovieParameters params = new ParametersBuilder()
+            MovieParameters params = MovieParameters.builder()
                     .withYear(userYear)
                     .withCertificationLte("PG-13")
                     .withCertificationCountry("US")

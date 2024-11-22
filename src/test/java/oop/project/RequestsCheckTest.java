@@ -2,8 +2,7 @@ package oop.project;
 
 import oop.project.deserializers.*;
 import org.junit.jupiter.api.Test;
-import oop.project.parameters.MovieParameters;
-import oop.project.parameters.ParametersBuilder;
+
 import static oop.project.shared.Config.tmdbService;
 import static oop.project.shared.Config.apiToken;
 import static org.junit.jupiter.api.Assertions.*;
@@ -46,7 +45,7 @@ public class RequestsCheckTest {
 
     @Test
     void getRecommendationsForMovieTest() {
-        ListDeserializer<FilmDeserializer> response = tmdbService().getRecommendations(apiToken(), FILM_ID);
+        ListDeserializer<FilmDeserializer> response = tmdbService().getRecommended(apiToken(), FILM_ID);
         assertNotNull(response, "Response should not be null");
         assertNotNull(response.getResults(), "Results should not be null");
         assertFalse(response.getResults().isEmpty(), "Results should not be empty");
@@ -70,7 +69,7 @@ public class RequestsCheckTest {
 
     @Test
     void getActorTest() {
-        PersonDeserializer response = tmdbService().getActorById(apiToken(),ACTOR_ID);
+        PersonDeserializer response = tmdbService().getActorById(apiToken(), ACTOR_ID);
         assertNotNull(response, "Response should not be null");
         assertNotNull(response.getBirthday(), "Result should not be null");
         assertEquals(response.getName(), "Ryan Gosling", "Result should be Ryan Gosling");
@@ -112,7 +111,7 @@ public class RequestsCheckTest {
 
     @Test
     void findMovieTest() {
-        MovieParameters params = new ParametersBuilder().withGenres("28").build();
+        MovieParameters params = MovieParameters.builder().withGenres("28").build();
         ListDeserializer<FilmDeserializer> response = tmdbService().findMovie(params);
         assertNotNull(response, "Response should not be null");
         assertNotNull(response.getResults(), "Results should not be null");
