@@ -11,42 +11,31 @@ import static oop.project.shared.CommandWaiter.NONE;
 public class Keyboards {
     public static ReplyKeyboardMarkup setKeyboard(CommandWaiter waiter) {
         if (waiter == NONE) {
-            return commandKeyboard();
+            return buildCommandKeyboard();
         } else if (waiter == GENRE) {
-            return genreKeyboard();
+            return buildGenreKeyboard();
         }
         return null;
     }
 
-    private static ReplyKeyboardMarkup commandKeyboard() {
-        ReplyKeyboardMarkup keyboardMarkup = ReplyKeyboardMarkup.builder().build();
+    public static List<KeyboardRow> createKeyboard(List<String> commands, int columns) {
         List<KeyboardRow> keyboard = new ArrayList<>();
+        for (int i = 0; i < commands.size(); i += columns) {
+            KeyboardRow row = new KeyboardRow();
+            for (int j = 0; j < columns && (i + j) < commands.size(); j++) {
+                row.add(commands.get(i + j));
+            }
+            keyboard.add(row);
+        }
+        return keyboard;
+    }
 
-        KeyboardRow row1 = new KeyboardRow();
-        KeyboardRow row2 = new KeyboardRow();
-        KeyboardRow row3 = new KeyboardRow();
-        KeyboardRow row4 = new KeyboardRow();
-        KeyboardRow row5 = new KeyboardRow();
-        KeyboardRow row6 = new KeyboardRow();
+    private static ReplyKeyboardMarkup buildCommandKeyboard() {
+        ReplyKeyboardMarkup keyboardMarkup = ReplyKeyboardMarkup.builder().build();
+        List<String> commands = List.of("Genre", "Year", "Movie Search", "Actor Search", "Similar",
+                "Recommended", "Popular", "Find by ID", "Top Rated", "Set Age", "Help");
 
-        row1.add("Genre");
-        row1.add("Year");
-        row2.add("Movie Search");
-        row2.add("Actor Search");
-        row3.add("Similar");
-        row3.add("Recommended");
-        row4.add("Popular");
-        row4.add("Find by ID");
-        row5.add("Top Rated");
-        row5.add("Set Age");
-        row6.add("Help");
-
-        keyboard.add(row1);
-        keyboard.add(row2);
-        keyboard.add(row3);
-        keyboard.add(row4);
-        keyboard.add(row5);
-        keyboard.add(row6);
+        List<KeyboardRow> keyboard = createKeyboard(commands, 2);
 
         keyboardMarkup.setKeyboard(keyboard);
         keyboardMarkup.setResizeKeyboard(true);
@@ -55,45 +44,13 @@ public class Keyboards {
         return keyboardMarkup;
     }
 
-    private static ReplyKeyboardMarkup genreKeyboard() {
+    private static ReplyKeyboardMarkup buildGenreKeyboard() {
         ReplyKeyboardMarkup keyboardMarkup = ReplyKeyboardMarkup.builder().build();
-        List<KeyboardRow> keyboard = new ArrayList<>();
+        List<String> commands = List.of("Fantasy", "Horror", "Action", "Music", "War", "Drama", "Western",
+                "Family", "Comedy", "History", "Crime", "Mystery", "Romance", "Thriller", "TV Movie",
+                "Adventure", "Animation", "Documentary", "Science Fiction");
 
-        KeyboardRow row1 = new KeyboardRow();
-        KeyboardRow row2 = new KeyboardRow();
-        KeyboardRow row3 = new KeyboardRow();
-        KeyboardRow row4 = new KeyboardRow();
-        KeyboardRow row5 = new KeyboardRow();
-        KeyboardRow row6 = new KeyboardRow();
-        KeyboardRow row7 = new KeyboardRow();
-
-        row1.add("Fantasy");
-        row1.add("Horror");
-        row1.add("Action");
-        row2.add("Music");
-        row2.add("War");
-        row2.add("Drama");
-        row3.add("Western");
-        row3.add("Family");
-        row3.add("Comedy");
-        row4.add("History");
-        row4.add("Crime");
-        row4.add("Mystery");
-        row5.add("Romance");
-        row5.add("Thriller");
-        row5.add("TV Movie");
-        row6.add("Science Fiction");
-        row6.add("Adventure");
-        row7.add("Animation");
-        row7.add("Documentary");
-
-        keyboard.add(row1);
-        keyboard.add(row2);
-        keyboard.add(row3);
-        keyboard.add(row4);
-        keyboard.add(row5);
-        keyboard.add(row6);
-        keyboard.add(row7);
+        List<KeyboardRow> keyboard = createKeyboard(commands, 3);
 
         keyboardMarkup.setKeyboard(keyboard);
         keyboardMarkup.setResizeKeyboard(true);
