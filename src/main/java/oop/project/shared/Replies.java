@@ -18,7 +18,7 @@ public class Replies {
                         /recommended - Рекомендуемые фильмы
                         /popular - Популярные фильмы
                         /toprated - Высоко-оценённые фильмы
-                        /findbyid - поиск фильма по ID TMDB
+                        /findbyid - Поиск фильма по ID TMDB
                         /setage - Установить возрастное ограничение
                         /help - Справка""");
         REPLIES.put("help", """
@@ -31,7 +31,7 @@ public class Replies {
                         /recommended - Рекомендуемые фильмы
                         /popular - Популярные фильмы
                         /toprated - Высоко-оценённые фильмы
-                        /findbyid - поиск фильма по ID TMDB
+                        /findbyid - Поиск фильма по ID TMDB
                         /setage - Установить возрастное ограничение""");
         REPLIES.put("year", "Введите год, и я найду фильмы, выпущенные в этом году");
         REPLIES.put("movie search", "Введите фильм который вы хотите найти");

@@ -141,7 +141,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 FilmDeserializer film = tmdbService().getMovieById(apiToken(), id);
                 ListDeserializer<VideoDeserializer> videos = tmdbService().getVideosForMovie(apiToken(), id);
 
-                StringBuilder filmBuilder = new StringBuilder(film.getTitle());
+                StringBuilder filmBuilder = new StringBuilder("**" + film.getTitle() + "**");
                 if (!Objects.equals(film.getOriginal_language(), "en")) {
                     filmBuilder.append(" / ").append(film.getOriginal_title());
                 }
@@ -150,8 +150,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                         .append(film.getOverview()).append("\n\n")
                         .append("Vote average: ").append(film.getVote_average()).append("/10\n")
                         .append("Runtime: ").append(film.getRuntime()).append(" min \n");
-                if (film.getHomepage() != null) {
-                    filmBuilder.append("Link: ").append(film.getHomepage()).append("\n");
+                if (film.getHomepage() != null && !film.getHomepage().isEmpty()) {
+                    filmBuilder.append("[Homepage](").append(film.getHomepage()).append(") ");
                 }
 
                 for (int i = 0; i < videos.getResults().size(); i++) {
@@ -160,8 +160,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                             Objects.equals(videos.getResults().get(i).getSite(), "YouTube") &&
                             Objects.equals(videos.getResults().get(i).getType(), "Trailer") &&
                             videos.getResults().get(i).isOfficial()) {
-                        filmBuilder.append("Trailer: ").
-                                append(youtubeUrl()).append(videos.getResults().get(i).getKey()).append("\n");
+                        filmBuilder.append("/ [Youtube](").append(youtubeUrl()).append(videos.getResults().get(i).getKey()).append(")").append("\n");
                     }
                 }
 
@@ -173,12 +172,13 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                         .text("Выберите фильм:")
                         .build();
                 response.setChatId(String.valueOf(chatId));
+                response.enableMarkdown(true);
                 response.setText(responseMessage);
 
                 try {
                     TG_CLIENT.execute(response);
                 } catch (TelegramApiException e) {
-                    e.printStackTrace();
+                    LOG.error("Error: {}", e.getMessage());
                 }
 
                 AnswerCallbackQuery answerCallbackQuery = AnswerCallbackQuery.builder()
@@ -200,7 +200,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 CreditsDeserializer actorsFilms = tmdbService().getActorsMovies(apiToken(), id);
                 PersonDeserializer actor = tmdbService().getActorById(apiToken(), id);
 
-                StringBuilder actorsData = new StringBuilder(actor.getName()).append(" (").append(actor.getBirthday(), 0, 4);
+                StringBuilder actorsData = new StringBuilder("**" + actor.getName() + "**").append(" (").append(actor.getBirthday(), 0, 4);
                 if (actor.getDeathday() != null) {
                     actorsData.append(" - ").append(actor.getDeathday(), 0, 4);
                 }

@@ -3,10 +3,8 @@ package oop.project;
 import oop.project.shared.CommandWaiter;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import static oop.project.shared.CommandWaiter.GENRE;
 import static oop.project.shared.CommandWaiter.NONE;
 
