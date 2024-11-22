@@ -143,17 +143,17 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 FilmDeserializer film = TMDB_SERVICE.getMovieById(TMDB_TOKEN, id);
                 ListDeserializer<VideoDeserializer> videos = TMDB_SERVICE.getVideosForFilm(TMDB_TOKEN, id);
 
-                StringBuilder filmBuilder = new StringBuilder(film.title);
-                if (!Objects.equals(film.original_language, "en")) {
-                    filmBuilder.append(" / ").append(film.original_title);
+                StringBuilder filmBuilder = new StringBuilder(film.getTitle());
+                if (!Objects.equals(film.getOriginal_language(), "en")) {
+                    filmBuilder.append(" / ").append(film.getOriginal_title());
                 }
-                filmBuilder.append(" (").append(film.release_date, 0, 4).append(", ")
-                        .append(film.origin_country[0]).append(")").append("\n\n")
-                        .append(film.overview).append("\n\n")
-                        .append("Vote average: ").append(film.vote_average).append("/10\n")
-                        .append("Runtime: ").append(film.runtime).append(" min \n");
-                if (film.homepage != null) {
-                    filmBuilder.append("Link: ").append(film.homepage).append("\n");
+                filmBuilder.append(" (").append(film.getRelease_date(), 0, 4).append(", ")
+                        .append(film.getOrigin_country()[0]).append(")").append("\n\n")
+                        .append(film.getOverview()).append("\n\n")
+                        .append("Vote average: ").append(film.getVote_average()).append("/10\n")
+                        .append("Runtime: ").append(film.getRuntime()).append(" min \n");
+                if (film.getHomepage() != null) {
+                    filmBuilder.append("Link: ").append(film.getHomepage()).append("\n");
                 }
 
                 for (int i = 0; i < videos.results.size(); i++) {
@@ -185,7 +185,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
                 AnswerCallbackQuery answerCallbackQuery = AnswerCallbackQuery.builder()
                         .callbackQueryId(update.getCallbackQuery().getId())
-                        .text("Выполнен поиск по " + film.title)
+                        .text("Выполнен поиск по " + film.getTitle())
                         .showAlert(false)
                         .build();
                 answerCallbackQuery.setCallbackQueryId(update.getCallbackQuery().getId());
@@ -226,7 +226,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                         int filmsToDisplay = Math.min(constNumber, movies.size());
                         for (int i = 0; i < filmsToDisplay; i++) {
                             FilmDeserializer currentMovie = movies.get(i);
-                            actorsFilmsBuilder.append(i + 1).append(". ").append(currentMovie.title).append("\n");
+                            actorsFilmsBuilder.append(i + 1).append(". ").append(currentMovie.getTitle()).append("\n");
                         }
                     } else {
                         actorsFilmsBuilder.append("Фильмов не найдено.\n");
@@ -368,7 +368,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
                 for (int i = 0; i < constNumber; i++) {
                     FilmDeserializer currentMovie = movies.get((currentIndex + i) % movies.size());
-                    movieListBuilder.append(i + 1).append(". ").append(currentMovie.title).append("\n");
+                    movieListBuilder.append(i + 1).append(". ").append(currentMovie.getTitle()).append("\n");
                 }
 
                 currentIndex = (currentIndex + constNumber) % movies.size();
@@ -419,7 +419,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
                 for (int i = 0; i < constNumber; i++) {
                     FilmDeserializer currentMovie = movies.get((currentIndex + i) % movies.size());
-                    movieListBuilder.append(i + 1).append(". ").append(currentMovie.title).append("\n");
+                    movieListBuilder.append(i + 1).append(". ").append(currentMovie.getTitle()).append("\n");
                 }
 
                 currentIndex = (currentIndex + constNumber) % movies.size();
@@ -455,8 +455,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         }
 
         for (int i = 0; i < filmsToProcess; i++) {
-            String currentId = String.valueOf(movies.get(i).id);
-            String currentTitle = String.valueOf(movies.get(i).title);
+            String currentId = String.valueOf(movies.get(i).getId());
+            String currentTitle = String.valueOf(movies.get(i).getTitle());
             InlineKeyboardButton button = InlineKeyboardButton.builder()
                     .text(currentTitle)
                     .callbackData("movie_" + currentId)
@@ -547,11 +547,11 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
             if (films != null && films.results != null && !films.results.isEmpty()) {
                 List<FilmDeserializer> movies = films.results;
-                StringBuilder movieListBuilder = new StringBuilder("Похожие фильмы для " + requestedFilm.title + ":\n");
+                StringBuilder movieListBuilder = new StringBuilder("Похожие фильмы для " + requestedFilm.getTitle() + ":\n");
 
                 for (int i = 0; i < constNumber; i++) {
                     FilmDeserializer currentMovie = movies.get(i);
-                    movieListBuilder.append(i + 1).append(". ").append(currentMovie.title).append("\n");
+                    movieListBuilder.append(i + 1).append(". ").append(currentMovie.getTitle()).append("\n");
                 }
                 responseMessage = movieListBuilder.toString();
             } else {
@@ -582,11 +582,11 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
             if (films != null && films.results != null && !films.results.isEmpty()) {
                 List<FilmDeserializer> movies = films.results;
-                StringBuilder movieListBuilder = new StringBuilder("Рекомендуемые фильмы для фильма " + requestedFilm.title + ":\n");
+                StringBuilder movieListBuilder = new StringBuilder("Рекомендуемые фильмы для фильма " + requestedFilm.getTitle() + ":\n");
 
                 for (int i = 0; i < constNumber; i++) {
                     FilmDeserializer currentMovie = movies.get(i);
-                    movieListBuilder.append(i + 1).append(". ").append(currentMovie.title).append("\n");
+                    movieListBuilder.append(i + 1).append(". ").append(currentMovie.getTitle()).append("\n");
                 }
                 responseMessage = movieListBuilder.toString();
             } else {
@@ -612,7 +612,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
                 for (int i = 0; i < constNumber; i++) {
                     FilmDeserializer currentMovie = movies.get((popularMovieIndex + i) % movies.size());
-                    moviesListBuilder.append(popularMovieIndex + i + 1).append(". ").append(currentMovie.title).append("\n");
+                    moviesListBuilder.append(popularMovieIndex + i + 1).append(". ").append(currentMovie.getTitle()).append("\n");
                 }
 
                 popularMovieIndex = (popularMovieIndex + constNumber) % movies.size();
@@ -643,7 +643,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 StringBuilder moviesListBuilder = new StringBuilder("Высоко-оцененные фильмы:\n");
                 for (int i = 0; i < constNumber; i++) {
                     FilmDeserializer currentMovie = movies.get((popularMovieIndex + i) % movies.size());
-                    moviesListBuilder.append(popularMovieIndex + i + 1).append(". ").append(currentMovie.title).append("\n");
+                    moviesListBuilder.append(popularMovieIndex + i + 1).append(". ").append(currentMovie.getTitle()).append("\n");
                 }
                 popularMovieIndex = (popularMovieIndex + constNumber) % movies.size();
                 responseMessage = moviesListBuilder.toString();
@@ -677,18 +677,18 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             ListDeserializer<VideoDeserializer> videos = TMDB_SERVICE.getVideosForFilm(TMDB_TOKEN, filmID);
 
             if (film != null) {
-                StringBuilder filmBuilder = new StringBuilder(film.title);
-                if (!Objects.equals(film.original_language, "en")) {
-                    filmBuilder.append(" / ").append(film.original_title);
+                StringBuilder filmBuilder = new StringBuilder(film.getTitle());
+                if (!Objects.equals(film.getOriginal_language(), "en")) {
+                    filmBuilder.append(" / ").append(film.getOriginal_title());
                 }
-                filmBuilder.append(" (").append(film.release_date, 0, 4).append(", ")
-                        .append(film.origin_country[0]).append(")").append("\n\n")
-                        .append(film.overview).append("\n\n")
-                        .append("Vote average: ").append(film.vote_average).append("/10\n")
-                        .append("Runtime: ").append(film.runtime).append(" min \n");
+                filmBuilder.append(" (").append(film.getRelease_date(), 0, 4).append(", ")
+                        .append(film.getOrigin_country()[0]).append(")").append("\n\n")
+                        .append(film.getOverview()).append("\n\n")
+                        .append("Vote average: ").append(film.getVote_average()).append("/10\n")
+                        .append("Runtime: ").append(film.getRuntime()).append(" min \n");
 
-                if (film.homepage != null) {
-                    filmBuilder.append("Link: ").append(film.homepage).append("\n");
+                if (film.getHomepage() != null) {
+                    filmBuilder.append("Link: ").append(film.getHomepage()).append("\n");
                 }
 
                 for (int i = 0; i < videos.results.size(); i++) {

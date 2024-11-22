@@ -33,7 +33,7 @@ public class RequestsCheckTest {
     void getMovieByIdTest() {
         FilmDeserializer response = TMDB_SERVICE.getMovieById(TMDB_TOKEN, FILM_ID);
         assertNotNull(response, "Response should not be null");
-        assertEquals("The Gray Man", response.title, "Expected movie should be 'The Gray Man'");
+        assertEquals("The Gray Man", response.getTitle(), "Expected movie should be 'The Gray Man'");
     }
 
     @Test
