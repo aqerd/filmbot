@@ -14,7 +14,7 @@ public class Config {
     private static final SiteRequests TMDB_SERVICE;
 
     static {
-        Dotenv dotenv = Dotenv.configure().directory("assets").filename("apiToken.env").load();
+        Dotenv dotenv = Dotenv.configure().directory("assets").filename("token.env").load();
         BOT_TOKEN = dotenv.get("TELEGRAM_BOT_TOKEN");
         TMDB_TOKEN = dotenv.get("TMDB_ACCESS_TOKEN");
         BASE_URL = "https://api.themoviedb.org/3";
