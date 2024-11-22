@@ -13,7 +13,7 @@ public class Main {
     public static void main(String[] args) {
         try {
             TelegramBotsLongPollingApplication bot = new TelegramBotsLongPollingApplication();
-            bot.registerBot(BOT_TOKEN, new TelegramBot(BOT_TOKEN));
+            bot.registerBot(getBotToken(), new TelegramBot(getBotToken()));
             logger.info("Bot is running");
         } catch (TelegramApiException e) {
             e.printStackTrace();

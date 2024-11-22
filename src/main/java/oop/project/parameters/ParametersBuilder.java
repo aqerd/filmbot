@@ -1,9 +1,9 @@
 package oop.project.parameters;
 
-import static oop.project.shared.Config.TMDB_TOKEN;
+import static oop.project.shared.Config.getTmdbToken;
 
 public class ParametersBuilder {
-    private String token = TMDB_TOKEN;
+    private String token = getTmdbToken();
     private String certificationLte = "G";
     private String certificationCountry = "US";
     private boolean includeAdult = false;

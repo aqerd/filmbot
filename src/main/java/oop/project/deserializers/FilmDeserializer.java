@@ -224,7 +224,7 @@ public boolean isAdult() {
         this.vote_count = vote_count;
     }
 
-    //    public boolean isBelongs_to_collection() {
+//    public boolean isBelongs_to_collection() {
 //        return belongs_to_collection;
 //    }
 //
