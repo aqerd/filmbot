@@ -25,8 +25,8 @@ public class RequestsCheckTest {
     void getPopularMoviesTest() {
         ListDeserializer<FilmDeserializer> response = TMDB_SERVICE.getPopularMovies(TMDB_TOKEN);
         assertNotNull(response, "Response should not be null");
-        assertNotNull(response.results, "Results should not be null");
-        assertFalse(response.results.isEmpty(), "Results should not be empty");
+        assertNotNull(response.getResults(), "Results should not be null");
+        assertFalse(response.getResults().isEmpty(), "Results should not be empty");
     }
 
     @Test
@@ -40,32 +40,32 @@ public class RequestsCheckTest {
     void getSimilarMovies() {
         ListDeserializer<FilmDeserializer> response = TMDB_SERVICE.getSimilarMovies(TMDB_TOKEN, FILM_ID);
         assertNotNull(response, "Response should not be null");
-        assertNotNull(response.results, "Results should not be null");
-        assertFalse(response.results.isEmpty(), "Results should not be empty");
+        assertNotNull(response.getResults(), "Results should not be null");
+        assertFalse(response.getResults().isEmpty(), "Results should not be empty");
     }
 
     @Test
     void getRecommendationsForMovieTest() {
         ListDeserializer<FilmDeserializer> response = TMDB_SERVICE.getRecommendationsForMovie(TMDB_TOKEN, FILM_ID);
         assertNotNull(response, "Response should not be null");
-        assertNotNull(response.results, "Results should not be null");
-        assertFalse(response.results.isEmpty(), "Results should not be empty");
+        assertNotNull(response.getResults(), "Results should not be null");
+        assertFalse(response.getResults().isEmpty(), "Results should not be empty");
     }
 
     @Test
     void getUpcomingTest() {
         ListDeserializer<FilmDeserializer> response = TMDB_SERVICE.getUpcoming(TMDB_TOKEN);
         assertNotNull(response, "Response should not be null");
-        assertNotNull(response.results, "Results should not be null");
-        assertFalse(response.results.isEmpty(), "Results should not be empty");
+        assertNotNull(response.getResults(), "Results should not be null");
+        assertFalse(response.getResults().isEmpty(), "Results should not be empty");
     }
 
     @Test
     void getTopRatedTest() {
         ListDeserializer<FilmDeserializer> response = TMDB_SERVICE.getTopRated(TMDB_TOKEN);
         assertNotNull(response, "Response should not be null");
-        assertNotNull(response.results, "Results should not be null");
-        assertFalse(response.results.isEmpty(), "Results should not be empty");
+        assertNotNull(response.getResults(), "Results should not be null");
+        assertFalse(response.getResults().isEmpty(), "Results should not be empty");
     }
 
     @Test
@@ -88,8 +88,8 @@ public class RequestsCheckTest {
     void getVideosForFilmTest() {
         ListDeserializer<VideoDeserializer> response = TMDB_SERVICE.getVideosForFilm(TMDB_TOKEN, FILM_ID);
         assertNotNull(response, "Response should not be null");
-        assertNotNull(response.results, "Results should not be null");
-        assertNotEquals(0, response.id, "Id should not be null");
+        assertNotNull(response.getResults(), "Results should not be null");
+        assertNotEquals(0, response.getId(), "Id should not be null");
     }
 
     @Test
@@ -97,8 +97,8 @@ public class RequestsCheckTest {
         ListDeserializer<FilmDeserializer> response = TMDB_SERVICE
                 .searchMovie(TMDB_TOKEN, "Oppenheimer", "en-US", 1);
         assertNotNull(response, "Response should not be null");
-        assertNotNull(response.results, "Results should not be null");
-        assertFalse(response.results.isEmpty(), "Results should not be empty");
+        assertNotNull(response.getResults(), "Results should not be null");
+        assertFalse(response.getResults().isEmpty(), "Results should not be empty");
     }
 
     @Test
@@ -106,8 +106,8 @@ public class RequestsCheckTest {
         ListDeserializer<PersonDeserializer> response = TMDB_SERVICE
                 .searchPerson(TMDB_TOKEN, "Ryan Gosling", "en-US", 1);
         assertNotNull(response, "Response should not be null");
-        assertNotNull(response.results, "Results should not be null");
-        assertFalse(response.results.isEmpty(), "Results should not be empty");
+        assertNotNull(response.getResults(), "Results should not be null");
+        assertFalse(response.getResults().isEmpty(), "Results should not be empty");
     }
 
     @Test
@@ -115,7 +115,7 @@ public class RequestsCheckTest {
         MovieParameters params = new ParametersBuilder().withGenres("28").build();
         ListDeserializer<FilmDeserializer> response = TMDB_SERVICE.findMovie(params);
         assertNotNull(response, "Response should not be null");
-        assertNotNull(response.results, "Results should not be null");
-        assertFalse(response.results.isEmpty(), "Results should not be empty");
+        assertNotNull(response.getResults(), "Results should not be null");
+        assertFalse(response.getResults().isEmpty(), "Results should not be empty");
     }
 }

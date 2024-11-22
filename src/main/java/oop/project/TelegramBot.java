@@ -156,14 +156,14 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                     filmBuilder.append("Link: ").append(film.getHomepage()).append("\n");
                 }
 
-                for (int i = 0; i < videos.results.size(); i++) {
-                    if (videos.results.get(i).getId() != null &&
-                            Objects.equals(videos.results.get(i).getName(), "Official Trailer") &&
-                            Objects.equals(videos.results.get(i).getSite(), "YouTube") &&
-                            Objects.equals(videos.results.get(i).getType(), "Trailer") &&
-                            videos.results.get(i).isOfficial()) {
+                for (int i = 0; i < videos.getResults().size(); i++) {
+                    if (videos.getResults().get(i).getId() != null &&
+                            Objects.equals(videos.getResults().get(i).getName(), "Official Trailer") &&
+                            Objects.equals(videos.getResults().get(i).getSite(), "YouTube") &&
+                            Objects.equals(videos.getResults().get(i).getType(), "Trailer") &&
+                            videos.getResults().get(i).isOfficial()) {
                         filmBuilder.append("Trailer: ").
-                                append("https://youtube.com/watch?v=").append(videos.results.get(i).getKey()).append("\n");
+                                append("https://youtube.com/watch?v=").append(videos.getResults().get(i).getKey()).append("\n");
                     }
                 }
 
@@ -361,8 +361,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                     .build();
             ListDeserializer<FilmDeserializer> moviesByGenre = TMDB_SERVICE.findMovie(params);
 
-            if (moviesByGenre != null && moviesByGenre.results != null && !moviesByGenre.results.isEmpty()) {
-                List<FilmDeserializer> movies = moviesByGenre.results;
+            if (moviesByGenre != null && moviesByGenre.getResults() != null && !moviesByGenre.getResults().isEmpty()) {
+                List<FilmDeserializer> movies = moviesByGenre.getResults();
                 int currentIndex = genreMovieIndexMap.getOrDefault(genreId, 0);
                 StringBuilder movieListBuilder = new StringBuilder("Фильмы жанра " + messageText + ":\n");
 
@@ -412,8 +412,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                     .build();
             ListDeserializer<FilmDeserializer> moviesByYear = TMDB_SERVICE.findMovie(params);
 
-            if (moviesByYear != null && moviesByYear.results != null && !moviesByYear.results.isEmpty()) {
-                List<FilmDeserializer> movies = moviesByYear.results;
+            if (moviesByYear != null && moviesByYear.getResults() != null && !moviesByYear.getResults().isEmpty()) {
+                List<FilmDeserializer> movies = moviesByYear.getResults();
                 int currentIndex = yearMovieIndexMap.getOrDefault(userYear, 0);
                 StringBuilder movieListBuilder = new StringBuilder("Фильмы, выпущенные в " + userYear + " году:\n");
 
@@ -447,7 +447,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         List<InlineKeyboardRow> cols = new ArrayList<>();
         ListDeserializer<FilmDeserializer> films = TMDB_SERVICE.searchMovie(TMDB_TOKEN, messageText, "en-US", 1);
 
-        List<FilmDeserializer> movies = films.results;
+        List<FilmDeserializer> movies = films.getResults();
         int filmsToProcess = Math.min(searchNumber, movies.size());
 
         if (filmsToProcess == 0) {
@@ -494,7 +494,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         List<InlineKeyboardRow> cols = new ArrayList<>();
         ListDeserializer<PersonDeserializer> humans = TMDB_SERVICE.searchPerson(TMDB_TOKEN, messageText, "en-US", 1);
 
-        List<PersonDeserializer> people = humans.results;
+        List<PersonDeserializer> people = humans.getResults();
         int actorsToProcess = Math.min(searchNumber, people.size());
 
         if (actorsToProcess == 0) {
@@ -545,8 +545,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             ListDeserializer<FilmDeserializer> films = TMDB_SERVICE.getSimilarMovies(TMDB_TOKEN, filmId);
             FilmDeserializer requestedFilm = TMDB_SERVICE.getMovieById(TMDB_TOKEN, filmId);
 
-            if (films != null && films.results != null && !films.results.isEmpty()) {
-                List<FilmDeserializer> movies = films.results;
+            if (films != null && films.getResults() != null && !films.getResults().isEmpty()) {
+                List<FilmDeserializer> movies = films.getResults();
                 StringBuilder movieListBuilder = new StringBuilder("Похожие фильмы для " + requestedFilm.getTitle() + ":\n");
 
                 for (int i = 0; i < constNumber; i++) {
@@ -580,8 +580,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             ListDeserializer<FilmDeserializer> films = TMDB_SERVICE.getRecommendationsForMovie(TMDB_TOKEN, filmId);
             FilmDeserializer requestedFilm = TMDB_SERVICE.getMovieById(TMDB_TOKEN, filmId);
 
-            if (films != null && films.results != null && !films.results.isEmpty()) {
-                List<FilmDeserializer> movies = films.results;
+            if (films != null && films.getResults() != null && !films.getResults().isEmpty()) {
+                List<FilmDeserializer> movies = films.getResults();
                 StringBuilder movieListBuilder = new StringBuilder("Рекомендуемые фильмы для фильма " + requestedFilm.getTitle() + ":\n");
 
                 for (int i = 0; i < constNumber; i++) {
@@ -606,8 +606,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         try {
             ListDeserializer<FilmDeserializer> popularFilms = TMDB_SERVICE.getPopularMovies(TMDB_TOKEN);
 
-            if (popularFilms != null && popularFilms.results != null && !popularFilms.results.isEmpty()) {
-                List<FilmDeserializer> movies = popularFilms.results;
+            if (popularFilms != null && popularFilms.getResults() != null && !popularFilms.getResults().isEmpty()) {
+                List<FilmDeserializer> movies = popularFilms.getResults();
                 StringBuilder moviesListBuilder = new StringBuilder("Популярные фильмы:\n");
 
                 for (int i = 0; i < constNumber; i++) {
@@ -638,8 +638,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         String responseMessage;
         try {
             ListDeserializer<FilmDeserializer> popularFilms = TMDB_SERVICE.getTopRated(TMDB_TOKEN);
-            if (popularFilms != null && popularFilms.results != null && !popularFilms.results.isEmpty()) {
-                List<FilmDeserializer> movies = popularFilms.results;
+            if (popularFilms != null && popularFilms.getResults() != null && !popularFilms.getResults().isEmpty()) {
+                List<FilmDeserializer> movies = popularFilms.getResults();
                 StringBuilder moviesListBuilder = new StringBuilder("Высоко-оцененные фильмы:\n");
                 for (int i = 0; i < constNumber; i++) {
                     FilmDeserializer currentMovie = movies.get((popularMovieIndex + i) % movies.size());
@@ -691,14 +691,14 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                     filmBuilder.append("Link: ").append(film.getHomepage()).append("\n");
                 }
 
-                for (int i = 0; i < videos.results.size(); i++) {
-                    if (videos.results.get(i).getId() != null &&
-                            Objects.equals(videos.results.get(i).getName(), "Official Trailer") &&
-                            Objects.equals(videos.results.get(i).getSite(), "YouTube") &&
-                            Objects.equals(videos.results.get(i).getType(), "Trailer") &&
-                            videos.results.get(i).isOfficial()) {
+                for (int i = 0; i < videos.getResults().size(); i++) {
+                    if (videos.getResults().get(i).getId() != null &&
+                            Objects.equals(videos.getResults().get(i).getName(), "Official Trailer") &&
+                            Objects.equals(videos.getResults().get(i).getSite(), "YouTube") &&
+                            Objects.equals(videos.getResults().get(i).getType(), "Trailer") &&
+                            videos.getResults().get(i).isOfficial()) {
                         filmBuilder.append("Trailer: ").
-                                append("https://youtube.com/watch?v=").append(videos.results.get(i).getKey()).append("\n");
+                                append("https://youtube.com/watch?v=").append(videos.getResults().get(i).getKey()).append("\n");
                     }
                 }
 
