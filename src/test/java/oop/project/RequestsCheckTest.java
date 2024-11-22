@@ -16,9 +16,9 @@ public class RequestsCheckTest {
     void checkAuthStatusTest() {
         AuthDeserializer response = TMDB_SERVICE.checkAuthStatus(TMDB_TOKEN);
         assertNotNull(response, "Response should not be null");
-        assertTrue(Boolean.parseBoolean(response.success), "Expected status should be true");
-        assertEquals(1, response.status_code, "Expected status code should be 1");
-        assertEquals("Success.", response.status_message, "Expected status should be 'Success.'");
+        assertTrue(Boolean.parseBoolean(response.getSuccess()), "Expected status should be true");
+        assertEquals(1, response.getStatus_code(), "Expected status code should be 1");
+        assertEquals("Success.", response.getStatus_message(), "Expected status should be 'Success.'");
     }
 
     @Test
