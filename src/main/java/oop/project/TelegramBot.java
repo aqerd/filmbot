@@ -9,7 +9,6 @@ import oop.project.shared.Genres;
 import static java.lang.Integer.parseInt;
 import static oop.project.shared.CommandWaiter.*;
 import static oop.project.shared.Config.*;
-import static oop.project.shared.Utils.isCommand;
 import static oop.project.shared.Replies.reply;
 import static oop.project.Keyboards.setKeyboard;
 // import java.lang.reflect.Type;
@@ -18,10 +17,8 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
-import oop.project.validators.AgeValidator;
-import oop.project.validators.IdValidator;
-import oop.project.validators.Validator;
-import oop.project.validators.YearValidator;
+
+import oop.project.validators.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
@@ -339,8 +336,9 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 //        database.updateGenreIndexesJson(chatId, jsonGenreString);
 //    }
 
-    protected String handleGenre(String messageText, long chatId) {
-        if (isCommand(messageText)) {
+    public String handleGenre(String messageText, long chatId) {
+        Validator<String> validCommand = new CommandValidator();
+        if (validCommand.isValid(messageText)) {
             COMMAND_WAITER.put(chatId, NONE);
             return handleCommands(messageText, chatId);
         }
@@ -391,10 +389,15 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 //    }
 
     protected String handleYear(String messageText, long chatId) {
-        Validator<String> validator = new YearValidator();
+        Validator<String> validCommand = new CommandValidator();
+        if (validCommand.isValid(messageText)) {
+            COMMAND_WAITER.put(chatId, NONE);
+            return handleCommands(messageText, chatId);
+        }
 
-        if (!validator.isValid(messageText)) {
-            return validator.getErrorMessage();
+        Validator<String> validYear = new YearValidator();
+        if (!validYear.isValid(messageText)) {
+            return validYear.getErrorMessage();
         }
 
         int userYear = Integer.parseInt(messageText);
@@ -434,7 +437,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     }
 
     protected String handleMovieSearch(String messageText, long chatId) {
-        if (isCommand(messageText)) {
+        Validator<String> validCommand = new CommandValidator();
+        if (validCommand.isValid(messageText)) {
             COMMAND_WAITER.put(chatId, NONE);
             return handleCommands(messageText, chatId);
         }
@@ -481,7 +485,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     }
 
     protected String handleActorSearch(String messageText, long chatId) {
-        if (isCommand(messageText)) {
+        Validator<String> validCommand = new CommandValidator();
+        if (validCommand.isValid(messageText)) {
             COMMAND_WAITER.put(chatId, NONE);
             return handleCommands(messageText, chatId);
         }
@@ -528,8 +533,13 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     }
 
     protected String handleSimilar(String messageText, long chatId) {
-        Validator<String> validator = new IdValidator();
+        Validator<String> validCommand = new CommandValidator();
+        if (validCommand.isValid(messageText)) {
+            COMMAND_WAITER.put(chatId, NONE);
+            return handleCommands(messageText, chatId);
+        }
 
+        Validator<String> validator = new IdValidator();
         if (!validator.isValid(messageText)) {
             return validator.getErrorMessage();
         }
@@ -561,10 +571,15 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     }
 
     protected String handleRecommended(String messageText, long chatId) {
-        Validator<String> validator = new IdValidator();
+        Validator<String> validCommand = new CommandValidator();
+        if (validCommand.isValid(messageText)) {
+            COMMAND_WAITER.put(chatId, NONE);
+            return handleCommands(messageText, chatId);
+        }
 
-        if (!validator.isValid(messageText)) {
-            return validator.getErrorMessage();
+        Validator<String> validId = new IdValidator();
+        if (!validId.isValid(messageText)) {
+            return validId.getErrorMessage();
         }
 
         String responseMessage;
@@ -658,10 +673,15 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     }
 
     protected String handleFindById(String messageText, long chatId) {
-        Validator<String> validator = new IdValidator();
+        Validator<String> validCommand = new CommandValidator();
+        if (validCommand.isValid(messageText)) {
+            COMMAND_WAITER.put(chatId, NONE);
+            return handleCommands(messageText, chatId);
+        }
 
-        if (!validator.isValid(messageText)) {
-            return validator.getErrorMessage();
+        Validator<String> validId = new IdValidator();
+        if (!validId.isValid(messageText)) {
+            return validId.getErrorMessage();
         }
 
         String responseMessage;
@@ -709,10 +729,15 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     }
 
     protected String handleSetAge(String messageText, long chatId) {
-        Validator<String> validator = new AgeValidator();
+        Validator<String> validCommand = new CommandValidator();
+        if (validCommand.isValid(messageText)) {
+            COMMAND_WAITER.put(chatId, NONE);
+            return handleCommands(messageText, chatId);
+        }
 
-        if (!validator.isValid(messageText)) {
-            return validator.getErrorMessage();
+        Validator<String> validAge = new AgeValidator();
+        if (!validAge.isValid(messageText)) {
+            return validAge.getErrorMessage();
         }
 
         return "Спасибо! Учтем ваш ответ";
