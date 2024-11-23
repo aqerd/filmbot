@@ -25,20 +25,20 @@ public record MovieParameters(
 
     public static class Builder {
         private String token = apiToken();
-        private String certificationLte = "G";
+        private String certificationLte = "R";
         private String certificationCountry = "US";
         private boolean includeAdult = false;
         private String language = "en";
         private int page = 1;
-        private String releaseDateGte = "1900-01-01";
-        private String releaseDateLte = "2100-01-01";
+        private String releaseDateGte;
+        private String releaseDateLte;
         private String sortBy = "popularity.desc";
-        private int voteAverageGte = 0;
-        private int voteAverageLte = 10;
-        private String withGenres = "";
+        private int voteAverageGte;
+        private int voteAverageLte;
+        private String withGenres;
         private String withOriginCountry = "US";
         private float withRuntimeGte = 0;
-        private int year = 0;
+        private int year;
 
         public Builder withToken(String token) {
             this.token = token;

@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
-import static oop.project.shared.Config.*;
+import static oop.project.shared.Config.botToken;
 
 public class Main {
     private static final Logger LOG = LoggerFactory.getLogger(Main.class);

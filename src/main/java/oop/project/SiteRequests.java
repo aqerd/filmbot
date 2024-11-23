@@ -80,7 +80,7 @@ public interface SiteRequests {
             "&release_date.lte={release_date_lte}" +
             "&sort_by={sort_by}" +
             "&vote_average.gte={vote_average_gte}" +
-            "&vote_average.gte={vote_average_lte}" +
+            "&vote_average.lte={vote_average_lte}" +
             "&with_genres={with_genres}" +
             "&with_origin_country={with_origin_country}" +
             "&with_runtime.gte={with_runtime_gte}" +
@@ -106,11 +106,11 @@ public interface SiteRequests {
             @Param("release_date_gte") String releaseDateGte,
             @Param("release_date_lte") String releaseDateLte,
             @Param("sort_by") String sortBy,
-            @Param("vote_average_gte") float voteAverageGte,
-            @Param("vote_average_lte") float voteAverageLte,
+            @Param("vote_average_gte") double voteAverageGte,
+            @Param("vote_average_lte") double voteAverageLte,
             @Param("with_genres") String withGenres,
             @Param("with_origin_country") String withOriginCountry,
-            @Param("with_runtime_gte") float withRuntimeGte,
+            @Param("with_runtime_gte") double withRuntimeGte,
             @Param("year") int year
             // ,
             // @Param("include_video") boolean includeVideo,
@@ -121,7 +121,7 @@ public interface SiteRequests {
             // @Param("with_companies") String withCompanies,
             // @Param("with_crew") String withCrew,
             // @Param("with_original_language") String withOriginalLanguage,
-            // @Param("with_runtime_lte") float withRuntimeLte,
+            // @Param("with_runtime_lte") double withRuntimeLte,
             // @Param("without_genres") String withoutGenres,
     );
 

@@ -16,7 +16,7 @@ public class PersonDeserializer {
     private String name;
     private String original_name;
     private String place_of_birth;
-    private String popularity;
+    private double popularity;
     private String profile_path;
     private List<FilmDeserializer> known_for;
 
@@ -124,11 +124,11 @@ public class PersonDeserializer {
         this.place_of_birth = place_of_birth;
     }
 
-    public String getPopularity() {
+    public double getPopularity() {
         return popularity;
     }
 
-    public void setPopularity(String popularity) {
+    public void setPopularity(double popularity) {
         this.popularity = popularity;
     }
 
