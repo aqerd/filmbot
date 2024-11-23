@@ -2,7 +2,6 @@ package oop.project;
 
 import oop.project.deserializers.*;
 import org.junit.jupiter.api.Test;
-
 import static oop.project.shared.Config.tmdbService;
 import static oop.project.shared.Config.apiToken;
 import static org.junit.jupiter.api.Assertions.*;

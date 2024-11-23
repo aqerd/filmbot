@@ -672,7 +672,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         return responseMessage;
     }
 
-    protected String handleFindById(String messageText, long chatId) {
+    public String handleFindById(String messageText, long chatId) {
         Validator<String> validCommand = new CommandValidator();
         if (validCommand.isValid(messageText)) {
             COMMAND_WAITER.put(chatId, NONE);
@@ -715,16 +715,14 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                                 append(youtubeUrl()).append(videos.getResults().get(i).getKey()).append("\n");
                     }
                 }
-
                 responseMessage = filmBuilder.toString();
             } else {
                 responseMessage = "Извините, я не нашел фильм";
             }
             COMMAND_WAITER.put(chatId, NONE);
         } catch (Exception e) {
-            responseMessage = "Что-то пошло не так";
+            responseMessage = "Фильм с таким ID не найден";
         }
-
         return responseMessage;
     }
 
