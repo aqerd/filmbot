@@ -1,22 +1,13 @@
 package oop.project;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.sql.SQLException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class HandleGenreTest extends TelegramBot {
-    private TelegramBot telegramBot;
-    private final long CHAT_ID = 1L;
-
+public class HandleGenreTest extends BaseHandleTest {
     public HandleGenreTest() throws SQLException {
-        super("dummy_token");
-    }
-
-    @BeforeEach
-    void setUp() throws SQLException {
-        telegramBot = new TelegramBot("dummy_token");
+        super();
     }
 
     @Test
