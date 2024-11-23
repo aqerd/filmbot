@@ -1,4 +1,4 @@
-package oop.project;
+package oop.project.handlers;
 
 import oop.project.deserializers.*;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
@@ -11,7 +11,7 @@ import java.util.Objects;
 import static java.lang.Integer.parseInt;
 import static oop.project.shared.Config.*;
 
-public class HandleButtons {
+public class Buttons {
     public static void handleButtons(Update update, TelegramClient telegramClient) {
         if (update.hasCallbackQuery()) {
             String callbackData = update.getCallbackQuery().getData();
@@ -20,7 +20,7 @@ public class HandleButtons {
             if (callbackData.startsWith("movie_")) {
                 handleMovieButtons(callbackData, chatId, update, telegramClient);
             } else if (callbackData.startsWith("actor_")) {
-                handleActorButtons(callbackData, chatId, update, telegramClient)
+                handleActorButtons(callbackData, chatId, update, telegramClient);
             }
         }
     }

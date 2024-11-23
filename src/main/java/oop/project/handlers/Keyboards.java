@@ -1,4 +1,4 @@
-package oop.project;
+package oop.project.handlers;
 
 import oop.project.shared.CommandWaiter;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
