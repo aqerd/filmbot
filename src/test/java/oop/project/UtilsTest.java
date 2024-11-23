@@ -1,31 +1,37 @@
 package oop.project;
 
-import org.junit.jupiter.api.Test;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import oop.project.shared.Utils;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class UtilsTest extends Utils {
-    @Test
-    void testValidCommands() {
-        for (String command : Utils.COMMANDS) {
-            assertTrue(Utils.isCommand(command), "Command should be valid: " + command);
+class UtilsTest {
+
+    static class SampleObject {
+        private String name;
+        private int age;
+
+        public SampleObject(String name, int age) {
+            this.name = name;
+            this.age = age;
         }
     }
 
     @Test
-    void testInvalidCommands() {
-        String[] invalidCommands = {"/unknown", "RandomCommand", " ", "setage", "/unset", "/find"};
-
-        for (String command : invalidCommands) {
-            assertFalse(Utils.isCommand(command), "Command should be invalid: " + command);
-        }
+    void testMakePrettyJson() {
+        SampleObject sampleObject = new SampleObject("John Doe", 30);
+        String prettyJson = Utils.makePrettyJson(sampleObject);
+        String expectedJson = new GsonBuilder()
+                .setPrettyPrinting()
+                .create()
+                .toJson(sampleObject);
+        assertEquals(expectedJson, prettyJson, "Pretty JSON output should match expected formatting");
     }
 
     @Test
-    void testCaseInsensitiveMatching() {
-        assertTrue(Utils.isCommand("/start".toUpperCase()), "Command should be valid: /START (case insensitive)");
-        assertTrue(Utils.isCommand("start".toLowerCase()), "Command should be valid: start (case insensitive)");
-        assertTrue(Utils.isCommand("Set Age".toUpperCase()), "Command should be valid: Set Age (case insensitive)");
+    void testMakePrettyJsonWithNull() {
+        String prettyJson = Utils.makePrettyJson(null);
+        assertEquals("null", prettyJson, "Pretty JSON for null input should return 'null'");
     }
 }
