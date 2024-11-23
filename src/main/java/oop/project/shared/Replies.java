@@ -41,6 +41,9 @@ public class Replies {
         REPLIES.put("find by id", "Введите ID фильма из сервиса TMDB");
         REPLIES.put("set age", "Введите ваш полный возраст");
         REPLIES.put("genre", "Введите жанр, и я найду фильмы по нему");
+        REPLIES.put("invalid", "Введите правильные данные!");
+        REPLIES.put("unexpected", "Не удалось обработать запрос");
+        REPLIES.put("no data", "Ничего не найдено");
         REPLIES.put("unknown", "Команда не распознана. Введите /help для получения списка команд");
     }
 

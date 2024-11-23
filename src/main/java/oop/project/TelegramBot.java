@@ -193,6 +193,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 responseMessage = reply("unknown");
                 break;
         }
+
         return responseMessage;
     }
 
@@ -224,7 +225,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             }
             COMMAND_WAITER.put(chatId, NONE);
         } catch (IllegalArgumentException e) {
-            responseMessage = "Извините, я не знаю такого жанра. Попробуйте другой";
+            responseMessage = reply("invalid");
         }
 
         return responseMessage;
@@ -263,7 +264,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             }
             COMMAND_WAITER.put(chatId, NONE);
         } catch (Exception e) {
-            responseMessage = "Что-то пошло не так";
+            responseMessage = reply("unexpected");
         }
 
         return responseMessage;
@@ -310,11 +311,13 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 .text(responseMessage)
                 .replyMarkup(markupInline)
                 .build();
+
         try {
             TG_CLIENT.execute(response);
         } catch (Exception e) {
             LOG.error("Error while sending message to chatId {}: {}", chatId, e.getMessage(), e);
         }
+
         return "";
     }
 
@@ -327,13 +330,14 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
         String responseMessage = "Поиск по " + "\"" + messageText + "\"\n" + "Выберите актёра: ";
         List<InlineKeyboardRow> cols = new ArrayList<>();
-        ListDeserializer<PersonDeserializer> humans = tmdbService().searchPerson(apiToken(), messageText, "en-US", 1).sortByPopularity();
+        ListDeserializer<PersonDeserializer> humans = tmdbService()
+                .searchPerson(apiToken(), messageText, "en-US", 1).sortByPopularity();
 
         List<PersonDeserializer> people = humans.getResults();
         int actorsToProcess = Math.min(SEARCH_NUM, people.size());
 
         if (actorsToProcess == 0) {
-            return "Ничего не найдено";
+            return reply("no data");
         }
 
         for (int i = 0; i < actorsToProcess; i++) {
@@ -363,6 +367,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         } catch (TelegramApiException e) {
             LOG.error("Error while sending message to chatId {}: {}", chatId, e.getMessage(), e);
         }
+
         return "";
     }
 
@@ -392,7 +397,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             }
             COMMAND_WAITER.put(chatId, NONE);
         } catch (Exception e) {
-            responseMessage = "Что-то пошло не так";
+            responseMessage = reply("unexpected");
         }
 
         return responseMessage;
@@ -424,7 +429,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             }
             COMMAND_WAITER.put(chatId, NONE);
         } catch (Exception e) {
-            responseMessage = "Введите корректные данные";
+            responseMessage = reply("unexpected");
         }
 
         return responseMessage;
@@ -439,11 +444,11 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             if (movies != null && movies.getResults() != null && !movies.getResults().isEmpty()) {
                 responseMessage = responseWithListOfMovies(movies, moviesListBuilder);
             } else {
-                responseMessage = "Данные не найдены";
+                responseMessage = reply("no data");
             }
             COMMAND_WAITER.put(chatId, NONE);
         } catch (Exception e) {
-            responseMessage = "Введите корректные данные";
+            responseMessage = reply("unexpected");
         }
 
         return responseMessage;
@@ -458,11 +463,11 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             if (movies != null && movies.getResults() != null && !movies.getResults().isEmpty()) {
                 responseMessage = responseWithListOfMovies(movies, moviesListBuilder);
             } else {
-                responseMessage = "Данные не найдены";
+                responseMessage = reply("no data");
             }
             COMMAND_WAITER.put(chatId, NONE);
         } catch (Exception e) {
-            responseMessage = "Введите корректные данные";
+            responseMessage = reply("unexpected");
         }
 
         return responseMessage;
@@ -487,8 +492,9 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             responseMessage = responseWithMovie(id);
             COMMAND_WAITER.put(chatId, NONE);
         } catch (Exception e) {
-            responseMessage = "Фильм с таким ID не найден";
+            responseMessage = reply("unexpected");
         }
+
         return responseMessage;
     }
 
