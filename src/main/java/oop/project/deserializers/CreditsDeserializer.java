@@ -30,4 +30,16 @@ public class CreditsDeserializer {
     public void setId(int id) {
         this.id = id;
     }
+
+    public CreditsDeserializer sortByPopularity() {
+        if (cast != null && !cast.isEmpty()) {
+            cast.sort((film1, film2) -> Double.compare(film2.getPopularity(), film1.getPopularity()));
+        }
+
+        if (crew != null && !crew.isEmpty()) {
+            crew.sort((film1, film2) -> Double.compare(film2.getPopularity(), film1.getPopularity()));
+        }
+
+        return this;
+    }
 }

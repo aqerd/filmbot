@@ -57,4 +57,22 @@ public class ListDeserializer<T> {
     public void setTotal_results(int total_results) {
         this.total_results = total_results;
     }
+
+    public ListDeserializer<T> sortByPopularity() {
+        if (results == null || results.isEmpty()) {
+            return this;
+        }
+
+        results.sort((o1, o2) -> {
+            try {
+                double popularity1 = (double) o1.getClass().getMethod("getPopularity").invoke(o1);
+                double popularity2 = (double) o2.getClass().getMethod("getPopularity").invoke(o2);
+                return Double.compare(popularity2, popularity1);
+            } catch (Exception e) {
+                throw new RuntimeException("Ошибка при попытке получить поле popularity", e);
+            }
+        });
+
+        return this;
+    }
 }
