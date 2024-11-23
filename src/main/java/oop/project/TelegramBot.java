@@ -9,6 +9,7 @@ import static oop.project.handlers.Keyboards.setKeyboard;
 import static oop.project.shared.CommandWaiter.*;
 import static oop.project.shared.Config.*;
 import static oop.project.shared.Replies.reply;
+import static oop.project.shared.Responses.*;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,7 +18,6 @@ import java.util.concurrent.ExecutorService;
 // import java.lang.reflect.Type;
 // import com.google.gson.Gson;
 // import com.google.gson.reflect.TypeToken;
-import feign.FeignException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -115,6 +115,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                     .text(responseMessage)
                     .replyMarkup(setKeyboard(updatedWaiter))
                     .build();
+            message.enableMarkdown(true);
 
             try {
                 TG_CLIENT.execute(message);
@@ -207,33 +208,17 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             return handleCommands(messageText, chatId);
         }
 
+        String genreId = Genres.valueOf(messageText.toUpperCase().replace(" ", "_")).getGenreId();
+        int currentIndex = genreMovieIndexMap.getOrDefault(genreId, 0);
         String responseMessage;
+        String moviesListBuilder = "Фильмы жанра " + messageText + ":\n";
+        MovieParameters params = MovieParameters.builder().withGenres(genreId).build();
+        ListDeserializer<FilmDeserializer> movies = tmdbService().findMovie(params).sortByPopularity();
 
         try {
-            String genreId = Genres.valueOf(messageText.toUpperCase().replace(" ", "_")).getGenreId();
-
-            MovieParameters params = MovieParameters.builder()
-                    .withGenres(genreId)
-                    .build();
-            ListDeserializer<FilmDeserializer> moviesByGenre = tmdbService().findMovie(params).sortByPopularity();
-
-            if (moviesByGenre != null && moviesByGenre.getResults() != null && !moviesByGenre.getResults().isEmpty()) {
-                List<FilmDeserializer> movies = moviesByGenre.getResults();
-                int currentIndex = genreMovieIndexMap.getOrDefault(genreId, 0);
-                StringBuilder movieListBuilder = new StringBuilder("Фильмы жанра " + messageText + ":\n");
-
-                for (int i = 0; i < CONST_NUM; i++) {
-                    FilmDeserializer currentMovie = movies.get((currentIndex + i) % movies.size());
-                    movieListBuilder.append(i + 1).append(". ").append(currentMovie.getTitle()).append("\n");
-                }
-
-                currentIndex = (currentIndex + CONST_NUM) % movies.size();
-                genreMovieIndexMap.put(genreId, currentIndex);
-
+            if (movies != null && movies.getResults() != null && !movies.getResults().isEmpty()) {
+                responseMessage = responseWithListOfMovies(movies, moviesListBuilder, currentIndex, genreMovieIndexMap, genreId);
 //                updateGenreIndexInDatabase(chatId);
-
-                responseMessage = movieListBuilder.toString();
-
             } else {
                 responseMessage = "Извините, я не нашел фильмов для жанра " + messageText;
             }
@@ -263,28 +248,16 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         }
 
         int userYear = Integer.parseInt(messageText);
+        int currentIndex = yearMovieIndexMap.getOrDefault(userYear, 0);
         String responseMessage;
+        String moviesListBuilder = "Фильмы, выпущенные в " + userYear + " году:\n";
+        MovieParameters params = MovieParameters.builder().withYear(userYear).build();
+        ListDeserializer<FilmDeserializer> movies = tmdbService().findMovie(params).sortByPopularity();
 
         try {
-            MovieParameters params = MovieParameters.builder()
-                    .withYear(userYear)
-                    .build();
-            ListDeserializer<FilmDeserializer> moviesByYear = tmdbService().findMovie(params).sortByPopularity();
-
-            if (moviesByYear != null && moviesByYear.getResults() != null && !moviesByYear.getResults().isEmpty()) {
-                List<FilmDeserializer> movies = moviesByYear.getResults();
-                int currentIndex = yearMovieIndexMap.getOrDefault(userYear, 0);
-                StringBuilder movieListBuilder = new StringBuilder("Фильмы, выпущенные в " + userYear + " году:\n");
-
-                for (int i = 0; i < CONST_NUM; i++) {
-                    FilmDeserializer currentMovie = movies.get((currentIndex + i) % movies.size());
-                    movieListBuilder.append(i + 1).append(". ").append(currentMovie.getTitle()).append("\n");
-                }
-
-                currentIndex = (currentIndex + CONST_NUM) % movies.size();
-                yearMovieIndexMap.put(userYear, currentIndex);
-
-                responseMessage = movieListBuilder.toString();
+            if (movies != null && movies.getResults() != null && !movies.getResults().isEmpty()) {
+                responseMessage = responseWithListOfMovies(movies, moviesListBuilder, currentIndex, yearMovieIndexMap, userYear);
+//                updateYearIndexInDatabase(chatId);
             } else {
                 responseMessage = "Извините, я не нашел фильмов за " + userYear + " год";
             }
@@ -305,9 +278,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
         String responseMessage = "Поиск по \"" + messageText + "\"\nВыберите фильм: ";
         List<InlineKeyboardRow> cols = new ArrayList<>();
-        ListDeserializer<FilmDeserializer> films = tmdbService().searchMovie(apiToken(), messageText, "en-US", 1)
-                .sortByPopularity()
-                ;
+        ListDeserializer<FilmDeserializer> films = tmdbService()
+                .searchMovie(apiToken(), messageText, "en-US", 1).sortByPopularity();
 
         List<FilmDeserializer> movies = films.getResults();
         int filmsToProcess = Math.min(SEARCH_NUM, movies.size());
@@ -353,7 +325,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             return handleCommands(messageText, chatId);
         }
 
-        String responseMessage = "Поиск по \"" + messageText + "\"\nВыберите актёра: ";
+        String responseMessage = "Поиск по " + "\"" + messageText + "\"\n" + "Выберите актёра: ";
         List<InlineKeyboardRow> cols = new ArrayList<>();
         ListDeserializer<PersonDeserializer> humans = tmdbService().searchPerson(apiToken(), messageText, "en-US", 1).sortByPopularity();
 
@@ -407,28 +379,22 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         }
 
         String responseMessage;
+        int id = Integer.parseInt(messageText);
+        ListDeserializer<FilmDeserializer> movies = tmdbService().getSimilar(apiToken(), id).sortByPopularity();
+        FilmDeserializer film = tmdbService().getMovieById(apiToken(), id);
+        String moviesListBuilder = "Похожие фильмы для " + film.getTitle() + ":\n";
+
         try {
-            int filmId = Integer.parseInt(messageText);
-
-            ListDeserializer<FilmDeserializer> films = tmdbService().getSimilar(apiToken(), filmId).sortByPopularity();
-            FilmDeserializer requestedFilm = tmdbService().getMovieById(apiToken(), filmId);
-
-            if (films != null && films.getResults() != null && !films.getResults().isEmpty()) {
-                List<FilmDeserializer> movies = films.getResults();
-                StringBuilder movieListBuilder = new StringBuilder("Похожие фильмы для " + requestedFilm.getTitle() + ":\n");
-
-                for (int i = 0; i < CONST_NUM; i++) {
-                    FilmDeserializer currentMovie = movies.get(i);
-                    movieListBuilder.append(i + 1).append(". ").append(currentMovie.getTitle()).append("\n");
-                }
-                responseMessage = movieListBuilder.toString();
+            if (movies != null && movies.getResults() != null && !movies.getResults().isEmpty()) {
+                responseMessage = responseWithListOfMovies(movies, moviesListBuilder);
             } else {
-                responseMessage = "Фильм с индексом " + filmId + " не найден";
+                responseMessage = "Фильм с индексом " + id + " не найден";
             }
             COMMAND_WAITER.put(chatId, NONE);
         } catch (Exception e) {
             responseMessage = "Что-то пошло не так";
         }
+
         return responseMessage;
     }
 
@@ -445,27 +411,20 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         }
 
         String responseMessage;
+        int id = Integer.parseInt(messageText);
+        ListDeserializer<FilmDeserializer> movies = tmdbService().getRecommended(apiToken(), id).sortByPopularity();
+        FilmDeserializer film = tmdbService().getMovieById(apiToken(), id);
+        String moviesListBuilder = "Рекомендуемые фильмы для " + film.getTitle() + ":\n";
+
         try {
-            int filmId = Integer.parseInt(messageText);
-
-            ListDeserializer<FilmDeserializer> films = tmdbService().getRecommended(apiToken(), filmId).sortByPopularity();
-            FilmDeserializer requestedFilm = tmdbService().getMovieById(apiToken(), filmId);
-
-            if (films != null && films.getResults() != null && !films.getResults().isEmpty()) {
-                List<FilmDeserializer> movies = films.getResults();
-                StringBuilder movieListBuilder = new StringBuilder("Рекомендуемые фильмы для фильма " + requestedFilm.getTitle() + ":\n");
-
-                for (int i = 0; i < CONST_NUM; i++) {
-                    FilmDeserializer currentMovie = movies.get(i);
-                    movieListBuilder.append(i + 1).append(". ").append(currentMovie.getTitle()).append("\n");
-                }
-                responseMessage = movieListBuilder.toString();
+            if (movies != null && movies.getResults() != null && !movies.getResults().isEmpty()) {
+                responseMessage = responseWithListOfMovies(movies, moviesListBuilder);
             } else {
-                responseMessage = "Фильм с индексом " + filmId + " не найден";
+                responseMessage = "Фильм с индексом " + id + " не найден";
             }
             COMMAND_WAITER.put(chatId, NONE);
         } catch (Exception e) {
-            responseMessage = "Что-то пошло не так";
+            responseMessage = "Введите корректные данные";
         }
 
         return responseMessage;
@@ -473,33 +432,18 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
     protected String handlePopular(long chatId) {
         String responseMessage;
+        ListDeserializer<FilmDeserializer> movies = tmdbService().getPopular(apiToken()).sortByPopularity();
+        String moviesListBuilder = "Популярные фильмы:\n";
 
         try {
-            ListDeserializer<FilmDeserializer> popularFilms = tmdbService().getPopular(apiToken()).sortByPopularity();
-
-            if (popularFilms != null && popularFilms.getResults() != null && !popularFilms.getResults().isEmpty()) {
-                List<FilmDeserializer> movies = popularFilms.getResults();
-                StringBuilder moviesListBuilder = new StringBuilder("Популярные фильмы:\n");
-
-                for (int i = 0; i < CONST_NUM; i++) {
-                    FilmDeserializer currentMovie = movies.get((popularMovieIndex + i) % movies.size());
-                    moviesListBuilder.append(popularMovieIndex + i + 1).append(". ").append(currentMovie.getTitle()).append("\n");
-                }
-
-                popularMovieIndex = (popularMovieIndex + CONST_NUM) % movies.size();
-                responseMessage = moviesListBuilder.toString();
+            if (movies != null && movies.getResults() != null && !movies.getResults().isEmpty()) {
+                responseMessage = responseWithListOfMovies(movies, moviesListBuilder);
             } else {
                 responseMessage = "Данные не найдены";
             }
             COMMAND_WAITER.put(chatId, NONE);
-        } catch (FeignException e) {
-            if (e.status() == 404) {
-                responseMessage = "404: Данные не найдены";
-            } else {
-                responseMessage = "Что-то пошло не так";
-            }
         } catch (Exception e) {
-            responseMessage = "Пожалуйста, введите корректные данные";
+            responseMessage = "Введите корректные данные";
         }
 
         return responseMessage;
@@ -507,30 +451,20 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
     protected String handleTopRated(long chatId) {
         String responseMessage;
+        ListDeserializer<FilmDeserializer> movies = tmdbService().getTopRated(apiToken());
+        String moviesListBuilder = "Высоко-оцененные фильмы:\n";
+
         try {
-            ListDeserializer<FilmDeserializer> popularFilms = tmdbService().getTopRated(apiToken());
-            if (popularFilms != null && popularFilms.getResults() != null && !popularFilms.getResults().isEmpty()) {
-                List<FilmDeserializer> movies = popularFilms.getResults();
-                StringBuilder moviesListBuilder = new StringBuilder("Высоко-оцененные фильмы:\n");
-                for (int i = 0; i < CONST_NUM; i++) {
-                    FilmDeserializer currentMovie = movies.get((popularMovieIndex + i) % movies.size());
-                    moviesListBuilder.append(popularMovieIndex + i + 1).append(". ").append(currentMovie.getTitle()).append("\n");
-                }
-                popularMovieIndex = (popularMovieIndex + CONST_NUM) % movies.size();
-                responseMessage = moviesListBuilder.toString();
+            if (movies != null && movies.getResults() != null && !movies.getResults().isEmpty()) {
+                responseMessage = responseWithListOfMovies(movies, moviesListBuilder);
             } else {
                 responseMessage = "Данные не найдены";
             }
             COMMAND_WAITER.put(chatId, NONE);
-        } catch (FeignException e) {
-            if (e.status() == 404) {
-                responseMessage = "404: Данные не найдены";
-            } else {
-                responseMessage = "Что-то пошло не так";
-            }
         } catch (Exception e) {
-            responseMessage = "Пожалуйста, введите корректные данные";
+            responseMessage = "Введите корректные данные";
         }
+
         return responseMessage;
     }
 
@@ -547,40 +481,10 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         }
 
         String responseMessage;
+        int id = Integer.parseInt(messageText);
+
         try {
-            int filmID = Integer.parseInt(messageText);
-            FilmDeserializer film = tmdbService().getMovieById(apiToken(), filmID);
-            ListDeserializer<VideoDeserializer> videos = tmdbService().getVideosForMovie(apiToken(), filmID);
-
-            if (film != null) {
-                StringBuilder filmBuilder = new StringBuilder(film.getTitle());
-                if (!Objects.equals(film.getOriginal_language(), "en")) {
-                    filmBuilder.append(" / ").append(film.getOriginal_title());
-                }
-                filmBuilder.append(" (").append(film.getRelease_date(), 0, 4).append(", ")
-                        .append(film.getOrigin_country()[0]).append(")").append("\n\n")
-                        .append(film.getOverview()).append("\n\n")
-                        .append("Vote average: ").append(film.getVote_average()).append("/10\n")
-                        .append("Runtime: ").append(film.getRuntime()).append(" min \n");
-
-                if (film.getHomepage() != null) {
-                    filmBuilder.append("Link: ").append(film.getHomepage()).append("\n");
-                }
-
-                for (int i = 0; i < videos.getResults().size(); i++) {
-                    if (videos.getResults().get(i).getId() != null &&
-                            Objects.equals(videos.getResults().get(i).getName(), "Official Trailer") &&
-                            Objects.equals(videos.getResults().get(i).getSite(), "YouTube") &&
-                            Objects.equals(videos.getResults().get(i).getType(), "Trailer") &&
-                            videos.getResults().get(i).isOfficial()) {
-                        filmBuilder.append("Trailer: ").
-                                append(youtubeUrl()).append(videos.getResults().get(i).getKey()).append("\n");
-                    }
-                }
-                responseMessage = filmBuilder.toString();
-            } else {
-                responseMessage = "Извините, я не нашел фильм";
-            }
+            responseMessage = responseWithMovie(id);
             COMMAND_WAITER.put(chatId, NONE);
         } catch (Exception e) {
             responseMessage = "Фильм с таким ID не найден";
