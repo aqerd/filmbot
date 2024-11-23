@@ -1,4 +1,4 @@
-package oop.project;
+package oop.project.commands;
 
 import org.junit.jupiter.api.Test;
 import java.sql.SQLException;

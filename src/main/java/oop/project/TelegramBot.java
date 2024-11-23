@@ -276,7 +276,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 //        }
 //    }
 
-    protected String handleCommands(String messageText, long chatId) {
+    public String handleCommands(String messageText, long chatId) {
         String responseMessage;
 
         switch (messageText.toLowerCase()) {
@@ -388,7 +388,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 //        database.updateYearIndexesJson(chatId, jsonYearString);
 //    }
 
-    protected String handleYear(String messageText, long chatId) {
+    public String handleYear(String messageText, long chatId) {
         Validator<String> validCommand = new CommandValidator();
         if (validCommand.isValid(messageText)) {
             COMMAND_WAITER.put(chatId, NONE);
@@ -728,7 +728,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         return responseMessage;
     }
 
-    protected String handleSetAge(String messageText, long chatId) {
+    public String handleSetAge(String messageText, long chatId) {
         Validator<String> validCommand = new CommandValidator();
         if (validCommand.isValid(messageText)) {
             COMMAND_WAITER.put(chatId, NONE);

@@ -1,5 +1,6 @@
-package oop.project;
+package oop.project.commands;
 
+import oop.project.TelegramBot;
 import org.junit.jupiter.api.BeforeEach;
 import java.sql.SQLException;
 
