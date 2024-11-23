@@ -6,7 +6,6 @@ import feign.FeignException;
 import oop.project.deserializers.*;
 import oop.project.shared.CommandWaiter;
 import oop.project.shared.Genres;
-
 import static java.lang.Integer.parseInt;
 import static oop.project.shared.CommandWaiter.*;
 import static oop.project.shared.Config.*;

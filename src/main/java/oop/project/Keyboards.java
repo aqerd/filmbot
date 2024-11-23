@@ -18,7 +18,7 @@ public class Keyboards {
         return null;
     }
 
-    public static List<KeyboardRow> createKeyboard(List<String> commands, int columns) {
+    public static ReplyKeyboardMarkup createKeyboard(List<String> commands, int columns) {
         List<KeyboardRow> keyboard = new ArrayList<>();
         for (int i = 0; i < commands.size(); i += columns) {
             KeyboardRow row = new KeyboardRow();
@@ -27,35 +27,27 @@ public class Keyboards {
             }
             keyboard.add(row);
         }
-        return keyboard;
+
+        ReplyKeyboardMarkup keyboardMarkup = ReplyKeyboardMarkup.builder().build();
+        keyboardMarkup.setKeyboard(keyboard);
+        keyboardMarkup.setResizeKeyboard(true);
+        keyboardMarkup.setOneTimeKeyboard(true);
+
+        return keyboardMarkup;
     }
 
     private static ReplyKeyboardMarkup buildCommandKeyboard() {
-        ReplyKeyboardMarkup keyboardMarkup = ReplyKeyboardMarkup.builder().build();
-        List<String> commands = List.of("Genre", "Year", "Movie Search", "Actor Search", "Similar",
-                "Recommended", "Popular", "Find by ID", "Top Rated", "Set Age", "Help");
-
-        List<KeyboardRow> keyboard = createKeyboard(commands, 2);
-
-        keyboardMarkup.setKeyboard(keyboard);
-        keyboardMarkup.setResizeKeyboard(true);
-        keyboardMarkup.setOneTimeKeyboard(true);
-
-        return keyboardMarkup;
+        List<String> commands = List.of("Genre", "Year", "Movie Search", "Actor Search",
+                "Similar", "Recommended", "Popular", "Find by ID", "Top Rated", "Set Age", "Help");
+        int columns = 2;
+        return createKeyboard(commands, columns);
     }
 
     private static ReplyKeyboardMarkup buildGenreKeyboard() {
-        ReplyKeyboardMarkup keyboardMarkup = ReplyKeyboardMarkup.builder().build();
-        List<String> commands = List.of("Fantasy", "Horror", "Action", "Music", "War", "Drama", "Western",
-                "Family", "Comedy", "History", "Crime", "Mystery", "Romance", "Thriller", "TV Movie",
-                "Adventure", "Animation", "Documentary", "Science Fiction");
-
-        List<KeyboardRow> keyboard = createKeyboard(commands, 3);
-
-        keyboardMarkup.setKeyboard(keyboard);
-        keyboardMarkup.setResizeKeyboard(true);
-        keyboardMarkup.setOneTimeKeyboard(true);
-
-        return keyboardMarkup;
+        List<String> commands = List.of("Fantasy", "Horror", "Action", "Music", "War",
+                "Drama", "Western", "Family", "Comedy", "History", "Crime", "Mystery", "Romance",
+                "Thriller", "TV Movie", "Adventure", "Animation", "Documentary", "Science Fiction");
+        int columns = 3;
+        return createKeyboard(commands, columns);
     }
 }
