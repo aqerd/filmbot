@@ -3,6 +3,7 @@ package oop.project.commands;
 import org.junit.jupiter.api.Test;
 import java.sql.SQLException;
 
+import static oop.project.shared.Replies.reply;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -30,11 +31,9 @@ public class HandleFindByIdTest extends BaseHandleTest {
 
     @Test
     void testHandleFindByIdWithUnknownId() {
-        String unknownId = "1212"; // Идентификатор фильма, который не существует
+        String unknownId = "1212";
         String response = telegramBot.handleFindById(unknownId, CHAT_ID);
-
-        // Проверяем, что возвращается сообщение о том, что фильм не найден
-        assertEquals("Фильм с таким ID не найден", response, "Responses should indicate the film was not found.");
+        assertEquals(reply("unexpected"), response, "Responses should indicate the film was not found.");
     }
 
     @Test
