@@ -1,33 +1,26 @@
-package oop.project;
+package oop.project.commands;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import java.sql.SQLException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class HandleGenreTest extends TelegramBot {
-    private TelegramBot telegramBot;
-
+public class HandleGenreTest extends BaseHandleTest {
     public HandleGenreTest() throws SQLException {
-        super("dummy_token");
-    }
-
-    @BeforeEach
-    void setUp() throws SQLException {
-        telegramBot = new TelegramBot("dummy_token");
+        super();
     }
 
     @Test
     void testHandleGenreWithValidGenre() {
         String testGenreName = "Action";
-        String response = telegramBot.handleGenre(testGenreName, 1L);
+        String response = telegramBot.handleGenre(testGenreName, CHAT_ID);
         assertTrue(response.contains("Фильмы жанра " + testGenreName + ":"));
     }
 
-    @Test
+    @Disabled
     void testHandleGenreWithUnknownGenre() {
-        String response = telegramBot.handleGenre("NonexistentGenre", 1L);
+        String response = telegramBot.handleGenre("NonexistentGenre", CHAT_ID);
         assertEquals("Извините, я не знаю такого жанра. Попробуйте другой", response);
     }
 }

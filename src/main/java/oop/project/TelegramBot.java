@@ -1,72 +1,63 @@
 package oop.project;
 
-// import com.google.gson.Gson;
-// import com.google.gson.reflect.TypeToken;
-import feign.FeignException;
 import oop.project.deserializers.*;
 import oop.project.shared.CommandWaiter;
 import oop.project.shared.Genres;
-import oop.project.parameters.MovieParameters;
-import oop.project.parameters.ParametersBuilder;
-
-import static java.lang.Integer.parseInt;
+import oop.project.validators.*;
+import static oop.project.handlers.Buttons.handleButtons;
+import static oop.project.handlers.Keyboards.setKeyboard;
 import static oop.project.shared.CommandWaiter.*;
 import static oop.project.shared.Config.*;
-import static oop.project.shared.Utils.isCommand;
-import static oop.project.shared.Replies.getReply;
-// import java.lang.reflect.Type;
+import static oop.project.shared.Replies.reply;
+import static oop.project.shared.Responses.*;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
-import oop.project.validators.AgeValidator;
-import oop.project.validators.IdValidator;
-import oop.project.validators.Validator;
-import oop.project.validators.YearValidator;
+// import java.lang.reflect.Type;
+// import com.google.gson.Gson;
+// import com.google.gson.reflect.TypeToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
 public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
-    private static final Logger logger = LoggerFactory.getLogger(TelegramBot.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TelegramBot.class);
 
-    private final TelegramClient telegramClient;
-    private final ExecutorService executorService = Executors.newFixedThreadPool(10);
+    private final TelegramClient TG_CLIENT;
+    private final ExecutorService EXECUTOR = Executors.newFixedThreadPool(10);
 
 //    private final Database database = new Database();
 //    private final Gson gson = new Gson();
 
-    private final int constNumber = 12;
-    private final int searchNumber = 6;
+    private final int CONST_NUM = 12;
+    private final int SEARCH_NUM = 6;
 
     private final HashMap<Integer, Integer> yearMovieIndexMap = new HashMap<>();
     private final HashMap<String, Integer> genreMovieIndexMap = new HashMap<>();
     private int popularMovieIndex = 0;
-    private final Map<Long, CommandWaiter> commandWaiter = new ConcurrentHashMap<>();
+    private final Map<Long, CommandWaiter> COMMAND_WAITER = new ConcurrentHashMap<>();
 
     public TelegramBot(String botToken) throws SQLException {
-        telegramClient = new OkHttpTelegramClient(botToken);
+        TG_CLIENT = new OkHttpTelegramClient(botToken);
     }
 
     @Override
     public void consume(Update update) {
-        executorService.submit(() -> handleUpdate(update));
+        EXECUTOR.submit(() -> handleUpdate(update));
     }
 
     public void handleUpdate(Update update) {
-        handleButtons(update);
+        handleButtons(update, TG_CLIENT);
 
         if (update.hasMessage() && update.getMessage().hasText()) {
             long chatId = update.getMessage().getChatId();
@@ -76,193 +67,60 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
             String messageText = update.getMessage().getText();
             String responseMessage;
-            CommandWaiter waiter = commandWaiter.getOrDefault(chatId, NONE);
+            CommandWaiter waiter = COMMAND_WAITER.getOrDefault(chatId, NONE);
 
-            logger.info("ID: {}, Message: {}, Waiter: {}", chatId, messageText, waiter);
+            LOG.info("ID: {}, Message: {}, Waiter: {}", chatId, messageText, waiter);
 
             switch (waiter) {
                 case GENRE:
                     responseMessage = handleGenre(messageText, chatId);
-                    commandWaiter.put(chatId, NONE);
+                    COMMAND_WAITER.put(chatId, NONE);
                     break;
                 case YEAR:
                     responseMessage = handleYear(messageText, chatId);
-                    commandWaiter.put(chatId, NONE);
+                    COMMAND_WAITER.put(chatId, NONE);
                     break;
                 case MOVIESEARCH:
                     responseMessage = handleMovieSearch(messageText, chatId);
-                    commandWaiter.put(chatId, NONE);
+                    COMMAND_WAITER.put(chatId, NONE);
                     break;
                 case ACTORSEARCH:
                     responseMessage = handleActorSearch(messageText, chatId);
-                    commandWaiter.put(chatId, NONE);
+                    COMMAND_WAITER.put(chatId, NONE);
                     break;
                 case SIMILAR:
                     responseMessage = handleSimilar(messageText, chatId);
-                    commandWaiter.put(chatId, NONE);
+                    COMMAND_WAITER.put(chatId, NONE);
                     break;
                 case RECOMMENDED:
                     responseMessage = handleRecommended(messageText, chatId);
-                    commandWaiter.put(chatId, NONE);
+                    COMMAND_WAITER.put(chatId, NONE);
                     break;
                 case FINDBYID:
                     responseMessage = handleFindById(messageText, chatId);
-                    commandWaiter.put(chatId, NONE);
+                    COMMAND_WAITER.put(chatId, NONE);
                     break;
                 case SETAGE:
                     responseMessage = handleSetAge(messageText, chatId);
-                    commandWaiter.put(chatId, NONE);
+                    COMMAND_WAITER.put(chatId, NONE);
                     break;
                 default:
                     responseMessage = handleCommands(messageText, chatId);
                     break;
             }
 
-            CommandWaiter updatedWaiter = commandWaiter.getOrDefault(chatId, NONE);
+            CommandWaiter updatedWaiter = COMMAND_WAITER.getOrDefault(chatId, NONE);
             SendMessage message = SendMessage.builder()
                     .chatId(chatId)
                     .text(responseMessage)
-                    .replyMarkup(getKeyboardByWaiter(updatedWaiter))
+                    .replyMarkup(setKeyboard(updatedWaiter))
                     .build();
+            message.enableMarkdown(true);
 
             try {
-                telegramClient.execute(message);
+                TG_CLIENT.execute(message);
             } catch (TelegramApiException err) {
                 err.printStackTrace();
-            }
-        }
-    }
-
-    public void handleButtons(Update update) {
-        if (update.hasCallbackQuery()) {
-            String callbackData = update.getCallbackQuery().getData();
-            long chatId = update.getCallbackQuery().getMessage().getChatId();
-
-            if (callbackData.startsWith("movie_")) {
-                int id = parseInt(callbackData.substring(6));
-                FilmDeserializer film = TMDB_SERVICE.getMovieById(TMDB_TOKEN, id);
-                ListDeserializer<VideoDeserializer> videos = TMDB_SERVICE.getVideosForFilm(TMDB_TOKEN, id);
-
-                StringBuilder filmBuilder = new StringBuilder(film.title);
-                if (!Objects.equals(film.original_language, "en")) {
-                    filmBuilder.append(" / ").append(film.original_title);
-                }
-                filmBuilder.append(" (").append(film.release_date, 0, 4).append(", ")
-                        .append(film.origin_country[0]).append(")").append("\n\n")
-                        .append(film.overview).append("\n\n")
-                        .append("Vote average: ").append(film.vote_average).append("/10\n")
-                        .append("Runtime: ").append(film.runtime).append(" min \n");
-                if (film.homepage != null) {
-                    filmBuilder.append("Link: ").append(film.homepage).append("\n");
-                }
-
-                for (int i = 0; i < videos.results.size(); i++) {
-                    if (videos.results.get(i).id != null &&
-                            Objects.equals(videos.results.get(i).name, "Official Trailer") &&
-                            Objects.equals(videos.results.get(i).site, "YouTube") &&
-                            Objects.equals(videos.results.get(i).type, "Trailer") &&
-                            videos.results.get(i).official) {
-                        filmBuilder.append("Trailer: ").
-                                append("https://youtube.com/watch?v=").append(videos.results.get(i).key).append("\n");
-                    }
-                }
-
-                String responseMessage = filmBuilder.toString();
-
-                SendMessage response = SendMessage
-                        .builder()
-                        .chatId(String.valueOf(chatId))
-                        .text("Выберите фильм:")
-                        .build();
-                response.setChatId(String.valueOf(chatId));
-                response.setText(responseMessage);
-
-                try {
-                    telegramClient.execute(response);
-                } catch (TelegramApiException e) {
-                    e.printStackTrace();
-                }
-
-                AnswerCallbackQuery answerCallbackQuery = AnswerCallbackQuery.builder()
-                        .callbackQueryId(update.getCallbackQuery().getId())
-                        .text("Выполнен поиск по " + film.title)
-                        .showAlert(false)
-                        .build();
-                answerCallbackQuery.setCallbackQueryId(update.getCallbackQuery().getId());
-
-                try {
-                    telegramClient.execute(answerCallbackQuery);
-                } catch (TelegramApiException e) {
-                    e.printStackTrace();
-                }
-            } else if (callbackData.startsWith("actor_")) {
-                int id = parseInt(callbackData.substring(6));
-                String responseMessage;
-                List<FilmDeserializer> movies;
-                CreditsDeserializer actorsFilms = TMDB_SERVICE.getActorsFilms(TMDB_TOKEN, id);
-                PersonDeserializer actor = TMDB_SERVICE.getActor(TMDB_TOKEN, id);
-
-                StringBuilder actorsData = new StringBuilder(actor.name).append(" (").append(actor.birthday, 0, 4);
-                if (actor.deathday != null) {
-                    actorsData.append(" - ").append(actor.deathday, 0, 4);
-                }
-                actorsData.append(")").append("\n").append("Place of birth: ").append(actor.place_of_birth.trim())
-                        .append("\n").append("Popularity: ").append(actor.popularity.trim())
-                        .append("\n").append("ID: ").append(actor.id).append("\n\n");
-                if (!Objects.equals(actor.biography, "")) {
-                    actorsData.append(actor.biography).append("\n\n");
-                }
-
-                if ((actorsFilms.cast != null || actorsFilms.crew != null) && actor.known_for_department != null) {
-                    StringBuilder actorsFilmsBuilder = new StringBuilder("Фильмы с участием " + actor.name + ":\n");
-
-                    if (Objects.equals(actor.known_for_department, "Acting")) {
-                        movies = actorsFilms.cast;
-                    } else {
-                        movies = actorsFilms.crew;
-                    }
-
-                    if (movies != null && !movies.isEmpty()) {
-                        int filmsToDisplay = Math.min(constNumber, movies.size());
-                        for (int i = 0; i < filmsToDisplay; i++) {
-                            FilmDeserializer currentMovie = movies.get(i);
-                            actorsFilmsBuilder.append(i + 1).append(". ").append(currentMovie.title).append("\n");
-                        }
-                    } else {
-                        actorsFilmsBuilder.append("Фильмов не найдено.\n");
-                    }
-
-                    responseMessage = actorsData.append(actorsFilmsBuilder).toString();
-                } else {
-                    responseMessage = "Данные не найдены";
-                }
-
-                SendMessage response = SendMessage
-                        .builder()
-                        .chatId(String.valueOf(chatId))
-                        .text("Выберите актёра:")
-                        .build();
-                response.setChatId(String.valueOf(chatId));
-                response.setText(responseMessage);
-
-                try {
-                    telegramClient.execute(response);
-                } catch (TelegramApiException e) {
-                    e.printStackTrace();
-                }
-
-                AnswerCallbackQuery answerCallbackQuery = AnswerCallbackQuery.builder()
-                        .callbackQueryId(update.getCallbackQuery().getId())
-                        .text("Выполнен поиск по " + actor.name)
-                        .showAlert(false)
-                        .build();
-                answerCallbackQuery.setCallbackQueryId(update.getCallbackQuery().getId());
-
-                try {
-                    telegramClient.execute(answerCallbackQuery);
-                } catch (TelegramApiException e) {
-                    e.printStackTrace();
-                }
             }
         }
     }
@@ -283,36 +141,36 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 //        }
 //    }
 
-    protected String handleCommands(String messageText, long chatId) {
+    public String handleCommands(String messageText, long chatId) {
         String responseMessage;
 
         switch (messageText.toLowerCase()) {
             case "/start": case "start":
-                responseMessage = getReply("start");
+                responseMessage = reply("start");
                 break;
             case "/genre": case "genre":
-                responseMessage = getReply("genre");
-                commandWaiter.put(chatId, GENRE);
+                responseMessage = reply("genre");
+                COMMAND_WAITER.put(chatId, GENRE);
                 break;
             case "/year": case "year":
-                responseMessage = getReply("year");
-                commandWaiter.put(chatId, YEAR);
+                responseMessage = reply("year");
+                COMMAND_WAITER.put(chatId, YEAR);
                 break;
             case "/moviesearch": case "movie search":
-                responseMessage = getReply("movie search");
-                commandWaiter.put(chatId, MOVIESEARCH);
+                responseMessage = reply("movie search");
+                COMMAND_WAITER.put(chatId, MOVIESEARCH);
                 break;
             case "/actorsearch": case "actor search":
-                responseMessage = getReply("actor search");
-                commandWaiter.put(chatId, ACTORSEARCH);
+                responseMessage = reply("actor search");
+                COMMAND_WAITER.put(chatId, ACTORSEARCH);
                 break;
             case "/similar": case "similar":
-                responseMessage = getReply("similar");
-                commandWaiter.put(chatId, SIMILAR);
+                responseMessage = reply("similar");
+                COMMAND_WAITER.put(chatId, SIMILAR);
                 break;
             case "/recommended": case "recommended":
-                responseMessage = getReply("recommended");
-                commandWaiter.put(chatId, RECOMMENDED);
+                responseMessage = reply("recommended");
+                COMMAND_WAITER.put(chatId, RECOMMENDED);
                 break;
             case "/popular": case "popular":
                 responseMessage = handlePopular(chatId);
@@ -321,20 +179,21 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 responseMessage = handleTopRated(chatId);
                 break;
             case "/findbyid": case "find by id":
-                responseMessage = getReply("find by id");
-                commandWaiter.put(chatId, FINDBYID);
+                responseMessage = reply("find by id");
+                COMMAND_WAITER.put(chatId, FINDBYID);
                 break;
             case "/setage": case "set age":
-                responseMessage = getReply("set age");
-                commandWaiter.put(chatId, SETAGE);
+                responseMessage = reply("set age");
+                COMMAND_WAITER.put(chatId, SETAGE);
                 break;
             case "/help": case "help":
-                responseMessage = getReply("help");
+                responseMessage = reply("help");
                 break;
             default:
-                responseMessage = getReply("unknown");
+                responseMessage = reply("unknown");
                 break;
         }
+
         return responseMessage;
     }
 
@@ -343,47 +202,30 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 //        database.updateGenreIndexesJson(chatId, jsonGenreString);
 //    }
 
-    protected String handleGenre(String messageText, long chatId) {
-        if (isCommand(messageText)) {
-            commandWaiter.put(chatId, NONE);
+    public String handleGenre(String messageText, long chatId) {
+        Validator<String> validCommand = new CommandValidator();
+        if (validCommand.isValid(messageText)) {
+            COMMAND_WAITER.put(chatId, NONE);
             return handleCommands(messageText, chatId);
         }
 
+        String genreId = Genres.valueOf(messageText.toUpperCase().replace(" ", "_")).getGenreId();
+        int currentIndex = genreMovieIndexMap.getOrDefault(genreId, 0);
         String responseMessage;
+        String moviesListBuilder = "Фильмы жанра " + messageText + ":\n";
+        MovieParameters params = MovieParameters.builder().withGenres(genreId).build();
+        ListDeserializer<FilmDeserializer> movies = tmdbService().findMovie(params).sortByPopularity();
 
         try {
-            String genreId = Genres.valueOf(messageText.toUpperCase().replace(" ", "_")).genreId;
-
-            MovieParameters params = new ParametersBuilder()
-                    .withGenres(genreId)
-                    .withCertificationLte("PG-13")
-                    .withCertificationCountry("US")
-                    .build();
-            ListDeserializer<FilmDeserializer> moviesByGenre = TMDB_SERVICE.findMovie(params);
-
-            if (moviesByGenre != null && moviesByGenre.results != null && !moviesByGenre.results.isEmpty()) {
-                List<FilmDeserializer> movies = moviesByGenre.results;
-                int currentIndex = genreMovieIndexMap.getOrDefault(genreId, 0);
-                StringBuilder movieListBuilder = new StringBuilder("Фильмы жанра " + messageText + ":\n");
-
-                for (int i = 0; i < constNumber; i++) {
-                    FilmDeserializer currentMovie = movies.get((currentIndex + i) % movies.size());
-                    movieListBuilder.append(i + 1).append(". ").append(currentMovie.title).append("\n");
-                }
-
-                currentIndex = (currentIndex + constNumber) % movies.size();
-                genreMovieIndexMap.put(genreId, currentIndex);
-
+            if (movies != null && movies.getResults() != null && !movies.getResults().isEmpty()) {
+                responseMessage = responseWithListOfMovies(movies, moviesListBuilder, currentIndex, genreMovieIndexMap, genreId);
 //                updateGenreIndexInDatabase(chatId);
-
-                responseMessage = movieListBuilder.toString();
-
             } else {
                 responseMessage = "Извините, я не нашел фильмов для жанра " + messageText;
             }
-            commandWaiter.put(chatId, NONE);
+            COMMAND_WAITER.put(chatId, NONE);
         } catch (IllegalArgumentException e) {
-            responseMessage = "Извините, я не знаю такого жанра. Попробуйте другой";
+            responseMessage = reply("invalid");
         }
 
         return responseMessage;
@@ -394,69 +236,62 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 //        database.updateYearIndexesJson(chatId, jsonYearString);
 //    }
 
-    protected String handleYear(String messageText, long chatId) {
-        Validator<String> validator = new YearValidator();
+    public String handleYear(String messageText, long chatId) {
+        Validator<String> validCommand = new CommandValidator();
+        if (validCommand.isValid(messageText)) {
+            COMMAND_WAITER.put(chatId, NONE);
+            return handleCommands(messageText, chatId);
+        }
 
-        if (!validator.isValid(messageText)) {
-            return validator.getErrorMessage();
+        Validator<String> validYear = new YearValidator();
+        if (!validYear.isValid(messageText)) {
+            return validYear.getErrorMessage();
         }
 
         int userYear = Integer.parseInt(messageText);
+        int currentIndex = yearMovieIndexMap.getOrDefault(userYear, 0);
         String responseMessage;
+        String moviesListBuilder = "Фильмы, выпущенные в " + userYear + " году:\n";
+        MovieParameters params = MovieParameters.builder().withYear(userYear).build();
+        ListDeserializer<FilmDeserializer> movies = tmdbService().findMovie(params).sortByPopularity();
 
         try {
-            MovieParameters params = new ParametersBuilder()
-                    .withYear(userYear)
-                    .withCertificationLte("PG-13")
-                    .withCertificationCountry("US")
-                    .build();
-            ListDeserializer<FilmDeserializer> moviesByYear = TMDB_SERVICE.findMovie(params);
-
-            if (moviesByYear != null && moviesByYear.results != null && !moviesByYear.results.isEmpty()) {
-                List<FilmDeserializer> movies = moviesByYear.results;
-                int currentIndex = yearMovieIndexMap.getOrDefault(userYear, 0);
-                StringBuilder movieListBuilder = new StringBuilder("Фильмы, выпущенные в " + userYear + " году:\n");
-
-                for (int i = 0; i < constNumber; i++) {
-                    FilmDeserializer currentMovie = movies.get((currentIndex + i) % movies.size());
-                    movieListBuilder.append(i + 1).append(". ").append(currentMovie.title).append("\n");
-                }
-
-                currentIndex = (currentIndex + constNumber) % movies.size();
-                yearMovieIndexMap.put(userYear, currentIndex);
-
-                responseMessage = movieListBuilder.toString();
+            if (movies != null && movies.getResults() != null && !movies.getResults().isEmpty()) {
+                responseMessage = responseWithListOfMovies(movies, moviesListBuilder, currentIndex, yearMovieIndexMap, userYear);
+//                updateYearIndexInDatabase(chatId);
             } else {
                 responseMessage = "Извините, я не нашел фильмов за " + userYear + " год";
             }
-            commandWaiter.put(chatId, NONE);
+            COMMAND_WAITER.put(chatId, NONE);
         } catch (Exception e) {
-            responseMessage = "Что-то пошло не так";
+            responseMessage = reply("unexpected");
         }
 
         return responseMessage;
     }
 
     protected String handleMovieSearch(String messageText, long chatId) {
-        if (isCommand(messageText)) {
-            commandWaiter.put(chatId, NONE);
+        Validator<String> validCommand = new CommandValidator();
+        if (validCommand.isValid(messageText)) {
+            COMMAND_WAITER.put(chatId, NONE);
             return handleCommands(messageText, chatId);
         }
 
         String responseMessage = "Поиск по \"" + messageText + "\"\nВыберите фильм: ";
         List<InlineKeyboardRow> cols = new ArrayList<>();
-        ListDeserializer<FilmDeserializer> films = TMDB_SERVICE.searchMovie(TMDB_TOKEN, messageText, "en-US", 1);
+        ListDeserializer<FilmDeserializer> films = tmdbService()
+                .searchMovie(apiToken(), messageText, "en-US", 1).sortByPopularity();
 
-        List<FilmDeserializer> movies = films.results;
-        int filmsToProcess = Math.min(searchNumber, movies.size());
+        List<FilmDeserializer> movies = films.getResults();
+        int filmsToProcess = Math.min(SEARCH_NUM, movies.size());
 
         if (filmsToProcess == 0) {
             return "Ничего не найдено";
         }
 
         for (int i = 0; i < filmsToProcess; i++) {
-            String currentId = String.valueOf(movies.get(i).id);
-            String currentTitle = String.valueOf(movies.get(i).title);
+            String currentId = String.valueOf(movies.get(i).getId());
+            String currentTitle = String.valueOf(movies.get(i).getTitle());
             InlineKeyboardButton button = InlineKeyboardButton.builder()
                     .text(currentTitle)
                     .callbackData("movie_" + currentId)
@@ -476,34 +311,38 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 .text(responseMessage)
                 .replyMarkup(markupInline)
                 .build();
+
         try {
-            telegramClient.execute(response);
+            TG_CLIENT.execute(response);
         } catch (Exception e) {
-            logger.error("Error while sending message to chatId {}: {}", chatId, e.getMessage(), e);
+            LOG.error("Error while sending message to chatId {}: {}", chatId, e.getMessage(), e);
         }
+
         return "";
     }
 
     protected String handleActorSearch(String messageText, long chatId) {
-        if (isCommand(messageText)) {
-            commandWaiter.put(chatId, NONE);
+        Validator<String> validCommand = new CommandValidator();
+        if (validCommand.isValid(messageText)) {
+            COMMAND_WAITER.put(chatId, NONE);
             return handleCommands(messageText, chatId);
         }
 
-        String responseMessage = "Поиск по \"" + messageText + "\"\nВыберите актёра: ";
+        String responseMessage = "Поиск по " + "\"" + messageText + "\"\n" + "Выберите актёра: ";
         List<InlineKeyboardRow> cols = new ArrayList<>();
-        ListDeserializer<PersonDeserializer> humans = TMDB_SERVICE.searchPerson(TMDB_TOKEN, messageText, "en-US", 1);
+        ListDeserializer<PersonDeserializer> humans = tmdbService()
+                .searchPerson(apiToken(), messageText, "en-US", 1).sortByPopularity();
 
-        List<PersonDeserializer> people = humans.results;
-        int actorsToProcess = Math.min(searchNumber, people.size());
+        List<PersonDeserializer> people = humans.getResults();
+        int actorsToProcess = Math.min(SEARCH_NUM, people.size());
 
         if (actorsToProcess == 0) {
-            return "Ничего не найдено";
+            return reply("no data");
         }
 
         for (int i = 0; i < actorsToProcess; i++) {
-            String currentName = String.valueOf(people.get(i).name);
-            String currentId = String.valueOf(people.get(i).id);
+            String currentName = String.valueOf(people.get(i).getName());
+            String currentId = String.valueOf(people.get(i).getId());
             InlineKeyboardButton button = InlineKeyboardButton.builder()
                     .text(currentName)
                     .callbackData("actor_" + currentId)
@@ -524,77 +363,73 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 .replyMarkup(markupInline)
                 .build();
         try {
-            telegramClient.execute(response);
+            TG_CLIENT.execute(response);
         } catch (TelegramApiException e) {
-            logger.error("Error while sending message to chatId {}: {}", chatId, e.getMessage(), e);
+            LOG.error("Error while sending message to chatId {}: {}", chatId, e.getMessage(), e);
         }
+
         return "";
     }
 
     protected String handleSimilar(String messageText, long chatId) {
-        Validator<String> validator = new IdValidator();
+        Validator<String> validCommand = new CommandValidator();
+        if (validCommand.isValid(messageText)) {
+            COMMAND_WAITER.put(chatId, NONE);
+            return handleCommands(messageText, chatId);
+        }
 
+        Validator<String> validator = new IdValidator();
         if (!validator.isValid(messageText)) {
             return validator.getErrorMessage();
         }
 
         String responseMessage;
+        int id = Integer.parseInt(messageText);
+        ListDeserializer<FilmDeserializer> movies = tmdbService().getSimilar(apiToken(), id).sortByPopularity();
+        FilmDeserializer film = tmdbService().getMovieById(apiToken(), id);
+        String moviesListBuilder = "Похожие фильмы для " + film.getTitle() + ":\n";
+
         try {
-            int filmId = Integer.parseInt(messageText);
-
-            ListDeserializer<FilmDeserializer> films = TMDB_SERVICE.getSimilarMovies(TMDB_TOKEN, filmId);
-            FilmDeserializer requestedFilm = TMDB_SERVICE.getMovieById(TMDB_TOKEN, filmId);
-
-            if (films != null && films.results != null && !films.results.isEmpty()) {
-                List<FilmDeserializer> movies = films.results;
-                StringBuilder movieListBuilder = new StringBuilder("Похожие фильмы для " + requestedFilm.title + ":\n");
-
-                for (int i = 0; i < constNumber; i++) {
-                    FilmDeserializer currentMovie = movies.get(i);
-                    movieListBuilder.append(i + 1).append(". ").append(currentMovie.title).append("\n");
-                }
-                responseMessage = movieListBuilder.toString();
+            if (movies != null && movies.getResults() != null && !movies.getResults().isEmpty()) {
+                responseMessage = responseWithListOfMovies(movies, moviesListBuilder);
             } else {
-                responseMessage = "Фильм с индексом " + filmId + " не найден";
+                responseMessage = "Фильм с индексом " + id + " не найден";
             }
-            commandWaiter.put(chatId, NONE);
+            COMMAND_WAITER.put(chatId, NONE);
         } catch (Exception e) {
-            responseMessage = "Что-то пошло не так";
+            responseMessage = reply("unexpected");
         }
 
         return responseMessage;
     }
 
-
     protected String handleRecommended(String messageText, long chatId) {
-        Validator<String> validator = new IdValidator();
+        Validator<String> validCommand = new CommandValidator();
+        if (validCommand.isValid(messageText)) {
+            COMMAND_WAITER.put(chatId, NONE);
+            return handleCommands(messageText, chatId);
+        }
 
-        if (!validator.isValid(messageText)) {
-            return validator.getErrorMessage();
+        Validator<String> validId = new IdValidator();
+        if (!validId.isValid(messageText)) {
+            return validId.getErrorMessage();
         }
 
         String responseMessage;
+        int id = Integer.parseInt(messageText);
+        ListDeserializer<FilmDeserializer> movies = tmdbService().getRecommended(apiToken(), id).sortByPopularity();
+        FilmDeserializer film = tmdbService().getMovieById(apiToken(), id);
+        String moviesListBuilder = "Рекомендуемые фильмы для " + film.getTitle() + ":\n";
+
         try {
-            int filmId = Integer.parseInt(messageText);
-
-            ListDeserializer<FilmDeserializer> films = TMDB_SERVICE.getRecommendationsForMovie(TMDB_TOKEN, filmId);
-            FilmDeserializer requestedFilm = TMDB_SERVICE.getMovieById(TMDB_TOKEN, filmId);
-
-            if (films != null && films.results != null && !films.results.isEmpty()) {
-                List<FilmDeserializer> movies = films.results;
-                StringBuilder movieListBuilder = new StringBuilder("Рекомендуемые фильмы для фильма " + requestedFilm.title + ":\n");
-
-                for (int i = 0; i < constNumber; i++) {
-                    FilmDeserializer currentMovie = movies.get(i);
-                    movieListBuilder.append(i + 1).append(". ").append(currentMovie.title).append("\n");
-                }
-                responseMessage = movieListBuilder.toString();
+            if (movies != null && movies.getResults() != null && !movies.getResults().isEmpty()) {
+                responseMessage = responseWithListOfMovies(movies, moviesListBuilder);
             } else {
-                responseMessage = "Фильм с индексом " + filmId + " не найден";
+                responseMessage = "Фильм с индексом " + id + " не найден";
             }
-            commandWaiter.put(chatId, NONE);
+            COMMAND_WAITER.put(chatId, NONE);
         } catch (Exception e) {
-            responseMessage = "Что-то пошло не так";
+            responseMessage = reply("unexpected");
         }
 
         return responseMessage;
@@ -602,33 +437,18 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
     protected String handlePopular(long chatId) {
         String responseMessage;
+        ListDeserializer<FilmDeserializer> movies = tmdbService().getPopular(apiToken()).sortByPopularity();
+        String moviesListBuilder = "Популярные фильмы:\n";
 
         try {
-            ListDeserializer<FilmDeserializer> popularFilms = TMDB_SERVICE.getPopularMovies(TMDB_TOKEN);
-
-            if (popularFilms != null && popularFilms.results != null && !popularFilms.results.isEmpty()) {
-                List<FilmDeserializer> movies = popularFilms.results;
-                StringBuilder moviesListBuilder = new StringBuilder("Популярные фильмы:\n");
-
-                for (int i = 0; i < constNumber; i++) {
-                    FilmDeserializer currentMovie = movies.get((popularMovieIndex + i) % movies.size());
-                    moviesListBuilder.append(popularMovieIndex + i + 1).append(". ").append(currentMovie.title).append("\n");
-                }
-
-                popularMovieIndex = (popularMovieIndex + constNumber) % movies.size();
-                responseMessage = moviesListBuilder.toString();
+            if (movies != null && movies.getResults() != null && !movies.getResults().isEmpty()) {
+                responseMessage = responseWithListOfMovies(movies, moviesListBuilder);
             } else {
-                responseMessage = "Данные не найдены";
+                responseMessage = reply("no data");
             }
-            commandWaiter.put(chatId, NONE);
-        } catch (FeignException e) {
-            if (e.status() == 404) {
-                responseMessage = "404: Данные не найдены";
-            } else {
-                responseMessage = "Что-то пошло не так";
-            }
+            COMMAND_WAITER.put(chatId, NONE);
         } catch (Exception e) {
-            responseMessage = "Пожалуйста, введите корректные данные";
+            responseMessage = reply("unexpected");
         }
 
         return responseMessage;
@@ -636,186 +456,60 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
     protected String handleTopRated(long chatId) {
         String responseMessage;
+        ListDeserializer<FilmDeserializer> movies = tmdbService().getTopRated(apiToken());
+        String moviesListBuilder = "Высоко-оцененные фильмы:\n";
+
         try {
-            ListDeserializer<FilmDeserializer> popularFilms = TMDB_SERVICE.getTopRated(TMDB_TOKEN);
-            if (popularFilms != null && popularFilms.results != null && !popularFilms.results.isEmpty()) {
-                List<FilmDeserializer> movies = popularFilms.results;
-                StringBuilder moviesListBuilder = new StringBuilder("Высоко-оцененные фильмы:\n");
-                for (int i = 0; i < constNumber; i++) {
-                    FilmDeserializer currentMovie = movies.get((popularMovieIndex + i) % movies.size());
-                    moviesListBuilder.append(popularMovieIndex + i + 1).append(". ").append(currentMovie.title).append("\n");
-                }
-                popularMovieIndex = (popularMovieIndex + constNumber) % movies.size();
-                responseMessage = moviesListBuilder.toString();
+            if (movies != null && movies.getResults() != null && !movies.getResults().isEmpty()) {
+                responseMessage = responseWithListOfMovies(movies, moviesListBuilder);
             } else {
-                responseMessage = "Данные не найдены";
+                responseMessage = reply("no data");
             }
-            commandWaiter.put(chatId, NONE);
-        } catch (FeignException e) {
-            if (e.status() == 404) {
-                responseMessage = "404: Данные не найдены";
-            } else {
-                responseMessage = "Что-то пошло не так";
-            }
+            COMMAND_WAITER.put(chatId, NONE);
         } catch (Exception e) {
-            responseMessage = "Пожалуйста, введите корректные данные";
+            responseMessage = reply("unexpected");
         }
+
         return responseMessage;
     }
 
-    protected String handleFindById(String messageText, long chatId) {
-        Validator<String> validator = new IdValidator();
+    public String handleFindById(String messageText, long chatId) {
+        Validator<String> validCommand = new CommandValidator();
+        if (validCommand.isValid(messageText)) {
+            COMMAND_WAITER.put(chatId, NONE);
+            return handleCommands(messageText, chatId);
+        }
 
-        if (!validator.isValid(messageText)) {
-            return validator.getErrorMessage();
+        Validator<String> validId = new IdValidator();
+        if (!validId.isValid(messageText)) {
+            return validId.getErrorMessage();
         }
 
         String responseMessage;
+        int id = Integer.parseInt(messageText);
+
         try {
-            int filmID = Integer.parseInt(messageText);
-            FilmDeserializer film = TMDB_SERVICE.getMovieById(TMDB_TOKEN, filmID);
-            ListDeserializer<VideoDeserializer> videos = TMDB_SERVICE.getVideosForFilm(TMDB_TOKEN, filmID);
-
-            if (film != null) {
-                StringBuilder filmBuilder = new StringBuilder(film.title);
-                if (!Objects.equals(film.original_language, "en")) {
-                    filmBuilder.append(" / ").append(film.original_title);
-                }
-                filmBuilder.append(" (").append(film.release_date, 0, 4).append(", ")
-                        .append(film.origin_country[0]).append(")").append("\n\n")
-                        .append(film.overview).append("\n\n")
-                        .append("Vote average: ").append(film.vote_average).append("/10\n")
-                        .append("Runtime: ").append(film.runtime).append(" min \n");
-
-                if (film.homepage != null) {
-                    filmBuilder.append("Link: ").append(film.homepage).append("\n");
-                }
-
-                for (int i = 0; i < videos.results.size(); i++) {
-                    if (videos.results.get(i).id != null &&
-                            Objects.equals(videos.results.get(i).name, "Official Trailer") &&
-                            Objects.equals(videos.results.get(i).site, "YouTube") &&
-                            Objects.equals(videos.results.get(i).type, "Trailer") &&
-                            videos.results.get(i).official) {
-                        filmBuilder.append("Trailer: ").
-                                append("https://youtube.com/watch?v=").append(videos.results.get(i).key).append("\n");
-                    }
-                }
-
-                responseMessage = filmBuilder.toString();
-            } else {
-                responseMessage = "Извините, я не нашел фильм";
-            }
-            commandWaiter.put(chatId, NONE);
+            responseMessage = responseWithMovie(id);
+            COMMAND_WAITER.put(chatId, NONE);
         } catch (Exception e) {
-            responseMessage = "Что-то пошло не так";
+            responseMessage = reply("unexpected");
         }
 
         return responseMessage;
     }
 
+    public String handleSetAge(String messageText, long chatId) {
+        Validator<String> validCommand = new CommandValidator();
+        if (validCommand.isValid(messageText)) {
+            COMMAND_WAITER.put(chatId, NONE);
+            return handleCommands(messageText, chatId);
+        }
 
-    protected String handleSetAge(String messageText, long chatId) {
-        Validator<String> validator = new AgeValidator();
-
-        if (!validator.isValid(messageText)) {
-            return validator.getErrorMessage();
+        Validator<String> validAge = new AgeValidator();
+        if (!validAge.isValid(messageText)) {
+            return validAge.getErrorMessage();
         }
 
         return "Спасибо! Учтем ваш ответ";
-    }
-
-
-    private ReplyKeyboardMarkup createCommandKeyboard() {
-        ReplyKeyboardMarkup keyboardMarkup = ReplyKeyboardMarkup.builder().build();
-        List<KeyboardRow> keyboard = new ArrayList<>();
-
-        KeyboardRow row1 = new KeyboardRow();
-        KeyboardRow row2 = new KeyboardRow();
-        KeyboardRow row3 = new KeyboardRow();
-        KeyboardRow row4 = new KeyboardRow();
-        KeyboardRow row5 = new KeyboardRow();
-        KeyboardRow row6 = new KeyboardRow();
-
-        row1.add("Genre");
-        row1.add("Year");
-        row2.add("Movie Search");
-        row2.add("Actor Search");
-        row3.add("Similar");
-        row3.add("Recommended");
-        row4.add("Popular");
-        row4.add("Find by ID");
-        row5.add("Top Rated");
-        row5.add("Set Age");
-        row6.add("Help");
-
-        keyboard.add(row1);
-        keyboard.add(row2);
-        keyboard.add(row3);
-        keyboard.add(row4);
-        keyboard.add(row5);
-        keyboard.add(row6);
-
-        keyboardMarkup.setKeyboard(keyboard);
-        keyboardMarkup.setResizeKeyboard(true);
-        keyboardMarkup.setOneTimeKeyboard(true);
-
-        return keyboardMarkup;
-    }
-
-    private ReplyKeyboardMarkup createGenreKeyboard() {
-        ReplyKeyboardMarkup keyboardMarkup = ReplyKeyboardMarkup.builder().build();
-        List<KeyboardRow> keyboard = new ArrayList<>();
-
-        KeyboardRow row1 = new KeyboardRow();
-        KeyboardRow row2 = new KeyboardRow();
-        KeyboardRow row3 = new KeyboardRow();
-        KeyboardRow row4 = new KeyboardRow();
-        KeyboardRow row5 = new KeyboardRow();
-        KeyboardRow row6 = new KeyboardRow();
-        KeyboardRow row7 = new KeyboardRow();
-
-        row1.add("Fantasy");
-        row1.add("Horror");
-        row1.add("Action");
-        row2.add("Music");
-        row2.add("War");
-        row2.add("Drama");
-        row3.add("Western");
-        row3.add("Family");
-        row3.add("Comedy");
-        row4.add("History");
-        row4.add("Crime");
-        row4.add("Mystery");
-        row5.add("Romance");
-        row5.add("Thriller");
-        row5.add("TV Movie");
-        row6.add("Science Fiction");
-        row6.add("Adventure");
-        row7.add("Animation");
-        row7.add("Documentary");
-
-        keyboard.add(row1);
-        keyboard.add(row2);
-        keyboard.add(row3);
-        keyboard.add(row4);
-        keyboard.add(row5);
-        keyboard.add(row6);
-        keyboard.add(row7);
-
-        keyboardMarkup.setKeyboard(keyboard);
-        keyboardMarkup.setResizeKeyboard(true);
-        keyboardMarkup.setOneTimeKeyboard(true);
-
-        return keyboardMarkup;
-    }
-
-    private ReplyKeyboardMarkup getKeyboardByWaiter(CommandWaiter waiter) {
-        if (waiter == NONE) {
-            return createCommandKeyboard();
-        } else if (waiter == GENRE) {
-            return createGenreKeyboard();
-        }
-        return null;
     }
 }

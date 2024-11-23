@@ -3,23 +3,22 @@ package oop.project;
 import feign.Param;
 import feign.RequestLine;
 import oop.project.deserializers.*;
-import oop.project.parameters.MovieParameters;
 
 public interface SiteRequests {
     @RequestLine("GET /authentication?api_key={api_key}")
-    AuthDeserializer checkAuthStatus(@Param("api_key") String token);
+    AuthDeserializer authStatus(@Param("api_key") String token);
 
     @RequestLine("GET /movie/popular?api_key={api_key}")
-    ListDeserializer<FilmDeserializer> getPopularMovies(@Param("api_key") String token);
+    ListDeserializer<FilmDeserializer> getPopular(@Param("api_key") String token);
 
     @RequestLine("GET /movie/{id}?api_key={api_key}")
     FilmDeserializer getMovieById(@Param("api_key") String token, @Param("id") int id);
 
     @RequestLine("GET /movie/{id}/similar?api_key={api_key}")
-    ListDeserializer<FilmDeserializer> getSimilarMovies(@Param("api_key") String token, @Param("id") int id);
+    ListDeserializer<FilmDeserializer> getSimilar(@Param("api_key") String token, @Param("id") int id);
 
     @RequestLine("GET /movie/{id}/recommendations?api_key={api_key}")
-    ListDeserializer<FilmDeserializer> getRecommendationsForMovie(@Param("api_key") String token, @Param("id") int id);
+    ListDeserializer<FilmDeserializer> getRecommended(@Param("api_key") String token, @Param("id") int id);
 
     @RequestLine("GET /movie/upcoming?api_key={api_key}")
     ListDeserializer<FilmDeserializer> getUpcoming(@Param("api_key") String token);
@@ -28,13 +27,13 @@ public interface SiteRequests {
     ListDeserializer<FilmDeserializer> getTopRated(@Param("api_key") String token);
 
     @RequestLine("GET /person/{id}?api_key={api_key}")
-    PersonDeserializer getActor(@Param("api_key") String token, @Param("id") int id);
+    PersonDeserializer getActorById(@Param("api_key") String token, @Param("id") int id);
 
     @RequestLine("GET /person/{id}/movie_credits?api_key={api_key}")
-    CreditsDeserializer getActorsFilms(@Param("api_key") String token, @Param("id") int id);
+    CreditsDeserializer getActorsMovies(@Param("api_key") String token, @Param("id") int id);
 
     @RequestLine("GET /movie/{id}/videos?api_key={api_key}")
-    ListDeserializer<VideoDeserializer> getVideosForFilm(@Param("api_key") String token, @Param("id") int id);
+    ListDeserializer<VideoDeserializer> getVideosForMovie(@Param("api_key") String token, @Param("id") int id);
 
     @RequestLine("GET /search/movie" +
             "?api_key={api_key}" +
@@ -81,7 +80,7 @@ public interface SiteRequests {
             "&release_date.lte={release_date_lte}" +
             "&sort_by={sort_by}" +
             "&vote_average.gte={vote_average_gte}" +
-            "&vote_average.gte={vote_average_lte}" +
+            "&vote_average.lte={vote_average_lte}" +
             "&with_genres={with_genres}" +
             "&with_origin_country={with_origin_country}" +
             "&with_runtime.gte={with_runtime_gte}" +
@@ -107,11 +106,11 @@ public interface SiteRequests {
             @Param("release_date_gte") String releaseDateGte,
             @Param("release_date_lte") String releaseDateLte,
             @Param("sort_by") String sortBy,
-            @Param("vote_average_gte") float voteAverageGte,
-            @Param("vote_average_lte") float voteAverageLte,
+            @Param("vote_average_gte") double voteAverageGte,
+            @Param("vote_average_lte") double voteAverageLte,
             @Param("with_genres") String withGenres,
             @Param("with_origin_country") String withOriginCountry,
-            @Param("with_runtime_gte") float withRuntimeGte,
+            @Param("with_runtime_gte") double withRuntimeGte,
             @Param("year") int year
             // ,
             // @Param("include_video") boolean includeVideo,
@@ -122,7 +121,7 @@ public interface SiteRequests {
             // @Param("with_companies") String withCompanies,
             // @Param("with_crew") String withCrew,
             // @Param("with_original_language") String withOriginalLanguage,
-            // @Param("with_runtime_lte") float withRuntimeLte,
+            // @Param("with_runtime_lte") double withRuntimeLte,
             // @Param("without_genres") String withoutGenres,
     );
 

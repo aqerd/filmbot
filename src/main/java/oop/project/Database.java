@@ -9,7 +9,7 @@ import java.util.Properties;
 
 public class Database {
     private Connection connection;
-    private static final Logger logger = LoggerFactory.getLogger(Database.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Database.class);
 
     public Database() {
         Properties properties = new Properties();
@@ -19,7 +19,7 @@ public class Database {
             String password = properties.getProperty("db.password");
             String connectionUrl = properties.getProperty("db.url");
             connection = DriverManager.getConnection(connectionUrl, username, password);
-            logger.info("Connected to database");
+            LOG.info("Connected to database");
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }

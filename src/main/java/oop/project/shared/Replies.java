@@ -4,10 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Replies {
-    private static final Map<String, String> replies = new HashMap<>();
+    private static final Map<String, String> REPLIES = new HashMap<>();
 
     static {
-        replies.put("start", """
+        REPLIES.put("start", """
                         Привет! Я бот по поиску фильмов.
                         У меня есть следующие команды:
                         /genre - Поиск по жанру
@@ -18,10 +18,10 @@ public class Replies {
                         /recommended - Рекомендуемые фильмы
                         /popular - Популярные фильмы
                         /toprated - Высоко-оценённые фильмы
-                        /findbyid - поиск фильма по ID TMDB
+                        /findbyid - Поиск фильма по ID TMDB
                         /setage - Установить возрастное ограничение
                         /help - Справка""");
-        replies.put("help", """
+        REPLIES.put("help", """
                         Доступны следующие команды:
                         /genre - Поиск по жанру
                         /year - Поиск по году
@@ -31,21 +31,23 @@ public class Replies {
                         /recommended - Рекомендуемые фильмы
                         /popular - Популярные фильмы
                         /toprated - Высоко-оценённые фильмы
-                        /findbyid - поиск фильма по ID TMDB
+                        /findbyid - Поиск фильма по ID TMDB
                         /setage - Установить возрастное ограничение""");
-        replies.put("genre", "Введите жанр, и я найду фильмы по нему");
-        replies.put("year", "Введите год, и я найду фильмы, выпущенные в этом году");
-        replies.put("movie search", "Введите фильм который вы хотите найти");
-        replies.put("actor search", "Введите актёра которого вы хотите найти");
-        replies.put("similar", "Введите ID фильма к которому вы хотите найти похожие фильмы");
-        replies.put("recommended", "Введите ID фильма к которому вы хотите найти рекомендации");
-        replies.put("find by id", "Введите ID фильма из сервиса TMDB");
-        replies.put("set age", "Введите ваш полный возраст");
-        replies.put("genre", "Введите жанр, и я найду фильмы по нему");
-        replies.put("unknown", "Команда не распознана. Введите /help для получения списка команд");
+        REPLIES.put("year", "Введите год, и я найду фильмы, выпущенные в этом году");
+        REPLIES.put("movie search", "Введите фильм который вы хотите найти");
+        REPLIES.put("actor search", "Введите актёра которого вы хотите найти");
+        REPLIES.put("similar", "Введите ID фильма к которому вы хотите найти похожие фильмы");
+        REPLIES.put("recommended", "Введите ID фильма к которому вы хотите найти рекомендации");
+        REPLIES.put("find by id", "Введите ID фильма из сервиса TMDB");
+        REPLIES.put("set age", "Введите ваш полный возраст");
+        REPLIES.put("genre", "Введите жанр, и я найду фильмы по нему");
+        REPLIES.put("invalid", "Введите правильные данные!");
+        REPLIES.put("unexpected", "Не удалось обработать запрос");
+        REPLIES.put("no data", "Ничего не найдено");
+        REPLIES.put("unknown", "Команда не распознана. Введите /help для получения списка команд");
     }
 
-    public static String getReply(String command) {
-        return replies.getOrDefault(command, "Вы не должны это видеть \uD83D\uDC40");
+    public static String reply(String command) {
+        return REPLIES.getOrDefault(command, "Вы не должны это видеть \uD83D\uDC40");
     }
 }
