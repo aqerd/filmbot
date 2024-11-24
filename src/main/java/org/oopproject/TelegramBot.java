@@ -14,11 +14,11 @@ import static org.oopproject.utils.Validators.isCommand;
 import static org.oopproject.utils.Replies.getReply;
 import java.lang.reflect.Type;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDate;
+import java.util.*;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
+
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -98,7 +98,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             }
         }
     }
-  
+
     private void loadGenreIndexFromDatabase(long chatId) {
         String jsonGenreString = database.getGenreIndexesJson(chatId);
         if (jsonGenreString != null) {
@@ -287,7 +287,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     protected void handleSubscribe(long chatId) {
         database.updateSubscribe(chatId, true);
     }
-  
+
     protected void handleUnsubscribe(long chatId) {
         database.updateSubscribe(chatId, false);
     }
@@ -317,15 +317,76 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         return responseMessage;
     }
 
-    public void startBroadcasting() {
-        scheduler.scheduleAtFixedRate(()-> {
-            List<Long> subscribedUsers = database.getSubscribedUsers();
-            for (Long chatId : subscribedUsers) {
-                sendMessage(chatId, "Подписчику");
+    public List<FilmDeserializer> getUpcomingMovies() {
+        try {
+            // Получаем текущий год и месяц для фильтрации премьеров
+            LocalDate currentDate = LocalDate.now();
+            int currentYear = currentDate.getYear();
+            int currentMonth = currentDate.getMonthValue();
+
+            // Создаем параметры запроса для фильмов, которые были выпущены в текущем месяце
+            MovieParameters params = new MovieParameters(
+                    "240e7fef369901fb314c80d53d1532d1", // Используйте ваш API ключ TMDb
+                    "PG-13",             // Уровень сертификации
+                    "US",                // Страна сертификации
+                    false,               // Без взрослых фильмов
+                    "ru",                // Язык (русский)
+                    1,                   // Страница
+                    "2024-11-01",       // Начальная дата
+                    currentDate.toString(), // Конечная дата
+                    "release_date.asc",   // Сортировка по дате релиза
+                    0,                   // Минимальный рейтинг
+                    10,                  // Максимальный рейтинг
+                    "",                  // Жанры
+                    "US",                // Страна происхождения
+                    0,                   // Минимальное время
+                    currentYear          // Год
+            );
+
+            // Выполнение запроса
+            ListDeserializer movieList = tmdbService.findMovie(params);
+            if (movieList != null && movieList.results != null) {
+                // Возвращаем первые 5 фильмов
+                return movieList.results.stream().limit(10).collect(Collectors.toList());
             }
-        }, 0, 1, TimeUnit.MINUTES);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return Collections.emptyList();
     }
-  
+
+
+    public void startBroadcasting() {
+        scheduler.scheduleAtFixedRate(() -> {
+            List<Long> subscribedUsers = database.getSubscribedUsers();
+            List<FilmDeserializer> upcomingMovies = getUpcomingMovies(); // Получаем премьеры
+
+            for (Long chatId : subscribedUsers) {
+                StringBuilder messageText = new StringBuilder("🎬 Фильмы премьеры:\n");
+
+                if (upcomingMovies.isEmpty()) {
+                    messageText.append("К сожалению, нет новых фильмов на данный момент.");
+                } else {
+                    for (int i = 0; i < upcomingMovies.size(); i++) {
+                        FilmDeserializer movie = upcomingMovies.get(i);
+                        messageText.append(i + 1)
+                                .append(". ")
+                                .append(movie.title)
+                                .append("\n")
+                                .append("Дата выхода: ")
+                                .append(movie.release_date)
+                                .append("\n")
+                                .append("Рейтинг: ")
+                                .append(movie.vote_average)
+                                .append("\n\n");
+                    }
+                }
+                sendMessage(chatId, messageText.toString()); // Отправляем сообщение
+            }
+        }, 0, 1, TimeUnit.MINUTES); // С интервалом в 1 минуту
+    }
+
+
     private void sendMessage(long chatId, String text) {
         SendMessage message=SendMessage.builder()
                 .chatId(chatId)
@@ -337,7 +398,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             e.printStackTrace();
         }
     }
-  
+
     public String handleSubscription(String messageText, long chatId) {
         if (isCommand(messageText)) {
             commandWaiter.put(chatId, NONE);
@@ -364,19 +425,4 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         return responseMessage;
     }
 
-//    protected void broadcastMessage(String message) {
-//        List<Long> users = database.getSubscribedUsers();
-//        for (Long chatId : users) {
-//            new SendMessage(chatId, message);
-//        }
-//    }
-//    protected void handleGetAge( long chatId) {
-//        Integer userAge = database.getUserAge(chatId);
-//        if (userAge != null) {
-//            System.out.println("возраст "+ userAge);
-//        }
-//        else {
-//            System.out.println("не нашли возраст");
-//        }
-//    }
 }
