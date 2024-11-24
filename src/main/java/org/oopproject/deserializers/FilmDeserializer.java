@@ -27,6 +27,7 @@ public class FilmDeserializer {
     public boolean video;
     public double vote_average;
     public double vote_count;
+    public String trailerUrl;
 //    public boolean belongs_to_collection;
 //    public List<FilmDeserializer> production_companies;
 //    public List<FilmDeserializer> production_countries;
