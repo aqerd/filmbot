@@ -1,6 +1,6 @@
 package oop.project;
 
-import static oop.project.handlers.Commands.handleMessage;
+import static oop.project.handlers.Message.handleMessage;
 import static oop.project.handlers.InlineMode.handleInlineQuery;
 import static oop.project.handlers.Buttons.handleButtons;
 import java.sql.SQLException;

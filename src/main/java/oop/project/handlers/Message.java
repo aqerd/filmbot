@@ -30,8 +30,8 @@ import static oop.project.shared.Replies.reply;
 import static oop.project.shared.Responses.responseWithListOfMovies;
 import static oop.project.shared.Responses.responseWithMovie;
 
-public class Commands {
-    private static final Logger LOG = LoggerFactory.getLogger(Commands.class);
+public class Message {
+    private static final Logger LOG = LoggerFactory.getLogger(Message.class);
     private static final TelegramClient TG_CLIENT = getTelegramClient();
 
 //    private final Database database = new Database();
