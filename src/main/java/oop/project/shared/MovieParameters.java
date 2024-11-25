@@ -1,4 +1,4 @@
-package oop.project;
+package oop.project.shared;
 
 import static oop.project.shared.Config.apiToken;
 

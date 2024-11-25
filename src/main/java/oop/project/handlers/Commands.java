@@ -1,6 +1,6 @@
 package oop.project.handlers;
 
-import oop.project.MovieParameters;
+import oop.project.shared.MovieParameters;
 import oop.project.deserializers.FilmDeserializer;
 import oop.project.deserializers.ListDeserializer;
 import oop.project.deserializers.PersonDeserializer;
@@ -107,7 +107,6 @@ public class Commands {
             e.printStackTrace();
         }
     }
-
 
 //    private void loadGenreIndexFromDatabase(long chatId) {
 //        String jsonGenreString = database.getGenreIndexesJson(chatId);
