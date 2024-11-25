@@ -1,20 +1,13 @@
 package oop.project;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import oop.project.shared.Utils;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class UtilsTest {
-
     static class SampleObject {
-        private String name;
-        private int age;
-
         public SampleObject(String name, int age) {
-            this.name = name;
-            this.age = age;
         }
     }
 
