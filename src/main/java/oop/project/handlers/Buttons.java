@@ -5,24 +5,25 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import static java.lang.Integer.parseInt;
+import static oop.project.TelegramBot.getTelegramClient;
 import static oop.project.shared.Responses.responseWithMovie;
 import static oop.project.shared.Responses.responseWithPerson;
 
 public class Buttons {
-    public static void handleButtons(Update update, TelegramClient tgClient) {
-        if (update.hasCallbackQuery()) {
-            String callbackData = update.getCallbackQuery().getData();
-            long chatId = update.getCallbackQuery().getMessage().getChatId();
+    private static final TelegramClient TG_CLIENT = getTelegramClient();
 
-            if (callbackData.startsWith("movie_")) {
-                handleMovieButtons(callbackData, chatId, update, tgClient);
-            } else if (callbackData.startsWith("actor_")) {
-                handleActorButtons(callbackData, chatId, update, tgClient);
-            }
+    public static void handleButtons(Update update) {
+        String callbackData = update.getCallbackQuery().getData();
+        long chatId = update.getCallbackQuery().getMessage().getChatId();
+
+        if (callbackData.startsWith("movie_")) {
+            handleMovieButtons(callbackData, chatId);
+        } else if (callbackData.startsWith("actor_")) {
+            handleActorButtons(callbackData, chatId);
         }
     }
 
-    public static void handleMovieButtons(String callbackData, long chatId, Update update, TelegramClient tgClient) {
+    public static void handleMovieButtons(String callbackData, long chatId) {
         int id = parseInt(callbackData.substring(6));
         String response = responseWithMovie(id);
 
@@ -34,13 +35,13 @@ public class Buttons {
         message.enableMarkdown(true);
 
         try {
-            tgClient.execute(message);
+            TG_CLIENT.execute(message);
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
     }
 
-    public static void handleActorButtons(String callbackData, long chatId, Update update, TelegramClient tgClient) {
+    public static void handleActorButtons(String callbackData, long chatId) {
         int id = parseInt(callbackData.substring(6));
         String response = responseWithPerson(id);
 
@@ -52,7 +53,7 @@ public class Buttons {
         message.enableMarkdown(true);
 
         try {
-            tgClient.execute(message);
+            TG_CLIENT.execute(message);
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
