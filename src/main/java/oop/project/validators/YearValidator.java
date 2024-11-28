@@ -19,4 +19,3 @@ public class YearValidator implements Validator<String> {
         return "Пожалуйста, введите год в диапазоне от " + minYear + " до " + maxYear;
     }
 }
-

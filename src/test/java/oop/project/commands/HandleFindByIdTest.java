@@ -24,8 +24,6 @@ public class HandleFindByIdTest extends BaseHandleTest {
     void testHandleFindByIdWithInvalidId() {
         String invalidId = "invalid";
         String response = Message.handleFindById(invalidId, CHAT_ID);
-
-        // Проверяем, что возвращается сообщение об ошибке валидации ID
         assertEquals("Пожалуйста, введите корректный ID!", response, "Responses should indicate invalid ID format.");
     }
 

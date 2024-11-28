@@ -66,7 +66,7 @@ public class Responses {
             filmBuilder.append(" / ").append(film.getOriginal_title());
         }
         filmBuilder.append(" (").append(film.getRelease_date(), 0, 4).append(", ")
-                .append(film.getOrigin_country()[0]).append(")").append("\n\n")
+                .append(film.getOrigin_country().get(0)).append(")").append("\n\n")
                 .append(film.getOverview().replace("\n", " ")).append("\n\n")
                 .append("Vote average: ").append(film.getVote_average()).append("/10\n")
                 .append("Runtime: ").append(film.getRuntime()).append(" min \n");

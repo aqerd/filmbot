@@ -37,8 +37,8 @@ public class InlineMode {
         if (filmsToProcess == 0) {
             AnswerInlineQuery emptyResponse = AnswerInlineQuery.builder()
                     .inlineQueryId(update.getInlineQuery().getId())
-                    .results(new ArrayList<>()) // Пустой список
-                    .cacheTime(1) // Минимальный кэш
+                    .results(new ArrayList<>())
+                    .cacheTime(1)
                     .build();
             try {
                 TG_CLIENT.execute(emptyResponse);
@@ -54,7 +54,7 @@ public class InlineMode {
             FilmDeserializer movie = movies.get(i);
             String title = movie.getTitle();
             String year = movie.getRelease_date().substring(0, 4);
-            String country = movie.getOrigin_country()[0]; // Предполагается, что массив стран не пустой
+            String country = movie.getOrigin_country().get(0);
 
             String formattedTitle = title + " (" + year + " / " + country + ")";
 
@@ -63,7 +63,7 @@ public class InlineMode {
                     .build();
 
             InlineQueryResultArticle result = InlineQueryResultArticle.builder()
-                    .id(String.valueOf(movie.getId())) // Уникальный ID для каждого фильма
+                    .id(String.valueOf(movie.getId()))
                     .title(formattedTitle)
                     .description(movie.getOverview())
                     .inputMessageContent(messageContent)
@@ -75,7 +75,7 @@ public class InlineMode {
         AnswerInlineQuery answer = AnswerInlineQuery.builder()
                 .inlineQueryId(update.getInlineQuery().getId())
                 .results(results)
-                .cacheTime(1) // Минимальный кэш
+                .cacheTime(1)
                 .build();
 
         try {
