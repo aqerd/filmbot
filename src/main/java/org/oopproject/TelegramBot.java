@@ -63,6 +63,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         if (update.hasMessage() && update.getMessage().hasText()) {
             long chatId = update.getMessage().getChatId();
             database.insertChatId(chatId);
+            Integer userAge=getUserAge(chatId);
             loadGenreIndexFromDatabase(chatId);
             loadYearIndexFromDatabase(chatId);
 
@@ -322,6 +323,10 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         }
 //        handleGetAge(chatId);
         return responseMessage;
+    }
+
+    public Integer getUserAge(long chatId) {
+        return database.getUserAge(chatId);
     }
 
     public class MovieService {
