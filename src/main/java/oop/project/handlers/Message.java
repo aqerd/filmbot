@@ -1,5 +1,8 @@
 package oop.project.handlers;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import oop.project.Database;
 import oop.project.shared.MovieParameters;
 import oop.project.deserializers.FilmDeserializer;
 import oop.project.deserializers.ListDeserializer;
@@ -7,6 +10,7 @@ import oop.project.deserializers.PersonDeserializer;
 import oop.project.shared.CommandWaiter;
 import oop.project.shared.Genres;
 import oop.project.validators.*;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,8 +38,8 @@ public class Message {
     private static final Logger LOG = LoggerFactory.getLogger(Message.class);
     private static final TelegramClient TG_CLIENT = getTelegramClient();
 
-//    private final Database database = new Database();
-//    private final Gson gson = new Gson();
+    private static final Database database = new Database();
+    private static final Gson gson = new Gson();
 
     private static final int SEARCH_NUM = 6;
 
@@ -45,9 +49,9 @@ public class Message {
 
     public static void handleMessage(Update update) {
         long chatId = update.getMessage().getChatId();
-//            database.insertChatId(chatId);
-//            loadGenreIndexFromDatabase(chatId);
-//            loadYearIndexFromDatabase(chatId);
+            database.insertChatId(chatId);
+            loadGenreIndexFromDatabase(chatId);
+            loadYearIndexFromDatabase(chatId);
 
         String messageText = update.getMessage().getText();
         String responseMessage;
@@ -108,21 +112,21 @@ public class Message {
         }
     }
 
-//    private void loadGenreIndexFromDatabase(long chatId) {
-//        String jsonGenreString = database.getGenreIndexesJson(chatId);
-//        if (jsonGenreString != null) {
-//            Type type = new TypeToken<HashMap<String, Integer>>(){}.getType();
-//            genreMovieIndexMap.putAll(gson.fromJson(jsonGenreString, type));
-//        }
-//    }
-//
-//    private void loadYearIndexFromDatabase(long chatId) {
-//        String jsonYearString = database.getYearIndexesJson(chatId);
-//        if (jsonYearString != null) {
-//            Type type = new TypeToken<HashMap<Integer, Integer>>(){}.getType();
-//            yearMovieIndexMap.putAll(gson.fromJson(jsonYearString, type));
-//        }
-//    }
+    private static void loadGenreIndexFromDatabase(long chatId) {
+        String jsonGenreString = database.getGenreIndexesJson(chatId);
+        if (jsonGenreString != null) {
+            Type type = new TypeToken<HashMap<String, Integer>>(){}.getType();
+            genreMovieIndexMap.putAll(gson.fromJson(jsonGenreString, type));
+        }
+    }
+
+    private static void loadYearIndexFromDatabase(long chatId) {
+        String jsonYearString = database.getYearIndexesJson(chatId);
+        if (jsonYearString != null) {
+            Type type = new TypeToken<HashMap<Integer, Integer>>(){}.getType();
+            yearMovieIndexMap.putAll(gson.fromJson(jsonYearString, type));
+        }
+    }
 
     public static String handleCommands(String messageText, long chatId) {
         String responseMessage;
@@ -180,10 +184,10 @@ public class Message {
         return responseMessage;
     }
 
-//    private void updateGenreIndexInDatabase(long chatId) {
-//        String jsonGenreString = gson.toJson(genreMovieIndexMap);
-//        database.updateGenreIndexesJson(chatId, jsonGenreString);
-//    }
+    private static void updateGenreIndexInDatabase(long chatId) {
+        String jsonGenreString = gson.toJson(genreMovieIndexMap);
+        database.updateGenreIndexesJson(chatId, jsonGenreString);
+    }
 
     public static String handleGenre(String messageText, long chatId) {
         Validator<String> validCommand = new CommandValidator();
@@ -202,7 +206,7 @@ public class Message {
         try {
             if (movies != null && movies.getResults() != null && !movies.getResults().isEmpty()) {
                 responseMessage = responseWithListOfMovies(movies, moviesListBuilder, currentIndex, genreMovieIndexMap, genreId);
-//                updateGenreIndexInDatabase(chatId);
+                updateGenreIndexInDatabase(chatId);
             } else {
                 responseMessage = "Извините, я не нашел фильмов для жанра " + messageText;
             }
@@ -214,10 +218,10 @@ public class Message {
         return responseMessage;
     }
 
-//    private void updateYearIndexInDatabase(long chatId) {
-//        String jsonYearString = gson.toJson(yearMovieIndexMap);
-//        database.updateYearIndexesJson(chatId, jsonYearString);
-//    }
+    private static void updateYearIndexInDatabase(long chatId) {
+        String jsonYearString = gson.toJson(yearMovieIndexMap);
+        database.updateYearIndexesJson(chatId, jsonYearString);
+    }
 
     public static String handleYear(String messageText, long chatId) {
         Validator<String> validCommand = new CommandValidator();
@@ -241,7 +245,7 @@ public class Message {
         try {
             if (movies != null && movies.getResults() != null && !movies.getResults().isEmpty()) {
                 responseMessage = responseWithListOfMovies(movies, moviesListBuilder, currentIndex, yearMovieIndexMap, userYear);
-//                updateYearIndexInDatabase(chatId);
+                updateYearIndexInDatabase(chatId);
             } else {
                 responseMessage = "Извините, я не нашел фильмов за " + userYear + " год";
             }

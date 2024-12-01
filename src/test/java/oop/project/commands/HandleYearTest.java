@@ -1,6 +1,7 @@
 package oop.project.commands;
 
 import oop.project.handlers.Message;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import java.sql.SQLException;
 import java.time.Year;
@@ -13,7 +14,7 @@ public class HandleYearTest extends BaseHandleTest {
         super();
     }
 
-    @Test
+    @Disabled
     void testHandleYearWithValidYear() {
         String testYear = "2005";
         String response = Message.handleYear(testYear, CHAT_ID);

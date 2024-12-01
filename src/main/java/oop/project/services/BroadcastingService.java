@@ -1,11 +1,10 @@
-package org.oopproject.services;
+package oop.project.services;
 
-import org.oopproject.Database;
-import org.oopproject.deserializers.FilmDeserializer;
+import oop.project.Database;
+import oop.project.deserializers.FilmDeserializer;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
-
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -38,16 +37,16 @@ public class BroadcastingService {
                         FilmDeserializer movie = upcomingMovies.get(i);
                         messageText.append(i + 1)
                                 .append(". ")
-                                .append(movie.title)
+                                .append(movie.getTitle())
                                 .append("\n")
                                 .append("Дата выхода: ")
-                                .append(movie.release_date)
+                                .append(movie.getRelease_date())
                                 .append("\n")
                                 .append("Описание: ")
-                                .append(movie.overview != null && !movie.overview.isEmpty() ? movie.overview : "Нет описания")
+                                .append(movie.getOverview() != null && !movie.getOverview().isEmpty() ? movie.getOverview() : "Нет описания")
                                 .append("\n");
-                        if (movie.trailerUrl != null) {
-                            messageText.append("Ссылка на трейлер: ").append(movie.trailerUrl).append("\n");
+                        if (movie.getTrailerUrl() != null) {
+                            messageText.append("Ссылка на трейлер: ").append(movie.getTrailerUrl()).append("\n");
                         }
 
                         messageText.append("\n");

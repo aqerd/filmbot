@@ -24,6 +24,7 @@ public class FilmDeserializer {
     private String status;
     private String tagline;
     private String title;
+    private String trailerUrl;
     private boolean video;
     private double vote_average;
     private double vote_count;
@@ -198,6 +199,14 @@ public boolean isAdult() {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getTrailerUrl() {
+        return trailerUrl;
+    }
+
+    public void setTrailerUrl(String trailerUrl) {
+        this.trailerUrl = trailerUrl;
     }
 
     public boolean isVideo() {
