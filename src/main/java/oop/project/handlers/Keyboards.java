@@ -38,7 +38,7 @@ public class Keyboards {
 
     private static ReplyKeyboardMarkup buildCommandKeyboard() {
         List<String> commands = List.of("Genre", "Year", "Movie Search", "Actor Search",
-                "Similar", "Recommended", "Popular", "Find by ID", "Top Rated", "Set Age", "Help");
+                "Similar", "Recommended", "Popular", "Find by ID", "Top Rated", "Set Age", "Subscribe", "Help");
         int columns = 2;
         return createKeyboard(commands, columns);
     }
