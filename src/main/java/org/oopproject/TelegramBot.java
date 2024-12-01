@@ -14,6 +14,8 @@ import org.oopproject.utils.Genres;
 import org.oopproject.parameters.MovieParameters;
 import org.oopproject.parameters.ParametersBuilder;
 import org.oopproject.deserializers.FilmDeserializer;
+
+import static org.oopproject.utils.AgeRating.getRatingForAge;
 import static org.oopproject.utils.CommandWaiter.*;
 import static org.oopproject.utils.Config.tmdbService;
 import static org.oopproject.utils.Validators.isCommand;
@@ -251,7 +253,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         try {
             int userYear = Integer.parseInt(messageText);
             int currentYear = java.time.Year.now().getValue();
-
+            String userRating = getRatingForAge(getUserAge(chatId));
             if (userYear < 1900 || userYear > currentYear) {
                 responseMessage = "Пожалуйста, введите год в диапазоне от 1900 до " + currentYear;
                 return responseMessage;
@@ -259,8 +261,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
             MovieParameters params = new ParametersBuilder()
                     .withYear(userYear)
-                    .withCertificationLte("PG-13")
-                    .withCertificationCountry("US")
+                    .withCertificationLte(userRating)
                     .build();
             ListDeserializer moviesByYear = tmdbService.findMovie(params);
 
@@ -441,9 +442,6 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         }
     }
 
-
-
-
     private void sendMessage(long chatId, String text) {
         SendMessage message=SendMessage.builder()
                 .chatId(chatId)
@@ -481,5 +479,4 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         }
         return responseMessage;
     }
-
 }
