@@ -104,7 +104,7 @@ public class Message {
         try {
             TG_CLIENT.execute(message);
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            LOG.error("Unexpected Telegram API error, Message: {}, ID: {}", messageText, chatId);
         }
     }
 

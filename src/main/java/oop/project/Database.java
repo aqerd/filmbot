@@ -21,7 +21,7 @@ public class Database {
             connection = DriverManager.getConnection(connectionUrl, username, password);
             LOG.info("Connected to database");
         } catch (SQLException | IOException e) {
-            e.printStackTrace();
+            LOG.error("Unexpected SQL or IO error: {}", e.getMessage());
         }
     }
 
@@ -31,7 +31,7 @@ public class Database {
             insertStatement.setLong(1, chatId);
             insertStatement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Unexpected SQL error in insertChatId: {}", e.getMessage());
         }
     }
 
@@ -42,7 +42,7 @@ public class Database {
             updateStatement.setLong(2, chatId);
             updateStatement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Unexpected SQL error in updateGenreIndexesJson {}", e.getMessage());
         }
     }
 
@@ -55,7 +55,7 @@ public class Database {
                 return resultSet.getString("genreIndexesJson");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Unexpected SQL error in getGenreIndexesJson {}", e.getMessage());
         }
         return null;
     }
@@ -67,7 +67,7 @@ public class Database {
             updateStatement.setLong(2, chatId);
             updateStatement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Unexpected SQL error in updateYearIndexesJson {}", e.getMessage());
         }
     }
 
@@ -80,7 +80,7 @@ public class Database {
                 return resultSet.getString("yearIndexesJson");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Unexpected SQL error in getYearIndexesJson {}", e.getMessage());
         }
         return null;
     }

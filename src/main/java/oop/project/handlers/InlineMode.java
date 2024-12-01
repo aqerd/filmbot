@@ -58,7 +58,7 @@ public class InlineMode {
         try {
             TG_CLIENT.execute(answer);
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            LOG.error("Unexpected Telegram API error, Query: {}", query);
         }
     }
 }
