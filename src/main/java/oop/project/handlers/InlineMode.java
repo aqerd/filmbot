@@ -33,8 +33,9 @@ public class InlineMode {
         ListDeserializer<FilmDeserializer> films = tmdbService()
                 .searchMovie(apiToken(), query, "en-US", 1).sortByPopularity();
         List<InlineQueryResult> results = new ArrayList<>();
+        int minNum = Math.min(SEARCH_NUM, films.getResults().size());
 
-        for (int i = 0; i < Math.min(SEARCH_NUM, films.getResults().size()); i++) {
+        for (int i = 0; i < minNum; i++) {
             String id = String.valueOf(i);
             FilmDeserializer currentFilm = films.getResults().get(i);
             InlineQueryResultArticle article = InlineQueryResultArticle.builder()
