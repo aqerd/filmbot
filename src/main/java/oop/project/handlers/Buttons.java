@@ -41,7 +41,7 @@ public class Buttons {
         try {
             TG_CLIENT.execute(message);
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            LOG.error("Unexpected Telegram API error, Callback Data: {}, ID: {}", callbackData, chatId, e);
         }
     }
 
@@ -59,7 +59,7 @@ public class Buttons {
         try {
             TG_CLIENT.execute(message);
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            LOG.error("Unexpected Telegram API error, Callback Data: {}, ID: {}", callbackData, chatId, e);
         }
     }
 }
