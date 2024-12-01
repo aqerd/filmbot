@@ -60,7 +60,6 @@ public class Database {
             e.printStackTrace();
         }
         return null;
-
     }
 
     public void updateGenreIndexesJson(long chatId, String genreIndexesJson) {

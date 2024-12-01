@@ -2,12 +2,13 @@ package org.oopproject;
 
 import feign.Param;
 import feign.RequestLine;
-import org.oopproject.deserializers.FilmDeserializer;
+import org.oopproject.deserializers.*;
 import org.oopproject.parameters.MovieParameters;
-import org.oopproject.deserializers.AuthDeserializer;
-import org.oopproject.deserializers.ListDeserializer;
+
+import java.util.List;
 
 public interface SiteRequests {
+
     @RequestLine("GET /authentication?api_key={api_key}")
     AuthDeserializer checkAuthStatus(@Param("api_key") String token);
 
@@ -16,6 +17,18 @@ public interface SiteRequests {
 
     @RequestLine("GET /movie/{id}?api_key={api_key}")
     FilmDeserializer getMovieById(@Param("api_key") String token, @Param("id") String id);
+
+    @RequestLine("GET /movie/upcoming?api_key={api_key}&language={language}&page={page}")
+    ListDeserializer findUpcomingMovies(@Param("api_key") String token,
+                                               @Param("language") String language,
+                                               @Param("page") int page);
+
+    @RequestLine("GET /movie/{id}/videos?api_key={api_key}&language={language}")
+    MovieVideosResponse getMovieVideos(@Param("api_key") String token,
+                                       @Param("id") String movieId,
+                                       @Param("language") String language);
+
+
 
     @RequestLine("GET /discover/movie" +
             "?api_key={api_key}" +

@@ -3,22 +3,22 @@ package org.oopproject;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.oopproject.deserializers.ListDeserializer;
+import org.oopproject.services.BroadcastingService;
 import org.oopproject.utils.CommandWaiter;
 import org.oopproject.utils.Genres;
 import org.oopproject.parameters.MovieParameters;
 import org.oopproject.parameters.ParametersBuilder;
 import org.oopproject.deserializers.FilmDeserializer;
+
+import static org.oopproject.utils.AgeRating.getRatingForAge;
 import static org.oopproject.utils.CommandWaiter.*;
 import static org.oopproject.utils.Config.tmdbService;
 import static org.oopproject.utils.Validators.isCommand;
 import static org.oopproject.utils.Replies.getReply;
 import java.lang.reflect.Type;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.*;
+
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -42,10 +42,10 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     private final HashMap<String, Integer> genreMovieIndexMap = new HashMap<>();
     private final Map<Long, CommandWaiter> commandWaiter = new ConcurrentHashMap<>();
 
-    public TelegramBot(String botToken) throws SQLException {
+    public TelegramBot(String botToken) {
         telegramClient = new OkHttpTelegramClient(botToken);
-        startBroadcasting();
-    }
+        BroadcastingService broadcastingService = new BroadcastingService(database, telegramClient);
+        broadcastingService.startBroadcasting();    }
 
     @Override
     public void consume(Update update) {
@@ -56,6 +56,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         if (update.hasMessage() && update.getMessage().hasText()) {
             long chatId = update.getMessage().getChatId();
             database.insertChatId(chatId);
+            Integer userAge=getUserAge(chatId);
             loadGenreIndexFromDatabase(chatId);
             loadYearIndexFromDatabase(chatId);
 
@@ -98,7 +99,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             }
         }
     }
-  
+
     private void loadGenreIndexFromDatabase(long chatId) {
         String jsonGenreString = database.getGenreIndexesJson(chatId);
         if (jsonGenreString != null) {
@@ -189,11 +190,11 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
         try {
             String genreId = Genres.valueOf(messageText.toUpperCase()).genreId;
+            String userRating = getRatingForAge(getUserAge(chatId));
 
             MovieParameters params = new ParametersBuilder()
                     .withGenres(genreId)
-                    .withCertificationLte("PG-13")
-                    .withCertificationCountry("US")
+                    .withCertificationLte(userRating)
                     .build();
             ListDeserializer moviesByGenre = tmdbService.findMovie(params);
 
@@ -211,7 +212,6 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 genreMovieIndexMap.put(genreId, currentIndex);
 
                 updateGenreIndexInDatabase(chatId);
-
 
                 responseMessage = movieListBuilder.toString();
 
@@ -232,7 +232,6 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     }
 
     protected String handleYear(String messageText, long chatId) {
-
         if (isCommand(messageText)) {
             commandWaiter.put(chatId, NONE);
             return handleCommands(messageText, chatId);
@@ -243,7 +242,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         try {
             int userYear = Integer.parseInt(messageText);
             int currentYear = java.time.Year.now().getValue();
-
+            String userRating = getRatingForAge(getUserAge(chatId));
             if (userYear < 1900 || userYear > currentYear) {
                 responseMessage = "Пожалуйста, введите год в диапазоне от 1900 до " + currentYear;
                 return responseMessage;
@@ -251,8 +250,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
             MovieParameters params = new ParametersBuilder()
                     .withYear(userYear)
-                    .withCertificationLte("PG-13")
-                    .withCertificationCountry("US")
+                    .withCertificationLte(userRating)
                     .build();
             ListDeserializer moviesByYear = tmdbService.findMovie(params);
 
@@ -287,7 +285,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     protected void handleSubscribe(long chatId) {
         database.updateSubscribe(chatId, true);
     }
-  
+
     protected void handleUnsubscribe(long chatId) {
         database.updateSubscribe(chatId, false);
     }
@@ -317,15 +315,12 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         return responseMessage;
     }
 
-    public void startBroadcasting() {
-        scheduler.scheduleAtFixedRate(()-> {
-            List<Long> subscribedUsers = database.getSubscribedUsers();
-            for (Long chatId : subscribedUsers) {
-                sendMessage(chatId, "Подписчику");
-            }
-        }, 0, 1, TimeUnit.MINUTES);
+    public Integer getUserAge(long chatId) {
+        return database.getUserAge(chatId);
     }
-  
+
+
+
     private void sendMessage(long chatId, String text) {
         SendMessage message=SendMessage.builder()
                 .chatId(chatId)
@@ -337,7 +332,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             e.printStackTrace();
         }
     }
-  
+
     public String handleSubscription(String messageText, long chatId) {
         if (isCommand(messageText)) {
             commandWaiter.put(chatId, NONE);
@@ -363,20 +358,4 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         }
         return responseMessage;
     }
-
-//    protected void broadcastMessage(String message) {
-//        List<Long> users = database.getSubscribedUsers();
-//        for (Long chatId : users) {
-//            new SendMessage(chatId, message);
-//        }
-//    }
-//    protected void handleGetAge( long chatId) {
-//        Integer userAge = database.getUserAge(chatId);
-//        if (userAge != null) {
-//            System.out.println("возраст "+ userAge);
-//        }
-//        else {
-//            System.out.println("не нашли возраст");
-//        }
-//    }
 }
