@@ -4,7 +4,7 @@ import java.util.List;
 
 public class PersonDeserializer {
     private boolean adult;
-    private String[] also_known_as;
+    private List<String> also_known_as;
     private String biography;
     private String birthday;
     private String deathday;
@@ -28,11 +28,11 @@ public class PersonDeserializer {
         this.adult = adult;
     }
 
-    public String[] getAlso_known_as() {
+    public List<String> getAlso_known_as() {
         return also_known_as;
     }
 
-    public void setAlso_known_as(String[] also_known_as) {
+    public void setAlso_known_as(List<String> also_known_as) {
         this.also_known_as = also_known_as;
     }
 

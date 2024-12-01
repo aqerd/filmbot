@@ -1,8 +1,10 @@
 package oop.project.validators;
 
+import java.time.Year;
+
 public class YearValidator implements Validator<String> {
     private final int minYear = 1895;
-    private final int maxYear = java.time.Year.now().getValue();
+    private final int maxYear = Year.now().getValue() + 5;
 
     @Override
     public boolean isValid(String input) {
@@ -19,4 +21,3 @@ public class YearValidator implements Validator<String> {
         return "Пожалуйста, введите год в диапазоне от " + minYear + " до " + maxYear;
     }
 }
-

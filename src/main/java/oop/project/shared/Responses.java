@@ -4,6 +4,7 @@ import oop.project.deserializers.*;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import static oop.project.shared.Config.*;
@@ -66,9 +67,9 @@ public class Responses {
             filmBuilder.append(" / ").append(film.getOriginal_title());
         }
         filmBuilder.append(" (").append(film.getRelease_date(), 0, 4).append(", ")
-                .append(film.getOrigin_country()[0]).append(")").append("\n\n")
+                .append(film.getOrigin_country().get(0)).append(")").append("\n\n")
                 .append(film.getOverview().replace("\n", " ")).append("\n\n")
-                .append("Vote average: ").append(film.getVote_average()).append("/10\n")
+                .append("Vote average: ").append(String.format(Locale.US, "%.1f", film.getVote_average())).append(" / 10\n")
                 .append("Runtime: ").append(film.getRuntime()).append(" min \n");
         if (film.getHomepage() != null && !film.getHomepage().isEmpty()) {
             filmBuilder.append("[Homepage](").append(film.getHomepage()).append(") ");

@@ -1,6 +1,7 @@
 package oop.project;
 
 import oop.project.deserializers.*;
+import oop.project.shared.MovieParameters;
 import org.junit.jupiter.api.Test;
 import static oop.project.shared.Config.tmdbService;
 import static oop.project.shared.Config.apiToken;

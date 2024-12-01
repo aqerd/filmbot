@@ -3,6 +3,7 @@ package oop.project;
 import feign.Param;
 import feign.RequestLine;
 import oop.project.deserializers.*;
+import oop.project.shared.MovieParameters;
 
 public interface SiteRequests {
     @RequestLine("GET /authentication?api_key={api_key}")

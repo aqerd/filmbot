@@ -1,4 +1,4 @@
-package oop.project;
+package oop.project.shared;
 
 import static oop.project.shared.Config.apiToken;
 
@@ -40,7 +40,7 @@ public record MovieParameters(
         private float withRuntimeGte = 0;
         private int year;
 
-        public Builder withToken(String token) {
+        private Builder withToken(String token) {
             this.token = token;
             return this;
         }
