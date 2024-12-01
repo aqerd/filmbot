@@ -199,11 +199,11 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
         try {
             String genreId = Genres.valueOf(messageText.toUpperCase()).genreId;
+            String userRating = getRatingForAge(getUserAge(chatId));
 
             MovieParameters params = new ParametersBuilder()
                     .withGenres(genreId)
-                    .withCertificationLte("PG-13")
-                    .withCertificationCountry("US")
+                    .withCertificationLte(userRating)
                     .build();
             ListDeserializer moviesByGenre = tmdbService.findMovie(params);
 
@@ -221,7 +221,6 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 genreMovieIndexMap.put(genreId, currentIndex);
 
                 updateGenreIndexInDatabase(chatId);
-
 
                 responseMessage = movieListBuilder.toString();
 
@@ -242,7 +241,6 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     }
 
     protected String handleYear(String messageText, long chatId) {
-
         if (isCommand(messageText)) {
             commandWaiter.put(chatId, NONE);
             return handleCommands(messageText, chatId);
