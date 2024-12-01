@@ -2,13 +2,8 @@ package org.oopproject;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import feign.Feign;
-import feign.Logger;
-import feign.gson.GsonDecoder;
-import feign.gson.GsonEncoder;
 import org.oopproject.deserializers.ListDeserializer;
-import org.oopproject.deserializers.MovieVideosResponse;
-import org.oopproject.deserializers.VideoDeserializer;
+import org.oopproject.services.BroadcastingService;
 import org.oopproject.utils.CommandWaiter;
 import org.oopproject.utils.Genres;
 import org.oopproject.parameters.MovieParameters;
@@ -21,12 +16,8 @@ import static org.oopproject.utils.Config.tmdbService;
 import static org.oopproject.utils.Validators.isCommand;
 import static org.oopproject.utils.Replies.getReply;
 import java.lang.reflect.Type;
-import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.stream.Collectors;
 
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
@@ -51,9 +42,9 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     private final HashMap<String, Integer> genreMovieIndexMap = new HashMap<>();
     private final Map<Long, CommandWaiter> commandWaiter = new ConcurrentHashMap<>();
 
-    public TelegramBot(String botToken) throws SQLException {
+    public TelegramBot(String botToken) {
         telegramClient = new OkHttpTelegramClient(botToken);
-        BroadcastingService broadcastingService = new BroadcastingService();  // Initialize BroadcastingService
+        BroadcastingService broadcastingService = new BroadcastingService(database, telegramClient);
         broadcastingService.startBroadcasting();    }
 
     @Override
@@ -328,117 +319,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         return database.getUserAge(chatId);
     }
 
-    public class MovieService {
 
-        private SiteRequests siteRequests;
-        private int currentPage;
-
-        public MovieService() {
-            siteRequests = Feign.builder()
-                    .encoder(new GsonEncoder())
-                    .decoder(new GsonDecoder())
-                    .logLevel(Logger.Level.FULL)
-                    .target(SiteRequests.class, "https://api.themoviedb.org/3");
-            this.currentPage = 1;
-        }
-
-        private boolean isUpcoming(String releaseDate) {
-            try {
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                Date release = sdf.parse(releaseDate);
-                Date now = new Date();
-                return release.after(now);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            return false;
-        }
-        public List<FilmDeserializer> getUpcomingMovies() {
-            try {
-                ListDeserializer upcomingMovies = siteRequests.findUpcomingMovies(
-                        "240e7fef369901fb314c80d53d1532d1",
-                        "ru",
-                        currentPage
-                );
-
-                if (upcomingMovies != null && upcomingMovies.results != null) {
-                    List<FilmDeserializer> resultList = upcomingMovies.results.stream()
-                            .filter(movie -> isUpcoming(movie.release_date))
-                            .limit(10) // Ограничиваем до 10 фильмов
-                            .collect(Collectors.toList());
-                    for (FilmDeserializer movie : resultList) {
-                        MovieVideosResponse videoResponse = siteRequests.getMovieVideos(
-                                "240e7fef369901fb314c80d53d1532d1",
-                                String.valueOf(movie.id),
-                                "ru"
-                        );
-
-                        if (videoResponse != null && videoResponse.results != null && !videoResponse.results.isEmpty()) {
-                            // Найдем первый трейлер (если он есть)
-                            VideoDeserializer trailer = videoResponse.results.stream()
-                                    .filter(v -> v.site.equals("YouTube"))
-                                    .findFirst()
-                                    .orElse(null);
-
-                            if (trailer != null) {
-                                // Формируем ссылку на трейлер
-                                movie.trailerUrl = "https://www.youtube.com/watch?v=" + trailer.key;
-                            }
-                        }
-                    }
-                    currentPage++;
-                    return resultList;
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return Collections.emptyList();
-        }
-    }
-
-    public class BroadcastingService {
-
-        private MovieService movieService;
-
-        public BroadcastingService() {
-            this.movieService = new MovieService();
-        }
-
-        public void startBroadcasting() {
-            scheduler.scheduleAtFixedRate(() -> {
-                List<Long> subscribedUsers = database.getSubscribedUsers();
-                List<FilmDeserializer> upcomingMovies = movieService.getUpcomingMovies();
-
-                for (Long chatId : subscribedUsers) {
-                    StringBuilder messageText = new StringBuilder("🎬 Фильмы, которые скоро выйдут:\n");
-
-                    if (upcomingMovies.isEmpty()) {
-                        messageText.append("К сожалению, нет новых фильмов на данный момент.");
-                    } else {
-                        for (int i = 0; i < upcomingMovies.size(); i++) {
-                            FilmDeserializer movie = upcomingMovies.get(i);
-                            messageText.append(i + 1)
-                                    .append(". ")
-                                    .append(movie.title)
-                                    .append("\n")
-                                    .append("Дата выхода: ")
-                                    .append(movie.release_date)
-                                    .append("\n")
-                                    .append("Описание: ")
-                                    .append(movie.overview != null && !movie.overview.isEmpty() ? movie.overview : "Нет описания")
-                                    .append("\n");
-                            if (movie.trailerUrl != null) {
-                                messageText.append("Ссылка на трейлер: ").append(movie.trailerUrl).append("\n");
-                            }
-
-                            messageText.append("\n");
-                        }
-                    }
-                    sendMessage(chatId, messageText.toString());
-                }
-            }, 0, 1, TimeUnit.MINUTES);
-        }
-    }
 
     private void sendMessage(long chatId, String text) {
         SendMessage message=SendMessage.builder()
