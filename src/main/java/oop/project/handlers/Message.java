@@ -53,7 +53,7 @@ public class Message {
         String responseMessage;
         CommandWaiter waiter = COMMAND_WAITER.getOrDefault(chatId, NONE);
 
-        LOG.info("ID: {}, Message: {}, Waiter: {}", chatId, messageText, waiter);
+        LOG.info("COMMAND, Message: {}, ID: {}, Waiter: {}", messageText, chatId, waiter);
 
         switch (waiter) {
             case GENRE:

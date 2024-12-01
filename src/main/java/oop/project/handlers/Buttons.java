@@ -1,5 +1,7 @@
 package oop.project.handlers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -10,11 +12,13 @@ import static oop.project.shared.Responses.responseWithMovie;
 import static oop.project.shared.Responses.responseWithPerson;
 
 public class Buttons {
+    private static final Logger LOG = LoggerFactory.getLogger(Buttons.class);
     private static final TelegramClient TG_CLIENT = getTelegramClient();
 
     public static void handleButtons(Update update) {
         String callbackData = update.getCallbackQuery().getData();
         long chatId = update.getCallbackQuery().getMessage().getChatId();
+        LOG.info("BUTTONS, Callback Data: {}, ID: {}", callbackData, chatId);
 
         if (callbackData.startsWith("movie_")) {
             handleMovieButtons(callbackData, chatId);
