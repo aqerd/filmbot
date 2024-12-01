@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 public class Database {
@@ -33,6 +35,32 @@ public class Database {
         } catch (SQLException e) {
             LOG.error("Unexpected SQL error in insertChatId: {}", e.getMessage());
         }
+    }
+
+    public void updateUserAge(long chatId, int userAge) {
+        String updateAgeQuery = "UPDATE users SET userAge = ? WHERE chatId = ?";
+
+        try (PreparedStatement updateStatement = connection.prepareStatement(updateAgeQuery)) {
+            updateStatement.setInt(1, userAge);
+            updateStatement.setLong(2, chatId);
+            updateStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+  
+    public Integer getUserAge(long chatId) {
+        String selectUserAgeQuery = "SELECT userAge FROM users WHERE chatId = ?";
+        try (PreparedStatement selectStatement = connection.prepareStatement(selectUserAgeQuery)) {
+            selectStatement.setLong(1, chatId);
+            ResultSet resultSet = selectStatement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt("userAge");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public void updateGenreIndexesJson(long chatId, String genreIndexesJson) {
@@ -83,5 +111,30 @@ public class Database {
             LOG.error("Unexpected SQL error in getYearIndexesJson {}", e.getMessage());
         }
         return null;
+    }
+
+  public void updateSubscribe(long chatId, boolean subscribed) {
+        String query = "UPDATE users SET subscribed = ? WHERE chatId = ?";
+        try (PreparedStatement updateStatement = connection.prepareStatement(query)) {
+            updateStatement.setBoolean(1, subscribed);
+            updateStatement.setLong(2, chatId);
+            updateStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public List<Long> getSubscribedUsers() {
+        String selectQuery = "SELECT chatId FROM users WHERE subscribed = TRUE";
+        List<Long> users = new ArrayList<>();
+        try (PreparedStatement selectStatement = connection.prepareStatement(selectQuery)) {
+            ResultSet resultSet = selectStatement.executeQuery();
+            while (resultSet.next()) {
+                users.add(resultSet.getLong("chatId"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return users;
     }
 }

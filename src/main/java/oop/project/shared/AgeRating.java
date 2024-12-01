@@ -23,7 +23,7 @@ public enum AgeRating {
                 return rating.rating;
             }
         }
-        return "Unknown";
+        return null;
     }
 
     public String getRating() {
