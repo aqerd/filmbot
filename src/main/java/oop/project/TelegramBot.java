@@ -6,6 +6,7 @@ import static oop.project.handlers.Buttons.handleButtons;
 import java.sql.SQLException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
+import oop.project.services.BroadcastingService;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
@@ -14,9 +15,12 @@ import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateC
 public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     private final ExecutorService EXECUTOR = Executors.newFixedThreadPool(10);
     private static TelegramClient telegramClient = null;
+    private final Database database = new Database();
 
     public TelegramBot(String botToken) throws SQLException {
         telegramClient = new OkHttpTelegramClient(botToken);
+        BroadcastingService broadcastingService = new BroadcastingService(database, telegramClient);
+        BroadcastingService.startBroadcasting();
     }
 
     public static TelegramClient getTelegramClient() {

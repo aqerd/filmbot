@@ -22,7 +22,7 @@ public class BroadcastingService {
         this.movieService = new MovieService();
     }
 
-    public void startBroadcasting() {
+    public static void startBroadcasting() {
         scheduler.scheduleAtFixedRate(() -> {
             List<Long> subscribedUsers = database.getSubscribedUsers();
             List<FilmDeserializer> upcomingMovies = movieService.getUpcomingMovies();
