@@ -9,5 +9,6 @@ public enum CommandWaiter {
     SIMILAR,
     RECOMMENDED,
     FINDBYID,
+    SUBSCRIBE,
     SETAGE;
 }

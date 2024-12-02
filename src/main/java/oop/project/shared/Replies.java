@@ -39,6 +39,7 @@ public class Replies {
         REPLIES.put("similar", "Введите ID фильма к которому вы хотите найти похожие фильмы");
         REPLIES.put("recommended", "Введите ID фильма к которому вы хотите найти рекомендации");
         REPLIES.put("find by id", "Введите ID фильма из сервиса TMDB");
+        REPLIES.put("subscribe", "Введите 1, чтобы подписаться на рассылку, или 0, чтобы отписаться");
         REPLIES.put("set age", "Введите ваш полный возраст");
         REPLIES.put("genre", "Введите жанр, и я найду фильмы по нему");
         REPLIES.put("invalid", "Введите правильные данные!");

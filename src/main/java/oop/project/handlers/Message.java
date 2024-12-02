@@ -88,6 +88,10 @@ public class Message {
                 responseMessage = handleFindById(messageText, chatId);
                 COMMAND_WAITER.put(chatId, NONE);
                 break;
+            case SUBSCRIBE:
+                responseMessage = handleSubscription(messageText, chatId);
+                COMMAND_WAITER.put(chatId, NONE);
+                break;
             case SETAGE:
                 responseMessage = handleSetAge(messageText, chatId);
                 COMMAND_WAITER.put(chatId, NONE);
@@ -168,6 +172,10 @@ public class Message {
             case "/findbyid": case "find by id":
                 responseMessage = reply("find by id");
                 COMMAND_WAITER.put(chatId, FINDBYID);
+                break;
+            case "/subscribe": case "Subscribe":
+                responseMessage = reply("subscribe");
+                COMMAND_WAITER.put(chatId, SUBSCRIBE);
                 break;
             case "/setage": case "set age":
                 responseMessage = reply("set age");
@@ -483,6 +491,41 @@ public class Message {
         }
 
         return responseMessage;
+    }
+
+    public static String handleSubscription(String messageText, long chatId) {
+        Validator<String> validCommand = new CommandValidator();
+        if (validCommand.isValid(messageText)) {
+            COMMAND_WAITER.put(chatId, NONE);
+            return handleCommands(messageText, chatId);
+        }
+
+        String responseMessage;
+
+        try {
+            int userInput = Integer.parseInt(messageText);
+
+            if (userInput == 1) {
+                handleSubscribe(chatId);
+                responseMessage = "Вы успешно подписались на рассылку!";
+            } else if (userInput == 0) {
+                handleUnsubscribe(chatId);
+                responseMessage = "Вы успешно отписались от рассылки.";
+            } else {
+                responseMessage = "Пожалуйста, введите 1 для подписки или 0 для отписки.";
+            }
+        } catch (NumberFormatException e) {
+            responseMessage = "Пожалуйста, введите число (1 для подписки, 0 для отписки).";
+        }
+        return responseMessage;
+    }
+
+    protected static void handleSubscribe(long chatId) {
+        database.updateSubscribe(chatId, true);
+    }
+
+    protected static void handleUnsubscribe(long chatId) {
+        database.updateSubscribe(chatId, false);
     }
 
     public static String handleSetAge(String messageText, long chatId) {
