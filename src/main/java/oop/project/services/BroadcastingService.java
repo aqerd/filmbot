@@ -11,10 +11,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class BroadcastingService {
-    private final Database database;
-    private final MovieService movieService;
-    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-    private final TelegramClient telegramClient;
+    private static Database database = null;
+    private static MovieService movieService = null;
+    private static final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    private static TelegramClient telegramClient = null;
 
     public BroadcastingService(Database database, TelegramClient telegramClient) {
         this.database = database;
@@ -54,10 +54,10 @@ public class BroadcastingService {
                 }
                 sendMessage(chatId, messageText.toString());
             }
-        }, 0, 3, TimeUnit.DAYS);
+        }, 0, 1, TimeUnit.MINUTES);
     }
 
-    private void sendMessage(long chatId, String text) {
+    private static void sendMessage(long chatId, String text) {
         SendMessage message = SendMessage.builder()
                 .chatId(chatId)
                 .text(text)
